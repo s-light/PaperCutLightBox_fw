@@ -23,7 +23,7 @@
 /******************************************************************************
 The MIT License (MIT)
 
-Copyright (c) 2019 Stefan Krüger
+Copyright (c) 2021 Stefan Krüger
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -59,6 +59,7 @@ SOFTWARE.
 #include <Tlc59711.h>
 
 #include "./color.h"
+#include "./matrix.h"
 
 
 class MyAnimation {
@@ -80,34 +81,6 @@ public:
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // attributes
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // pixel map
-    // LEDBoard_4x4_16bit mapping
-
-    static const uint16_t LEDBOARD_COL_COUNT = 4;
-    static const uint16_t LEDBOARD_ROW_COUNT = 4;
-    static const uint16_t LEDBOARD_PIXEL_COUNT = (
-        LEDBOARD_ROW_COUNT * LEDBOARD_COL_COUNT);
-
-    // Layouts for LEDBoard_4x4_HD
-    // https://github.com/s-light/LEDBoard_4x4_HD
-
-    static const uint8_t LEDBOARD_SINGLE
-        [LEDBOARD_ROW_COUNT][LEDBOARD_COL_COUNT];
-
-
-    static const uint8_t BOARDS_COL_COUNT = 2;
-    static const uint8_t BOARDS_ROW_COUNT = 2;
-    static const uint8_t BOARDS_COUNT = BOARDS_COL_COUNT * BOARDS_ROW_COUNT;
-    static const uint8_t BOARDS_POSITIONS
-        [BOARDS_ROW_COUNT][BOARDS_COL_COUNT];
-
-    static const uint8_t MATRIX_COL_COUNT = LEDBOARD_COL_COUNT * BOARDS_COL_COUNT;
-    static const uint8_t MATRIX_ROW_COUNT = LEDBOARD_ROW_COUNT * BOARDS_ROW_COUNT;
-    static const uint8_t MATRIX_PIXEL_COUNT = MATRIX_COL_COUNT * MATRIX_ROW_COUNT;
-
-    static const uint8_t LEDBOARDS_ROTATED
-        [MATRIX_ROW_COUNT][MATRIX_COL_COUNT];
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TLC5957
@@ -122,7 +95,8 @@ public:
     //     uint8_t sin_pin = MISO
     // );
     // use default pins
-    slight_TLC5957 tlc = slight_TLC5957(MATRIX_PIXEL_COUNT, 7);
+    // slight_TLC5957 tlc = slight_TLC5957(MATRIX_PIXEL_COUNT, 7);
+    Tlc59711 tlc(CHIPS_COUNT);
 
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -149,16 +123,11 @@ public:
     void menu__set_contrast(Print &out, char *command);
     void menu__set_brightness(Print &out, char *command);
 
-    float gsclock_set_frequency_MHz(float frequency_MHz);
-    float gsclock_get_frequency_MHz();
-
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // helper
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // configurations
-
-    uint8_t pmap[MATRIX_ROW_COUNT][MATRIX_COL_COUNT];
 
     bool animation_run = true;
 
@@ -197,25 +166,7 @@ private:
     CHSV effect__sparkle(float col, float row, float offset);
 
     // others
-    void pmap_init();
-
-    uint8_t mymap_LEDBoard_4x4_HD(uint8_t col, uint8_t row);
-    uint8_t mymap_LEDBoard_4x4_HD_CrystalLightGuide(uint8_t col, uint8_t row);
-
     void tlc_init(Stream &out);
-
-    // grayscale clock things
-    void gsclock_init(Print &out);
-
-    void setup_GenericClock7();
-
-    void setup_D9_10MHz();
-    void set_D9_period_reg(uint8_t period_reg);
-    uint8_t get_D9_period_reg();
-
-    void setup_D2_10MHz();
-    void set_D2_period_reg(uint8_t period_reg);
-    uint8_t get_D2_period_reg();
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // attributes
