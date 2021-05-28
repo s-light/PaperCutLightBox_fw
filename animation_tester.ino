@@ -1,7 +1,7 @@
 /******************************************************************************
 
     animation_tester.ino
-        big 20x28Pixel LED-Matrix for nice animations
+        develop nice animations for big LED-Matrix things
         debugout on usbserial interface: 115200baud
 
     hardware:
@@ -45,7 +45,7 @@
 /******************************************************************************
     The MIT License (MIT)
 
-    Copyright (c) 2018 Stefan Krüger
+    Copyright (c) 2021 Stefan Krüger
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -74,10 +74,14 @@
 // use <file.h> for files in library directory
 // #include <file.h>
 
-#include <slight_DebugMenu.h>
+#include <slight_ButtonInput_CallbackHelper.h>
 
-#include <Tlc59711.h>
+// #include <slight_DebugMenu.h>
+// #include <slight_ButtonInput.h>
 
+#include "./animation.h"
+#include "./myinput.h"
+#include "./mymenu.h"
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Info
@@ -91,8 +95,8 @@ void sketchinfo_print(Print &out) {
     out.println(F("|                      ( _ )                     |"));
     out.println(F("|                       \" \"                      |"));
     out.println(F("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"));
-    out.println(F("| LEDBoard_4x4_16bit_HWTest.ino"));
-    out.println(F("|   Test LEDBoard_4x4_16bit HW minimal"));
+    out.println(F("| animation_tester.ino"));
+    out.println(F("|   develop nice animations for big LED-Matrix things"));
     out.println(F("|"));
     out.println(F("| This Sketch has a debug-menu:"));
     out.println(F("| send '?'+Return for help"));
@@ -107,299 +111,40 @@ void sketchinfo_print(Print &out) {
     out.print(F("  "));
     out.print(F(__TIME__));
     out.println();
+    out.print(F("| last changed: "));
+    out.print(F(__TIMESTAMP__));
+    out.println();
+    //
+    // out.println(F("|"));
+    // out.print(F("| __FILE__: "));
+    // out.print(F(__FILE__));
+    // out.println();
+    // out.print(F("| __BASE_FILE__"));
+    // out.print(F(__BASE_FILE__));
+    // out.println();
+    // out.println(F("|"));
+    //
     out.println(F("|"));
     out.println(F("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"));
     out.println();
 
     //out.println(__DATE__); Nov 11 2013
     //out.println(__TIME__); 20:35:04
+    // __TIMESTAMP__ Tue Dec 27 14:14:04 2016
+    // __FILE__  /home/stefan/mydata/arduino_sketchbook/libraries/slight_TLC5957/examples/src_arduino/src_arduino.ino
+    // __BASE_FILE__ /tmp/arduino_build_330237/sketch/src_arduino.ino.cpp
 }
 
+
+}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // definitions (global)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Debug Output
-
-boolean infoled_state = 0;
-const byte infoled_pin = 13;
-
-unsigned long debugOut_LiveSign_TimeStamp_LastAction = 0;
-const uint16_t debugOut_LiveSign_UpdateInterval = 1000; //ms
-
-boolean debugOut_LiveSign_Serial_Enabled = 0;
-boolean debugOut_LiveSign_LED_Enabled = 1;
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Menu
-
-// slight_DebugMenu(Stream &in_ref, Print &out_ref, uint8_t input_length_new);
-slight_DebugMenu myDebugMenu(Serial, Serial, 15);
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// LEDBoard
-
-const uint8_t boards_count = 5*7;
-
-const uint8_t chips_per_board = 4;
-
-const uint8_t colors_per_led = 3;
-const uint8_t leds_per_chip = 4;
-
-const uint8_t colorchannels_per_board = (
-    colors_per_led * leds_per_chip * chips_per_board
-);
-const uint16_t colorchannels_total = colorchannels_per_board * boards_count;
-
-const uint8_t leds_per_row = 4;
-const uint8_t leds_per_column = 4;
-const uint8_t leds_per_board = leds_per_row * leds_per_column;
-const uint16_t leds_total = leds_per_board * boards_count;
-
-const uint8_t channel_position_map[leds_per_column][leds_per_row] = {
-    { 0,  1,  4,  5},
-    { 2,  3,  6,  7},
-    { 8,  9, 12, 13},
-    {10, 11, 14, 15},
-};
-
-// tlc info
-const uint8_t tlc_channels = colors_per_led * leds_per_chip;
-const uint8_t tlc_channels_per_board = tlc_channels * chips_per_board;
-const uint8_t tlc_chips = boards_count * chips_per_board;
-const uint16_t tlc_channels_total = (uint16_t)(tlc_chips * tlc_channels);
-
-Tlc59711 tlc(tlc_chips);
-
-bool output_enabled = true;
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// sequencer
-
-uint32_t sequencer_timestamp_last = millis();
-uint16_t sequencer_interval = 50; // ms
-int16_t sequencer_current_step = 0;
-
-uint16_t value_low = 1;
-uint16_t value_high = 50;
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// functions
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Menu System
-
-// Main Menu
-void handleMenu_Main(slight_DebugMenu *pInstance) {
-    Print &out = pInstance->get_stream_out_ref();
-    char *command = pInstance->get_command_current_pointer();
-    // out.print("command: '");
-    // out.print(command);
-    // out.println("'");
-    switch (command[0]) {
-        case 'h':
-        case 'H':
-        case '?': {
-            // help
-            out.println(F("____________________________________________________________"));
-            out.println();
-            out.println(F("Help for Commands:"));
-            out.println();
-            out.println(F("\t '?': this help"));
-            out.println(F("\t 'i': sketch info"));
-            out.println(F("\t 'y': toggle DebugOut livesign print"));
-            out.println(F("\t 'Y': toggle DebugOut livesign LED"));
-            out.println(F("\t 'x': tests"));
-            out.println();
-            // out.println(F("\t 'A': Show 'HelloWorld' "));
-            out.println(F("\t 'I': set sequencer interval 'i65535'"));
-            out.println(F("\t 'v': set effect value_low 'v65535'"));
-            out.println(F("\t 'V': set effect value_high 'V65535'"));
-            out.println();
-            out.println(F("\t 's': set channel 's1:65535'"));
-            // out.println(F("\t 'f': DemoFadeTo(ID, value) 'f1:65535'"));
-            out.println();
-            out.println(F("____________________________________________________________"));
-        } break;
-        case 'i': {
-            sketchinfo_print(out);
-        } break;
-        case 'y': {
-            out.println(F("\t toggle DebugOut livesign Serial:"));
-            debugOut_LiveSign_Serial_Enabled = !debugOut_LiveSign_Serial_Enabled;
-            out.print(F("\t debugOut_LiveSign_Serial_Enabled:"));
-            out.println(debugOut_LiveSign_Serial_Enabled);
-        } break;
-        case 'Y': {
-            out.println(F("\t toggle DebugOut livesign LED:"));
-            debugOut_LiveSign_LED_Enabled = !debugOut_LiveSign_LED_Enabled;
-            out.print(F("\t debugOut_LiveSign_LED_Enabled:"));
-            out.println(debugOut_LiveSign_LED_Enabled);
-        } break;
-        case 'x': {
-            // get state
-            out.println(F("__________"));
-            out.println(F("Tests:"));
-
-            out.println(F("nothing to do."));
-
-            // uint16_t wTest = 65535;
-            uint16_t wTest = atoi(&command[1]);
-            out.print(F("wTest: "));
-            out.print(wTest);
-            out.println();
-
-            out.print(F("1: "));
-            out.print((byte)wTest);
-            out.println();
-
-            out.print(F("2: "));
-            out.print((byte)(wTest>>8));
-            out.println();
-
-            out.println();
-
-            out.println(F("__________"));
-        } break;
-        //---------------------------------------------------------------------
-        // case 'A': {
-        //     out.println(F("\t Hello World! :-)"));
-        // } break;
-        case 'I': {
-            out.print(F("\t set sequencer interval "));
-            // convert part of string to int
-            // (up to first char that is not a number)
-            uint8_t command_offset = 1;
-            uint16_t value = atoi(&command[command_offset]);
-            out.print(value);
-            out.println();
-            sequencer_interval = value;
-        } break;
-        case 'v': {
-            out.print(F("\t set effect value_low"));
-            // convert part of string to int
-            // (up to first char that is not a number)
-            uint8_t command_offset = 1;
-            uint16_t value = atoi(&command[command_offset]);
-            out.print(value);
-            out.println();
-            value_low = value;
-        } break;
-        case 'V': {
-            out.print(F("\t set effect value_high"));
-            // convert part of string to int
-            // (up to first char that is not a number)
-            uint8_t command_offset = 1;
-            uint16_t value = atoi(&command[command_offset]);
-            out.print(value);
-            out.println();
-            value_high = value;
-        } break;
-        // ------------------------------------------
-        case 's': {
-            out.print(F("\t set channel "));
-            // convert part of string to int
-            // (up to first char that is not a number)
-            uint8_t command_offset = 1;
-            uint8_t ch = atoi(&command[command_offset]);
-            // convert single character to int representation
-            // uint8_t id = &command[1] - '0';
-            command_offset = 3;
-            if (ch > 9) {
-                command_offset = command_offset +1;
-            }
-            out.print(ch);
-            out.print(F(" : "));
-            uint16_t value = atoi(&command[command_offset]);
-            out.print(value);
-            out.println();
-
-            if (output_enabled) {
-                tlc.setChannel(ch, value);
-                tlc.write();
-            }
-        } break;
-        //---------------------------------------------------------------------
-        default: {
-            if(strlen(command) > 0) {
-                out.print(F("command '"));
-                out.print(command);
-                out.println(F("' not recognized. try again."));
-            }
-            pInstance->get_command_input_pointer()[0] = '?';
-            pInstance->set_flag_EOC(true);
-        }
-    } // end switch
-
-    // end Command Parser
-}
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// LEDBoard
-
-
-void setup_Boards(Print &out) {
-    out.println(F("setup LEDBoards:"));
-
-    out.println(F("\t init tlc lib"));
-    tlc.beginFast();
-    out.println(F("\t start with leds off"));
-    tlc.setRGB();
-    tlc.write();
-    out.println(F("\t set leds to 0, 0, 1"));
-    tlc.setRGB(0, 0, 1);
-    tlc.write();
-
-    out.println(F("\t finished."));
-}
-
-CHSV effect__plasma(
-    float col, float row, float offset
-) {
-    // calculate plasma
-    // mostly inspired by
-    // https://www.bidouille.org/prog/plasma
-    // moving rings
-    float cx = col + 0.5 * sin(offset / 5);
-    float cy = row + 0.5 * cos(offset / 3);
-    // double xy_value = sin(
-    float xy_value = sin(
-        sqrt(100 * (cx*cx + cy*cy) + 1)
-        + offset);
-    // mapping
-    float pixel_hue = map_range(
-        xy_value,
-        -1.0, 1.0,
-        // self._hue_min, self._hue_max
-        // 0.0, 0.08
-        hue - 0.05, hue + 0.2);
-    float pixel_saturation = map_range(
-        xy_value,
-        -1.0, 1.0,
-        1.0, 1.0);
-    float pixel_value = map_range(
-        xy_value,
-        1.0, -1.0,
-        // self._contrast_min, self._contrast_max
-        // -0.005, 1.0
-        1.0 - contrast, 1.0);
-    // map to color
-    CHSV pixel_hsv = CHSV(pixel_hue, pixel_saturation, pixel_value);
-    return pixel_hsv;
-}
-
-void calculate_step() {
-
-
-    tlc.write();
-}
-
+MyAnimation animation = MyAnimation();
+MyInput myinput = MyInput(animation);
+MyMenu mymenu = MyMenu(animation, myinput, sketchinfo_print);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // setup
@@ -407,104 +152,55 @@ void calculate_step() {
 void setup() {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // initialise PINs
-
-        //LiveSign
-        pinMode(infoled_pin, OUTPUT);
-        digitalWrite(infoled_pin, HIGH);
-
-        // as of arduino 1.0.1 you can use INPUT_PULLUP
+    // pinMode(infoled_pin, OUTPUT);
+    // digitalWrite(infoled_pin, HIGH);
+    // as of arduino 1.0.1 you can use INPUT_PULLUP
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // initialise serial
+    // wait for arduino IDE to release all serial ports after upload.
+    delay(1000);
+    // initialise serial
+    Serial.begin(115200);
 
-        // for ATmega32U4 devices:
-        #if defined (__AVR_ATmega32U4__)
-            // wait for arduino IDE to release all serial ports after upload.
-            // delay(2000);
-        #endif
+    // Wait for Serial Connection to be Opend from Host or
+    // timeout after 6second
+    uint32_t timeStamp_Start = millis();
+    while( (! Serial) && ( (millis() - timeStamp_Start) < 3000 ) ) {
+        // nothing to do
+        delay(1);
+    }
 
-        Serial.begin(115200);
-
-        // for ATmega32U4 devices:
-        #if defined (__AVR_ATmega32U4__)
-            // Wait for Serial Connection to be Opend from Host or
-            // timeout after 6second
-            uint32_t timeStamp_Start = millis();
-            while( (! Serial) && ( (millis() - timeStamp_Start) < 1000 ) ) {
-                // nothing to do
-            }
-        #endif
-
-        Print &out = Serial;
-        out.println();
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // print welcome
-
-        sketchinfo_print(out);
+    Serial.println();
+    Serial.println();
+    Serial.println();
+    Serial.println();
+    Serial.println();
+    sketchinfo_print(Serial);
+    Serial.println();
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // setup LEDBoard
-
-        setup_Boards(out);
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // show serial commands
-
-        // myDebugMenu.set_user_EOC_char(';');
-        myDebugMenu.set_callback(handleMenu_Main);
-        myDebugMenu.begin();
+    // setup sub-Parts
+    animation.begin(Serial);
+    myinput.begin(Serial);
+    mymenu.begin(Serial);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // go
+    Serial.println(F("wait 0.1s."));
+    delay(100);
+    Serial.println(F("Loop:"));
 
-        out.println(F("Loop:"));
-
-} /** setup **/
+}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // main loop
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void loop() {
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // menu input
-        myDebugMenu.update();
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // timed things
-        if(
-            (millis() - sequencer_timestamp_last) > sequencer_interval
-        ) {
-            sequencer_timestamp_last =  millis();
-            calculate_step();
-        }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // debug output
-        if (
-            (millis() - debugOut_LiveSign_TimeStamp_LastAction) >
-            debugOut_LiveSign_UpdateInterval
-        ) {
-            debugOut_LiveSign_TimeStamp_LastAction = millis();
-
-            if ( debugOut_LiveSign_Serial_Enabled ) {
-                Serial.print(millis());
-                Serial.print(F("ms;"));
-                Serial.println();
-            }
-
-            if ( debugOut_LiveSign_LED_Enabled ) {
-                infoled_state = ! infoled_state;
-                if (infoled_state) {
-                    //set LED to HIGH
-                    digitalWrite(infoled_pin, HIGH);
-                } else {
-                    //set LED to LOW
-                    digitalWrite(infoled_pin, LOW);
-                }
-            }
-        }
-} /** loop **/
+    animation.update();
+    myinput.update();
+    mymenu.update();
+}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // THE END
