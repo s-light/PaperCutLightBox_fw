@@ -164,6 +164,46 @@ void MyInput::menu__set_yyy(Print &out, char *command) {
 }
 
 
+void MyInput::menu__set_test_token(Print &out, char *command) {
+    out.println(F("Set yyy "));
+    out.println(F("TODO"));
+
+    // char * pCh;
+    // pCh = strtok_r(&caCommand[1], " :");
+    // byte bIndex = (byte)atoi(pCh);
+    // pCh = strtok_r(NULL, " :");
+    // byte bPSC = (byte)atoi(pCh);
+    // pCh = strtok_r(NULL, " :");
+    // byte bPWM = (byte)atoi(pCh);
+    //
+    // out.print(F("\t bIndex: "));
+    // out.println(bIndex);
+    // out.print(F("\t bPSC: "));
+    // out.println(bPSC);
+    // out.print(F("\t bPWM: "));
+    // out.println(bPWM);
+
+
+
+    out.print(F("Set yyy "));
+    uint8_t command_offset = 1;
+    uint8_t index = atoi(&command[command_offset]);
+    // a better way than this would be to search for the ':'
+    // i have used this a long time ago for MAC address format parsing
+    // was something with 'tokenize' or similar..
+    command_offset = 3;
+    if (index > 9) {
+        command_offset = command_offset +1;
+    }
+    out.print(index);
+    out.print(F(" to "));
+    uint16_t value = atoi(&command[command_offset]);
+    out.print(value);
+    // tlc.set_pixel_16bit_value(index, value, value, value);
+    out.println();
+}
+
+
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // ambientlight sensor

@@ -1,3 +1,4 @@
+// NOLINT(legal/copyright)
 /******************************************************************************
 
     minimal float version of FastLED / FancyLED pixel types and HSV2RGB

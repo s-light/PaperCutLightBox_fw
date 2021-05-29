@@ -59,7 +59,8 @@ SOFTWARE.
 #include <Tlc59711.h>
 
 #include "./color.h"
-#include "./matrix.h"
+// #include "./matrix.h"
+static const uint16_t CHIPS_COUNT__XX = 20*28*4;
 
 
 class MyAnimation {
@@ -97,7 +98,8 @@ public:
     // use default pins
     // slight_TLC5957 tlc = slight_TLC5957(MATRIX_PIXEL_COUNT, 7);
     // Tlc59711 tlc(CHIPS_COUNT);
-    Tlc59711 tlc = Tlc59711(CHIPS_COUNT);
+    // Tlc59711 tlc = Tlc59711(CHIPS_COUNT);
+    Tlc59711 tlc = Tlc59711(CHIPS_COUNT__XX);
 
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -115,6 +117,7 @@ public:
     void end();
 
     // menu & helper
+    void menu__set_pixel_index(Print &out, char *command);
     void menu__set_pixel(Print &out, char *command);
     void menu__test_buffer(Print &out);
     void menu__time_meassurements(Print &out);
@@ -165,6 +168,7 @@ private:
     CHSV effect_Matrix2D_get_pixel(float col, float row, float offset);
     CHSV effect__plasma(float col, float row, float offset);
     CHSV effect__sparkle(float col, float row, float offset);
+    CHSV effect__mapping_checker(float col, float row, float offset);
 
     // others
     void tlc_init(Stream &out);

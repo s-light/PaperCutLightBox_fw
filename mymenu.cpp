@@ -360,10 +360,11 @@ void MyMenu::menu__print_help(Print &out) {
     // out.println(F("MHz)"));
     out.println(F("\t 't': set buffer to test values 't'"));
     out.println(F("\t 'T': time_meassurements 'T'"));
-    out.println(F("\t 'p': set pixel 'p0:65535'"));
-    out.println(F("\t 'P': set all pixel 'P65535'"));
+    out.println(F("\t 'p': set pixel 'pX,Y:65535'"));
+    out.println(F("\t 'P': set pixel 'p0:65535'"));
     out.println(F("\t 'z': set all pixel to black 'b'"));
-    out.println(F("\t 'Z': set all pixel to 21845 'z'"));
+    out.println(F("\t 'Z': set all pixel 'Z65535'"));
+    // out.println(F("\t 'Z': set all pixel to 21845 'z'"));
     // out.println(F("\t 'B': print Buffer 'B'"));
     // out.println(F("\t 'F': print buffer_fc 'F'"));
     out.println();
@@ -475,11 +476,7 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
             animation.menu__set_pixel(out, command);
         } break;
         case 'P': {
-            out.print(F("Set all pixel to "));
-            uint16_t value = atoi(&command[1]);
-            animation.tlc.setRGB(value, value, value);
-            out.print(value);
-            out.println();
+            animation.menu__set_pixel(out, command);
         } break;
         case 'z': {
             out.println(F("Set all Pixel to black."));
@@ -487,10 +484,17 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
             out.println();
         } break;
         case 'Z': {
-            out.println(F("Set all Pixel to 21845."));
-            animation.tlc.setRGB(21845, 21845, 21845);
+            out.print(F("Set all pixel to "));
+            uint16_t value = atoi(&command[1]);
+            animation.tlc.setRGB(value, value, value);
+            out.print(value);
             out.println();
         } break;
+        // case 'Z': {
+        //     out.println(F("Set all Pixel to 21845."));
+        //     animation.tlc.setRGB(21845, 21845, 21845);
+        //     out.println();
+        // } break;
         // case 'B': {
         //     out.println(F("Print Buffer:"));
         //     animation.print_tlc_buffer(out);

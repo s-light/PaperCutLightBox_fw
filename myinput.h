@@ -60,7 +60,7 @@ SOFTWARE.
 // #include <slight_TSL2591AutoSensitivity.h>
 
 #include "./animation.h"
-#include "./mapping.h"
+// #include "./mapping.h"
 
 
 class MyInput {
@@ -124,6 +124,7 @@ class MyInput {
     // menu & helper
     void menu__test_xxx(Print &out);
     void menu__set_yyy(Print &out, char *command);
+    void menu__set_test_token(Print &out, char *command);
 
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
