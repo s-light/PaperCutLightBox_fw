@@ -96,7 +96,8 @@ public:
     // );
     // use default pins
     // slight_TLC5957 tlc = slight_TLC5957(MATRIX_PIXEL_COUNT, 7);
-    Tlc59711 tlc(CHIPS_COUNT);
+    // Tlc59711 tlc(CHIPS_COUNT);
+    Tlc59711 tlc = Tlc59711(CHIPS_COUNT);
 
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

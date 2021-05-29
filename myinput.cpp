@@ -103,7 +103,7 @@ void MyInput::begin(Stream &out) {
         board_dotstar.begin();
         board_dotstar.setPixelColor(0, board_dotstar_active_color);
         board_dotstar.show();
-        als.begin(out);
+        // als.begin(out);
         button_init(out);
         // out.println("  myencoder.begin");
         // myencoder.begin(funcISR);
@@ -122,7 +122,7 @@ void MyInput::end() {
 void MyInput::update() {
     if (ready) {
         // do it :-)
-        als_update(Serial);
+        // als_update(Serial);
         // Serial.println("button.");
         mybutton.update();
         // Serial.println("update.");
@@ -168,119 +168,119 @@ void MyInput::menu__set_yyy(Print &out, char *command) {
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // ambientlight sensor
 
-void MyInput::als_setup(Print &out) {
-    out.println("Ambient Light Sensor:");
-    if (als.begin(out)) {
-        out.println(F("found TSL2591 sensor"));
-        out.println(F("------------------------------------------"));
-        als.tsl.setConfig(&als.sens_conf[0]);
-        out.println(F("------------------------------------------"));
-        als.sensor_print_details(out);
-        out.println(F("------------------------------------------"));
-        als.tsl.printConfig(out);
-        out.println(F("------------------------------------------"));
-        for (size_t i = 0; i < 10; i++) {
-            als.update();
-            // delay(110);
-        }
-    } else {
-        out.println("No sensor found. → please check your wiring..");
-    }
-    out.println();
-}
-
-void MyInput::als_update(Print &out) {
-    als.update();
-    als_handle_sens_conf_change(out);
-    if (als_debugout_enabled) {
-        if ((millis() - als_debugout_timeStamp) > 1000) {
-            als_debugout(out);
-            als_debugout_timeStamp = millis();
-        }
-    }
-    als_handle_lux_change(out);
-}
-
-void MyInput::als_handle_sens_conf_change(Print &out) {
-    if (als.sensitivity_config_changed()) {
-        als_debugout_sens_conf_change(out);
-        als.sensitivity_config_changed_clear();
-    }
-}
-
-void MyInput::als_handle_lux_change(Print &out) {
-    if (als.lux_filtered_changed()) {
-        out.print("update: ");
-        out.print(als.get_lux_filtered(), 4);
-        out.print("LUX");
-        // out.println();
-
-        // als_brightness_automatic = map_range_clamped__double(
-        //     als.get_lux_filtered(),
-        //     // 0.0, 88000.0,
-        //     0.0001, 2000.0,
-        //     0.0005, 1.0);
-        //     // 0.00002, 1.0);
-
-        als_brightness_automatic = light_map.mapit(als.get_lux_filtered());
-        out.print(" -> ");
-        out.print(als_brightness_automatic, 5);
-        out.println();
-        if (als_sets_brightness) {
-            animation.brightness = als_brightness_automatic;
-            // TODO(s-light): implement fading
-        }
-        als.lux_filtered_changed_clear();
-    }
-}
-
-void MyInput::als_debugout(Print &out) {
-    print_runtime(out);
-
-    out.print("  ");
-    out.print(als.get_lux_filtered(), 4);
-    out.print(" lux");
-
-    out.print("    id:");
-    out.print(als.get_sensitivity_config_id());
-    out.print("    full:");
-    out.print(als.get_full_raw());
-    out.print("    lux_raw:");
-    out.print(als.get_lux_raw(), 4);
-
-    // als.print_status(out);
-    out.println();
-}
-
-void MyInput::als_debugout_sens_conf_change(Print &out) {
-    out.println("******************************************");
-    print_runtime(out);
-    out.println();
-
-    out.print("");
-    out.print("sens_conf_current_id:");
-    out.print(als.get_sensitivity_config_id());
-    out.println();
-
-    out.print("sens_conf_changed:");
-    out.print(als.sensitivity_config_changed());
-    out.println();
-    out.print("full_raw:");
-    out.print(als.get_full_raw());
-    out.println();
-    out.print("lux_raw:");
-    out.print(als.get_lux_raw(), 4);
-    out.println();
-    out.println();
-
-    als.tsl.printConfig(out);
-    out.println();
-    out.println("******************************************");
-}
-
-double MyInput::get_als_brightness_automatic(void) {
-    return als_brightness_automatic;
-}
+// void MyInput::als_setup(Print &out) {
+//     out.println("Ambient Light Sensor:");
+//     if (als.begin(out)) {
+//         out.println(F("found TSL2591 sensor"));
+//         out.println(F("------------------------------------------"));
+//         als.tsl.setConfig(&als.sens_conf[0]);
+//         out.println(F("------------------------------------------"));
+//         als.sensor_print_details(out);
+//         out.println(F("------------------------------------------"));
+//         als.tsl.printConfig(out);
+//         out.println(F("------------------------------------------"));
+//         for (size_t i = 0; i < 10; i++) {
+//             als.update();
+//             // delay(110);
+//         }
+//     } else {
+//         out.println("No sensor found. → please check your wiring..");
+//     }
+//     out.println();
+// }
+//
+// void MyInput::als_update(Print &out) {
+//     als.update();
+//     als_handle_sens_conf_change(out);
+//     if (als_debugout_enabled) {
+//         if ((millis() - als_debugout_timeStamp) > 1000) {
+//             als_debugout(out);
+//             als_debugout_timeStamp = millis();
+//         }
+//     }
+//     als_handle_lux_change(out);
+// }
+//
+// void MyInput::als_handle_sens_conf_change(Print &out) {
+//     if (als.sensitivity_config_changed()) {
+//         als_debugout_sens_conf_change(out);
+//         als.sensitivity_config_changed_clear();
+//     }
+// }
+//
+// void MyInput::als_handle_lux_change(Print &out) {
+//     if (als.lux_filtered_changed()) {
+//         out.print("update: ");
+//         out.print(als.get_lux_filtered(), 4);
+//         out.print("LUX");
+//         // out.println();
+//
+//         // als_brightness_automatic = map_range_clamped__double(
+//         //     als.get_lux_filtered(),
+//         //     // 0.0, 88000.0,
+//         //     0.0001, 2000.0,
+//         //     0.0005, 1.0);
+//         //     // 0.00002, 1.0);
+//
+//         als_brightness_automatic = light_map.mapit(als.get_lux_filtered());
+//         out.print(" -> ");
+//         out.print(als_brightness_automatic, 5);
+//         out.println();
+//         if (als_sets_brightness) {
+//             animation.brightness = als_brightness_automatic;
+//             // TODO(s-light): implement fading
+//         }
+//         als.lux_filtered_changed_clear();
+//     }
+// }
+//
+// void MyInput::als_debugout(Print &out) {
+//     print_runtime(out);
+//
+//     out.print("  ");
+//     out.print(als.get_lux_filtered(), 4);
+//     out.print(" lux");
+//
+//     out.print("    id:");
+//     out.print(als.get_sensitivity_config_id());
+//     out.print("    full:");
+//     out.print(als.get_full_raw());
+//     out.print("    lux_raw:");
+//     out.print(als.get_lux_raw(), 4);
+//
+//     // als.print_status(out);
+//     out.println();
+// }
+//
+// void MyInput::als_debugout_sens_conf_change(Print &out) {
+//     out.println("******************************************");
+//     print_runtime(out);
+//     out.println();
+//
+//     out.print("");
+//     out.print("sens_conf_current_id:");
+//     out.print(als.get_sensitivity_config_id());
+//     out.println();
+//
+//     out.print("sens_conf_changed:");
+//     out.print(als.sensitivity_config_changed());
+//     out.println();
+//     out.print("full_raw:");
+//     out.print(als.get_full_raw());
+//     out.println();
+//     out.print("lux_raw:");
+//     out.print(als.get_lux_raw(), 4);
+//     out.println();
+//     out.println();
+//
+//     als.tsl.printConfig(out);
+//     out.println();
+//     out.println("******************************************");
+// }
+//
+// double MyInput::get_als_brightness_automatic(void) {
+//     return als_brightness_automatic;
+// }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // button

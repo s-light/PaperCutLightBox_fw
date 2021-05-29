@@ -348,16 +348,16 @@ void MyMenu::menu__print_help(Print &out) {
     out.println(F(")"));
     out.println();
     // out.println(F("\t 'f': test fc 'f'"));
-    out.println(F("\t 'u': tlc.show() 'u'"));
-    out.print(F("\t 'e': toggle ESPWM 'e' ("));
-    out.print(animation.tlc.get_fc_ESPWM());
-    out.println(F(")"));
-    out.print(F("\t 'g': set grayscale frequency in MHz 'g1.0' ("));
-    out.print(animation.gsclock_get_frequency_MHz(), 4);
-    out.println(F("MHz)"));
-    out.print(F("\t 's': set spi baudrate in MHz 's1.0' ("));
-    out.print(animation.tlc.spi_baudrate / (1000.0 * 1000), 4);
-    out.println(F("MHz)"));
+    out.println(F("\t 'u': tlc.write() 'u'"));
+    // out.print(F("\t 'e': toggle ESPWM 'e' ("));
+    // out.print(animation.tlc.get_fc_ESPWM());
+    // out.println(F(")"));
+    // out.print(F("\t 'g': set grayscale frequency in MHz 'g1.0' ("));
+    // out.print(animation.gsclock_get_frequency_MHz(), 4);
+    // out.println(F("MHz)"));
+    // out.print(F("\t 's': set spi baudrate in MHz 's1.0' ("));
+    // out.print(animation.tlc.spi_baudrate / (1000.0 * 1000), 4);
+    // out.println(F("MHz)"));
     out.println(F("\t 't': set buffer to test values 't'"));
     out.println(F("\t 'T': time_meassurements 'T'"));
     out.println(F("\t 'p': set pixel 'p0:65535'"));
@@ -367,14 +367,14 @@ void MyMenu::menu__print_help(Print &out) {
     // out.println(F("\t 'B': print Buffer 'B'"));
     // out.println(F("\t 'F': print buffer_fc 'F'"));
     out.println();
-    out.println(F("\t 'a': print ambient light sensor 'a'"));
-    out.println(F("\t 'A': toggle als_debugout_enabled 'A'"));
-    out.print(F("\t 'B': toggle als_sets_brightness 'B' ("));
-    out.print(myinput.als_sets_brightness);
-    out.print(F(" | "));
-    out.print(myinput.get_als_brightness_automatic(), 5);
-    out.println(F(")"));
-    out.println(F("\t 'q': test light_map 'q1.0"));
+    // out.println(F("\t 'a': print ambient light sensor 'a'"));
+    // out.println(F("\t 'A': toggle als_debugout_enabled 'A'"));
+    // out.print(F("\t 'B': toggle als_sets_brightness 'B' ("));
+    // out.print(myinput.als_sets_brightness);
+    // out.print(F(" | "));
+    // out.print(myinput.get_als_brightness_automatic(), 5);
+    // out.println(F(")"));
+    // out.println(F("\t 'q': test light_map 'q1.0"));
     out.println();
     out.println(F("__________________________________________________"));
 }
@@ -439,35 +439,35 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
         // ---------------------
         case 'u': {
             out.println(F("write buffer to chips"));
-            animation.tlc.show();
+            animation.tlc.write();
         } break;
-        case 'e': {
-            out.println(F("toggle ESPWM"));
-            animation.tlc.set_fc_ESPWM_all(!animation.tlc.get_fc_ESPWM());
-            animation.tlc.update_fc();
-        } break;
-        case 'g': {
-            out.print(F("set grayscale frequency - new value:"));
-            float value = atof(&command[1]);
-            out.print(value);
-            value = animation.gsclock_set_frequency_MHz(value);
-            out.print(F(" → "));
-            out.print(value, 4);
-            out.println(F("MHz"));
-        } break;
-        case 's': {
-            out.print(F("set spi baudrate in MHz - new value:"));
-            float value = atof(&command[1]);
-            out.print(value, 4);
-            out.println(F("MHz"));
-            animation.tlc.spi_baudrate = value * 1000 * 1000;
-            // out.print(F(" → "));
-            // out.print(animation.tlc.spi_baudrate);
-            // out.println();
-        } break;
-        case 't': {
-            animation.menu__test_buffer(out);
-        } break;
+        // case 'e': {
+        //     out.println(F("toggle ESPWM"));
+        //     animation.tlc.set_fc_ESPWM_all(!animation.tlc.get_fc_ESPWM());
+        //     animation.tlc.update_fc();
+        // } break;
+        // case 'g': {
+        //     out.print(F("set grayscale frequency - new value:"));
+        //     float value = atof(&command[1]);
+        //     out.print(value);
+        //     value = animation.gsclock_set_frequency_MHz(value);
+        //     out.print(F(" → "));
+        //     out.print(value, 4);
+        //     out.println(F("MHz"));
+        // } break;
+        // case 's': {
+        //     out.print(F("set spi baudrate in MHz - new value:"));
+        //     float value = atof(&command[1]);
+        //     out.print(value, 4);
+        //     out.println(F("MHz"));
+        //     animation.tlc.spi_baudrate = value * 1000 * 1000;
+        //     // out.print(F(" → "));
+        //     // out.print(animation.tlc.spi_baudrate);
+        //     // out.println();
+        // } break;
+        // case 't': {
+        //     animation.menu__test_buffer(out);
+        // } break;
         case 'T': {
             animation.menu__time_meassurements(out);
         } break;
@@ -477,18 +477,18 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
         case 'P': {
             out.print(F("Set all pixel to "));
             uint16_t value = atoi(&command[1]);
-            animation.tlc.set_pixel_all_16bit_value(value, value, value);
+            animation.tlc.setRGB(value, value, value);
             out.print(value);
             out.println();
         } break;
         case 'z': {
             out.println(F("Set all Pixel to black."));
-            animation.tlc.set_pixel_all_16bit_value(0, 0, 0);
+            animation.tlc.setRGB(0, 0, 0);
             out.println();
         } break;
         case 'Z': {
             out.println(F("Set all Pixel to 21845."));
-            animation.tlc.set_pixel_all_16bit_value(21845, 21845, 21845);
+            animation.tlc.setRGB(21845, 21845, 21845);
             out.println();
         } break;
         // case 'B': {
@@ -502,29 +502,29 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
         //     out.println();
         // } break;
         //---------------------------------------------------------------------
-        case 'a': {
-            out.println(F("Print ambient light sensor:"));
-            // myinput.als.print_status(out);
-            myinput.als_debugout(out);
-            out.println();
-        } break;
-        case 'A': {
-            out.println(F("toggle als_debugout_enabled:"));
-            myinput.als_debugout_enabled = !myinput.als_debugout_enabled;
-        } break;
-        case 'B': {
-            out.println(F("toggle als_sets_brightness:"));
-            myinput.als_sets_brightness = !myinput.als_sets_brightness;
-        } break;
-        case 'q': {
-            out.println(F("test light_map:"));
-            uint8_t command_offset = 1;
-            float value = atof(&command[command_offset]);
-            out.print(value, 5);
-            out.print(" -> ");
-            out.print(myinput.light_map.mapit(value), 5);
-            out.println();
-        } break;
+        // case 'a': {
+        //     out.println(F("Print ambient light sensor:"));
+        //     // myinput.als.print_status(out);
+        //     myinput.als_debugout(out);
+        //     out.println();
+        // } break;
+        // case 'A': {
+        //     out.println(F("toggle als_debugout_enabled:"));
+        //     myinput.als_debugout_enabled = !myinput.als_debugout_enabled;
+        // } break;
+        // case 'B': {
+        //     out.println(F("toggle als_sets_brightness:"));
+        //     myinput.als_sets_brightness = !myinput.als_sets_brightness;
+        // } break;
+        // case 'q': {
+        //     out.println(F("test light_map:"));
+        //     uint8_t command_offset = 1;
+        //     float value = atof(&command[command_offset]);
+        //     out.print(value, 5);
+        //     out.print(" -> ");
+        //     out.print(myinput.light_map.mapit(value), 5);
+        //     out.println();
+        // } break;
         //---------------------------------------------------------------------
         default: {
             if (strlen(command) > 0) {

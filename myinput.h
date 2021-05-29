@@ -57,7 +57,7 @@ SOFTWARE.
 
 #include <slight_ButtonInput.h>
 
-#include <slight_TSL2591AutoSensitivity.h>
+// #include <slight_TSL2591AutoSensitivity.h>
 
 #include "./animation.h"
 #include "./mapping.h"
@@ -113,10 +113,10 @@ class MyInput {
     );
 
     // Ambient Light Sensor
-    slight_TSL2591AutoSensitivity als = slight_TSL2591AutoSensitivity();
-    void als_debugout(Print &out);
-    bool als_debugout_enabled = false;
-    double get_als_brightness_automatic(void);
+    // slight_TSL2591AutoSensitivity als = slight_TSL2591AutoSensitivity();
+    // void als_debugout(Print &out);
+    // bool als_debugout_enabled = false;
+    // double get_als_brightness_automatic(void);
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // public functions
@@ -129,36 +129,36 @@ class MyInput {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // configurations
 
-    bool ambientlight_run = true;
-    bool als_sets_brightness = false;
-
-    uint16_t filter_duration = 20 * 1000;  // ms
-    float light_event_threshold = 0.1;
-
-    // map ambient lux to animation.brightness
-    static const size_t light_map_count = 7;
-    MultiMap<double, light_map_count> light_map{
-        // als lux
-        std::array<double, light_map_count>{
-            0.0001,
-            0.0100,
-            0.1000,
-            1.5000,
-            10.000,
-            200.00,
-            10000.0,
-        },
-        // animation.brightness
-        std::array<double, light_map_count>{
-            0.00005,
-            0.0050,
-            0.0500,
-            0.1000,
-            0.2000,
-            0.5000,
-            0.8000,
-        }
-    };
+    // bool ambientlight_run = true;
+    // bool als_sets_brightness = false;
+    //
+    // uint16_t filter_duration = 20 * 1000;  // ms
+    // float light_event_threshold = 0.1;
+    //
+    // // map ambient lux to animation.brightness
+    // static const size_t light_map_count = 7;
+    // MultiMap<double, light_map_count> light_map{
+    //     // als lux
+    //     std::array<double, light_map_count>{
+    //         0.0001,
+    //         0.0100,
+    //         0.1000,
+    //         1.5000,
+    //         10.000,
+    //         200.00,
+    //         10000.0,
+    //     },
+    //     // animation.brightness
+    //     std::array<double, light_map_count>{
+    //         0.00005,
+    //         0.0050,
+    //         0.0500,
+    //         0.1000,
+    //         0.2000,
+    //         0.5000,
+    //         0.8000,
+    //     }
+    // };
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // helper
@@ -167,13 +167,13 @@ class MyInput {
     MyAnimation &animation;
 
     // ambientlight sensor
-    uint32_t als_debugout_timeStamp = 0;
-    void als_setup(Print &out);
-    void als_update(Print &out);
-    void als_handle_sens_conf_change(Print &out);
-    void als_handle_lux_change(Print &out);
-    void als_debugout_sens_conf_change(Print &out);
-    double als_brightness_automatic = 0.0001;
+    // uint32_t als_debugout_timeStamp = 0;
+    // void als_setup(Print &out);
+    // void als_update(Print &out);
+    // void als_handle_sens_conf_change(Print &out);
+    // void als_handle_lux_change(Print &out);
+    // void als_debugout_sens_conf_change(Print &out);
+    // double als_brightness_automatic = 0.0001;
 
     // // button input
     void button_init(Stream &out);

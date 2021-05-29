@@ -88,6 +88,7 @@ void MyAnimation::begin(Stream &out) {
     // start up...
     if (ready == false) {
         // setup
+        pmap_init();
         tlc_init(out);
         animation_init(out);
 
@@ -135,7 +136,7 @@ void MyAnimation::menu__set_pixel(Print &out, char *command) {
     out.print(F(" to "));
     uint16_t value = atoi(&command[command_offset]);
     out.print(value);
-    tlc.set_pixel_16bit_value(index, value, value, value);
+    tlc.setRGB(index, value, value, value);
     out.println();
 }
 
@@ -150,7 +151,7 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     for (size_t i = 0; i < tm_loop_count; i++) {
         tm_start = millis();
         effect_Matrix2D();
-        tlc.show();
+        tlc.write();
         tm_end = millis();
         tm_duration += (tm_end - tm_start);
     }
@@ -195,14 +196,16 @@ void MyAnimation::menu__set_brightness(Print &out, char *command) {
 void MyAnimation::tlc_init(Stream &out) {
     out.println(F("setup tlc:"));
 
-    out.println(F("  tlc.beginFast()"));
+    out.println(F("    tlc.beginFast()"));
     tlc.beginFast();
 
-    out.println(F("\t start with leds off"));
+    // tlc.setBrightness(127, 127, 127);
+
+    out.println(F("    start with leds off"));
     tlc.setRGB();
     tlc.write();
 
-    out.println(F("\t set leds to 0, 0, 1"));
+    out.println(F("    set leds to 0, 0, 1"));
     tlc.setRGB(0, 0, 1);
     tlc.write();
 
@@ -251,10 +254,10 @@ void MyAnimation::animation_init(Stream &out) {
         out.println(F("ms"));
 
         // out.println(F("  Set all Pixel to 21845."));
-        // tlc.set_pixel_all_16bit_value(21845, 21845, 21845);
+        // tlc.setRGB(21845, 21845, 21845);
         out.println(F("  Set all Pixel to red=blue=100."));
-        tlc.set_pixel_all_16bit_value(100, 0, 100);
-        tlc.show();
+        tlc.setRGB(100, 0, 100);
+        tlc.write();
 
         effect_start = millis();
         effect_end = millis() + effect_duration;
@@ -272,7 +275,7 @@ void MyAnimation::animation_update() {
         effect_Matrix2D();
 
         // write data to chips
-        tlc.show();
+        tlc.write();
     }
 }
 
@@ -300,15 +303,15 @@ void MyAnimation::calculate_effect_position() {
 void MyAnimation::effect__pixel_checker() {
     uint8_t step = map_range_01_to(
         effect_position, 0, MATRIX_PIXEL_COUNT);
-    tlc.set_pixel_all_16bit_value(0, 0, 0);
-    tlc.set_pixel_16bit_value(step, 0, 0, 500);
+    tlc.setRGB(0, 0, 0);
+    tlc.setRGB(step, 0, 0, 500);
 }
 
 void MyAnimation::effect__line() {
-    uint8_t step = map_range_01_to(effect_position, 0, MATRIX_COL_COUNT);
-    tlc.set_pixel_all_16bit_value(0, 0, 0);
+    uint16_t step = map_range_01_to(effect_position, 0, MATRIX_COL_COUNT);
+    tlc.setRGB(0, 0, 0);
     for (size_t row_index = 0; row_index < MATRIX_ROW_COUNT; row_index++) {
-        tlc.set_pixel_16bit_value(pmap[row_index][step], 0, 0, 500);
+        tlc.setRGB(pmap[row_index][step], 0, 0, 500);
     }
 }
 
@@ -318,10 +321,13 @@ void MyAnimation::effect__rainbow() {
             // full rainbow
             CHSV color_hsv = CHSV(effect_position, 1.0, brightness);
             CRGB color_rgb = hsv2rgb(color_hsv);
-            tlc.set_pixel_float_value(
+            tlc.setRGB(
                 pmap[row_i][col_i],
-                color_rgb.r, color_rgb.g, color_rgb.b);
-            // tlc.set_pixel_16bit_value(
+                // convert float to uint16_t
+                color_rgb.r * 65535,
+                color_rgb.g * 65535,
+                color_rgb.b * 65535);
+            // tlc.setRGB(
             //     pmap[row_i][col_i],
             //     0, col_i * step * 10 , row_i * 100);
         }
@@ -420,9 +426,12 @@ void MyAnimation::effect_Matrix2D() {
             CRGB pixel_rgb = hsv2rgb(pixel_hsv);
             // gamma & global brightness
             // fancyled.gamma_adjust(brightness=self.brightness);
-            tlc.set_pixel_float_value(
+            tlc.setRGB(
                 pmap[row_i][col_i],
-                pixel_rgb.r, pixel_rgb.g, pixel_rgb.b);
+                // convert float to uint16_t
+                pixel_rgb.r * 65535,
+                pixel_rgb.g * 65535,
+                pixel_rgb.b * 65535);
         }
     }
 }
