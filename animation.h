@@ -63,6 +63,95 @@ SOFTWARE.
 static const uint16_t CHIPS_COUNT__XX = 20*28*4;
 
 
+
+
+    static const uint16_t LEDBOARD_COL_COUNT = 4;
+    static const uint16_t LEDBOARD_ROW_COUNT = 4;
+    static const uint16_t LEDBOARD_PIXEL_COUNT = (
+        LEDBOARD_ROW_COUNT * LEDBOARD_COL_COUNT);
+    static const uint16_t LEDBOARD_CHIP_COUNT = LEDBOARD_PIXEL_COUNT / 4;
+
+    static const uint8_t LEDBOARD_SINGLE
+            [4][LEDBOARD_ROW_COUNT][LEDBOARD_COL_COUNT] = {
+        // with all 4 rotations
+        {
+            // 0 =  0° → socket at bottom
+            { 0,  1,  4,  5},
+            { 2,  3,  6,  7},
+            { 8,  9, 12, 13},
+            {10, 11, 14, 15},
+        },
+        {
+            // 1 = 90° → socket at left
+            {10,  8,  2,  0},
+            {11,  9,  3,  1},
+            {14, 12,  6,  4},
+            {15, 13,  7,  5},
+        },
+        {
+            // 2 = 180° → socket at top
+            {15, 14, 11, 10},
+            {13, 12,  9,  8},
+            { 7,  6,  3,  2},
+            { 5,  4,  1,  0},
+        },
+        {
+            // 3 = 270° → socket at right
+            { 5,  7, 13, 15},
+            { 4,  6, 12, 14},
+            { 1,  3,  9, 11},
+            { 0,  2,  8, 10},
+        },
+    };
+
+    static const uint8_t BOARDS_COL_COUNT = 5;
+    static const uint8_t BOARDS_ROW_COUNT = 7;
+    // static const uint8_t BOARDS_COL_COUNT = 1;
+    // static const uint8_t BOARDS_ROW_COUNT = 2;
+    static const uint8_t BOARDS_COUNT = BOARDS_COL_COUNT * BOARDS_ROW_COUNT;
+
+    static const uint16_t CHIPS_COUNT = BOARDS_COUNT * LEDBOARD_CHIP_COUNT;
+
+    static const uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+        {34, 33, 32, 31, 30},
+        {29, 28, 27, 26, 25},
+        {24, 23, 22, 21, 20},
+        {3, 7, 11, 15, 19},
+        {2, 6, 10, 14, 18},
+        {1, 5, 9, 13, 17},
+        {0, 4, 8, 12, 16},
+    };
+
+    static const uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+        {2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2},
+        {3, 3, 3, 3, 3},
+        {3, 3, 3, 3, 3},
+        {3, 3, 3, 3, 3},
+        {3, 3, 3, 3, 3},
+    };
+
+    // static const uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+    //     // {3},
+    //     // {2},
+    //     {1},
+    //     {0},
+    // };
+    //
+    // static const uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+    //     // {3},
+    //     // {3},
+    //     {3},
+    //     {3},
+    // };
+
+    static const uint8_t MATRIX_COL_COUNT = LEDBOARD_COL_COUNT * BOARDS_COL_COUNT;
+    static const uint8_t MATRIX_ROW_COUNT = LEDBOARD_ROW_COUNT * BOARDS_ROW_COUNT;
+    static const uint16_t MATRIX_PIXEL_COUNT = MATRIX_COL_COUNT * MATRIX_ROW_COUNT;
+
+
+
 class MyAnimation {
 public:
 
@@ -78,6 +167,26 @@ public:
     //   const uint16_t mask;
     //   const uint16_t defaultv;
     // };
+
+
+
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // matrix definitions
+    // please extract this to own file / fix linking errors with matrix.h
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // pixel map
+    // LEDBoard_4x4_16bit mapping
+
+    uint16_t pmap[MATRIX_COL_COUNT][MATRIX_ROW_COUNT];
+
+    uint16_t mymap_LEDBoard_4x4_16bit(uint8_t col, uint8_t row);
+
+    void pmap_init();
+
+
+
+
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // attributes
@@ -121,7 +230,7 @@ public:
     void menu__set_pixel(Print &out, char *command);
     void menu__test_buffer(Print &out);
     void menu__time_meassurements(Print &out);
-    void print_tlc_buffer(Print &out);
+    void print_pmap(Print &out);
 
     void menu__set_hue(Print &out, char *command);
     void menu__set_contrast(Print &out, char *command);
@@ -135,7 +244,7 @@ public:
 
     bool animation_run = true;
 
-    uint16_t effect_duration = 30 * 1000; //ms
+    uint16_t effect_duration = 1 * 1000; //ms
 
     // lounge blue - night
     // float hue = 0.7;

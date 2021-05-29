@@ -362,10 +362,11 @@ void MyMenu::menu__print_help(Print &out) {
     out.println(F("\t 'T': time_meassurements 'T'"));
     out.println(F("\t 'p': set pixel 'pX,Y:65535'"));
     out.println(F("\t 'P': set pixel 'p0:65535'"));
-    out.println(F("\t 'z': set all pixel to black 'b'"));
+    out.println(F("\t 'z': set all pixel to black 'z'"));
     out.println(F("\t 'Z': set all pixel 'Z65535'"));
     // out.println(F("\t 'Z': set all pixel to 21845 'z'"));
     // out.println(F("\t 'B': print Buffer 'B'"));
+    out.println(F("\t 'q': print pmap 'q'"));
     // out.println(F("\t 'F': print buffer_fc 'F'"));
     out.println();
     // out.println(F("\t 'a': print ambient light sensor 'a'"));
@@ -476,7 +477,7 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
             animation.menu__set_pixel(out, command);
         } break;
         case 'P': {
-            animation.menu__set_pixel(out, command);
+            animation.menu__set_pixel_index(out, command);
         } break;
         case 'z': {
             out.println(F("Set all Pixel to black."));
@@ -489,6 +490,9 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
             animation.tlc.setRGB(value, value, value);
             out.print(value);
             out.println();
+        } break;
+        case 'q': {
+            animation.print_pmap(out);
         } break;
         // case 'Z': {
         //     out.println(F("Set all Pixel to 21845."));
