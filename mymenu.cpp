@@ -19,7 +19,7 @@
 /******************************************************************************
 The MIT License (MIT)
 
-Copyright (c) 2019 Stefan Krüger
+Copyright (c) 2021 Stefan Krüger
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -360,13 +360,16 @@ void MyMenu::menu__print_help(Print &out) {
     // out.println(F("MHz)"));
     out.println(F("\t 't': set buffer to test values 't'"));
     out.println(F("\t 'T': time_meassurements 'T'"));
-    out.println(F("\t 'p': set pixel 'pX,Y:65535'"));
-    out.println(F("\t 'P': set pixel 'p0:65535'"));
+    // out.println(F("\t 'p': set pixel 'pX,Y:65535'"));
+    // out.println(F("\t 'P': set pixel 'p0:65535'"));
+    out.println(F("\t 'p': set pixel to 2000 'pX,Y'"));
+    out.println(F("\t 'P': set pixel to 2000 'p0'"));
     out.println(F("\t 'z': set all pixel to black 'z'"));
     out.println(F("\t 'Z': set all pixel 'Z65535'"));
     // out.println(F("\t 'Z': set all pixel to 21845 'z'"));
     // out.println(F("\t 'B': print Buffer 'B'"));
     out.println(F("\t 'q': print pmap 'q'"));
+    out.println(F("\t 'Q': print pmap 'Q'"));
     // out.println(F("\t 'F': print buffer_fc 'F'"));
     out.println();
     // out.println(F("\t 'a': print ambient light sensor 'a'"));
@@ -493,6 +496,9 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
         } break;
         case 'q': {
             animation.print_pmap(out);
+        } break;
+        case 'Q': {
+            animation.print_2Dmatrix(out);
         } break;
         // case 'Z': {
         //     out.println(F("Set all Pixel to 21845."));

@@ -95,6 +95,11 @@ T3 map_range(T1 x, T2 in_min, T2 in_max, T3 out_min, T3 out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
+template<class T1, class T2, class T3, class T4>
+T4 map_range(T1 x, T2 in_min, T2 in_max, T3 out_min, T3 out_max) {
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 template<class T1>
 T1 map_range_clamped(
     T1 x, T1 in_min, T1 in_max, T1 out_min, T1 out_max
@@ -131,8 +136,14 @@ T2 normalize_to_01(T1 x, T1 in_min, T1 in_max) {
     return ((x - in_min) * 1.0) / (in_max - in_min);
 }
 
+
 template<class T1>
 double normalize_to_01(T1 x, T1 in_min, T1 in_max) {
+    return ((x - in_min) * 1.0) / (in_max - in_min);
+}
+
+template<class T1, class T2>
+double normalize_to_01(T1 x, T2 in_min, T2 in_max) {
     return ((x - in_min) * 1.0) / (in_max - in_min);
 }
 
@@ -141,6 +152,10 @@ T3 normalize_to_01(T1 x, T2 in_min, T2 in_max) {
     return ((x - in_min) * 1.0) / ((in_max - in_min) * 1.0);
 }
 
+// template<class T1, class T2, class T3>
+// T3 normalize_to_01(T1 x, T2 in_min, T2 in_max) {
+//     return ((x - in_min) * 1.0) / (in_max - in_min);
+// }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // MultiMap / multi_map
