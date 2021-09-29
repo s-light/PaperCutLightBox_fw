@@ -57,11 +57,16 @@ SOFTWARE.
 
 #include <slight_ButtonInput.h>
 
+// #include <slight_RotaryEncoder_CallbackHelper.h>
+#include <slight_RotaryEncoder.h>
+
 // #include <slight_TSL2591AutoSensitivity.h>
 
 #include "./animation.h"
 // #include "./mapping.h"
 
+// void myencoder_pin_changed_ISR();
+// void myencoder_pin_changed_ISR__helper(slight_RotaryEncoder* instance);
 
 class MyInput {
  public:
@@ -76,7 +81,7 @@ class MyInput {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // basic library api
-    void begin(Stream &out);
+    void begin(Stream &out, slight_RotaryEncoder::tCallbackFunctionISR func_ISR);
     void update();
     void end();
 
@@ -97,7 +102,7 @@ class MyInput {
         // uint8_t id_new
         1,
         // uint8_t pin_new,
-        A4,
+        A3,
         // tCallbackFunctionGetInput callbackGetInput_new,
         std::bind(&MyInput::mybutton_get_input, this, std::placeholders::_1),
         // tCallbackFunction callbackOnEvent_new,
@@ -110,6 +115,23 @@ class MyInput {
         2000,
         // const uint16_t duration_click_double_new = 250
         250
+    );
+
+
+    // static void myencoder_pin_changed_ISR();
+    void myencoder_event(slight_RotaryEncoder *instance);
+
+    slight_RotaryEncoder myencoder = slight_RotaryEncoder(
+        // uint8_t id_new,
+        1,
+        // uint8_t pin_A_new,
+        A4,
+        // uint8_t pin_B_new,
+        A5,
+        // uint8_t pulse_per_step_new,
+        2,
+        // tCallbackFunction callbackOnEvent_new
+        std::bind(&MyInput::myencoder_event, this, std::placeholders::_1)
     );
 
     // Ambient Light Sensor
@@ -176,8 +198,10 @@ class MyInput {
     // void als_debugout_sens_conf_change(Print &out);
     // double als_brightness_automatic = 0.0001;
 
-    // // button input
+    // button input
     void button_init(Stream &out);
+    // encoder input
+    void encoder_init(Stream &out, slight_RotaryEncoder::tCallbackFunctionISR func_ISR);
 
     // helper
     void print_runtime(Print &out);
@@ -190,6 +214,9 @@ class MyInput {
     uint32_t light_end = 0;
     uint32_t light_loopcount = 0;
     float effect_position = 0.0;
+
+    // int16_t counter = 0;
+    // int16_t counter_last = 0;
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // power modes

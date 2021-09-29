@@ -91,7 +91,7 @@ MyInput::~MyInput() {
 }
 
 
-void MyInput::begin(Stream &out) {
+void MyInput::begin(Stream &out, slight_RotaryEncoder::tCallbackFunctionISR func_ISR) {
     // clean up..
     end();
     // start up...
@@ -101,10 +101,12 @@ void MyInput::begin(Stream &out) {
         // sleepmode_init(out);
         out.println("  board_dotstar");
         board_dotstar.begin();
-        board_dotstar.setPixelColor(0, board_dotstar_active_color);
+        // board_dotstar.setPixelColor(0, board_dotstar_active_color);
+        board_dotstar.setPixelColor(0, board_dotstar_standby_color);
         board_dotstar.show();
         // als.begin(out);
         button_init(out);
+        encoder_init(out, func_ISR);
         // out.println("  myencoder.begin");
         // myencoder.begin(funcISR);
         out.println("done.");
@@ -125,6 +127,15 @@ void MyInput::update() {
         // als_update(Serial);
         // Serial.println("button.");
         mybutton.update();
+        myencoder.update();
+        // if (counter != counter_last) {
+        //     counter_last = counter;
+        //     Serial.print("counter changed: ");
+        //     Serial.print(counter);
+        //     Serial.println();
+        //     animation.brightness = map_range(counter, 0, 500, 0.0, 1.0);
+        // }
+
         // Serial.println("update.");
         // delay(100);
     }
@@ -363,6 +374,13 @@ void MyInput::mybutton_event(slight_ButtonInput *instance) {
         } break;
         case slight_ButtonInput::event_click : {
             Serial.println(F("click"));
+            if (animation.brightness > 0.1) {
+                animation.set_brightness(0.00015);
+            } else {
+                animation.set_brightness(0.5);
+            }
+            Serial.print(F("  animation.brightness: "));
+            Serial.println(animation.brightness, 4);
         } break;
         case slight_ButtonInput::event_click_long : {
             Serial.print(F("click long "));
@@ -380,6 +398,53 @@ void MyInput::mybutton_event(slight_ButtonInput *instance) {
         } break;
     }  // end switch
 }
+
+
+// ------------------------------------------
+// slight_RotaryEncoder things
+
+void MyInput::encoder_init(Stream &out, slight_RotaryEncoder::tCallbackFunctionISR func_ISR) {
+    out.println(F("setup encoder input:"));
+    out.println(F("  myencoder.begin()"));
+    // myencoder.begin(myencoder_pin_changed_ISR__helper);
+    myencoder.begin(func_ISR);
+    out.println(F("  finished."));
+}
+
+
+
+// void myencoder_pin_changed_ISR__helper(slight_RotaryEncoder * instance) {
+//   // instance->set(15);
+//   instance->updateClassic();
+//   // instance->updateGray();
+// }
+// void MyInput::myencoder_pin_changed_ISR() {
+// moved to main .ino file.
+
+
+void MyInput::myencoder_event(slight_RotaryEncoder *instance) {
+    // react on event
+    switch ((*instance).getEventLast()) {
+        case slight_RotaryEncoder::event_Rotated : {
+            // get current data
+            // int16_t temp_steps = (*instance).getSteps();
+            int16_t temp_stepsAccel = (*instance).getStepsAccelerated();
+            // clear data
+            (*instance).clearSteps();
+
+            // Serial.print(F("  steps: "));
+            // Serial.println(temp_steps);
+            // Serial.print(F("  steps accelerated: "));
+            // Serial.println(temp_stepsAccel);
+            // counter += temp_stepsAccel;
+            animation.set_brightness(animation.brightness + temp_stepsAccel*0.0002);
+            Serial.print(F("  animation.brightness: "));
+            Serial.println(animation.brightness, 4);
+        } break;
+        // currently there are no other events fired.
+    }  // end switch
+}
+
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // helper

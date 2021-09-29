@@ -340,6 +340,9 @@ void MyMenu::menu__print_help(Print &out) {
     out.print(F("\t 'h': set hue 'h1.0' ("));
     out.print(animation.hue, 4);
     out.println(F(")"));
+    out.print(F("\t 'h': set saturation 's1.0' ("));
+    out.print(animation.saturation, 4);
+    out.println(F(")"));
     out.print(F("\t 'c': set contrast 'c1.0' ("));
     out.print(animation.contrast, 4);
     out.println(F(")"));
@@ -365,7 +368,7 @@ void MyMenu::menu__print_help(Print &out) {
     out.println(F("\t 'p': set pixel to 2000 'pX,Y'"));
     out.println(F("\t 'P': set pixel to 2000 'p0'"));
     out.println(F("\t 'z': set all pixel to black 'z'"));
-    out.println(F("\t 'Z': set all pixel 'Z65535'"));
+    out.println(F("\t 'Z': set all pixel 'Z65535,65535,65535'"));
     // out.println(F("\t 'Z': set all pixel to 21845 'z'"));
     // out.println(F("\t 'B': print Buffer 'B'"));
     out.println(F("\t 'q': print pmap 'q'"));
@@ -435,6 +438,9 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
         case 'h': {
             animation.menu__set_hue(out, command);
         } break;
+        case 's': {
+            animation.menu__set_saturation(out, command);
+        } break;
         case 'c': {
             animation.menu__set_contrast(out, command);
         } break;
@@ -488,11 +494,7 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
             out.println();
         } break;
         case 'Z': {
-            out.print(F("Set all pixel to "));
-            uint16_t value = atoi(&command[1]);
-            animation.tlc.setRGB(value, value, value);
-            out.print(value);
-            out.println();
+            animation.menu__set_all_pixel(out, command);
         } break;
         case 'q': {
             animation.print_pmap(out);

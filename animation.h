@@ -165,8 +165,6 @@ SOFTWARE.
     static const uint16_t MATRIX_PIXEL_COUNT = MATRIX_COL_COUNT * MATRIX_ROW_COUNT;
 
 
-    static const uint16_t CHIPS_COUNT__XX = BOARDS_COL_COUNT*BOARDS_ROW_COUNT*LEDBOARD_CHIP_COUNT;
-
 class MyAnimation {
 public:
 
@@ -222,8 +220,7 @@ public:
     // use default pins
     // slight_TLC5957 tlc = slight_TLC5957(MATRIX_PIXEL_COUNT, 7);
     // Tlc59711 tlc(CHIPS_COUNT);
-    // Tlc59711 tlc = Tlc59711(CHIPS_COUNT);
-    Tlc59711 tlc = Tlc59711(CHIPS_COUNT__XX);
+    Tlc59711 tlc = Tlc59711(CHIPS_COUNT);
 
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -243,17 +240,20 @@ public:
     // menu & helper
     void menu__set_pixel_index(Print &out, char *command);
     void menu__set_pixel(Print &out, char *command);
+    void menu__set_all_pixel(Print &out, char *command);
     void menu__test_buffer(Print &out);
     void menu__time_meassurements(Print &out);
     void print_pmap(Print &out);
     void print_2Dmatrix(Print &out);
 
     void menu__set_hue(Print &out, char *command);
+    void menu__set_saturation(Print &out, char *command);
     void menu__set_contrast(Print &out, char *command);
     void menu__set_brightness(Print &out, char *command);
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // helper
+    float set_brightness(float brightness_);
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // configurations
@@ -268,9 +268,12 @@ public:
     // float brightness = 0.01;
 
     // forest green - daylight
-    float hue = 0.36;
+    float hue = 0.05;
+    float saturation = 1.0;
     float contrast = 1.70;
     float brightness = 0.001;
+    const float brightness_max = 0.37;
+    const uint16_t brightness_max_i = 25000;
 
     // const float PI = 3.141592;
     // is already defined by arduino or some other defaults...
@@ -290,11 +293,11 @@ private:
     void effect__rainbow();
 
     void effect_Matrix2D();
-    // CHSV effect_Matrix2D_get_pixel(float col, float row, float offset);
-    CHSV effect_Matrix2D_get_pixel(
-        float col, float row,
-        uint16_t col_i, uint16_t row_i,
-        float offset);
+    CHSV effect_Matrix2D_get_pixel(float col, float row, float offset);
+    // CHSV effect_Matrix2D_get_pixel(
+    //     float col, float row,
+    //     uint16_t col_i, uint16_t row_i,
+    //     float offset);
     CHSV effect__plasma(float col, float row, float offset);
     CHSV effect__wave(float col, float row, float offset);
     CHSV effect__sparkle(float col, float row, float offset);

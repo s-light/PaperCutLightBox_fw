@@ -78,6 +78,7 @@
 
 // #include <slight_DebugMenu.h>
 // #include <slight_ButtonInput.h>
+// #include <slight_RotaryEncoder.h>
 
 #include "./animation.h"
 #include "./myinput.h"
@@ -126,6 +127,18 @@ void sketchinfo_print(Print &out) {
     //
     out.println(F("|"));
     out.println(F("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"));
+    out.println(F("|"));
+    out.println(F("| LED Matrix:"));
+    out.printf("|   BOARDS_COUNT:       %4d\r\n", BOARDS_COUNT);
+    out.printf("|   CHIPS_COUNT:        %4d\r\n", CHIPS_COUNT);
+    out.printf("|   BOARDS_ROW_COUNT:   %4d\r\n", BOARDS_ROW_COUNT);
+    out.printf("|   BOARDS_COL_COUNT:   %4d\r\n", BOARDS_COL_COUNT);
+    out.printf("|   MATRIX_ROW_COUNT:   %4d\r\n", MATRIX_ROW_COUNT);
+    out.printf("|   MATRIX_COL_COUNT:   %4d\r\n", MATRIX_COL_COUNT);
+    out.printf("|   MATRIX_PIXEL_COUNT: %4d\r\n", MATRIX_PIXEL_COUNT);
+    out.println(F("|"));
+    out.println(F("|"));
+    out.println(F("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"));
     out.println();
 
     //out.println(__DATE__); Nov 11 2013
@@ -143,6 +156,15 @@ void sketchinfo_print(Print &out) {
 MyAnimation animation = MyAnimation();
 MyInput myinput = MyInput(animation);
 MyMenu mymenu = MyMenu(animation, myinput, sketchinfo_print);
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// ISR magic
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void myinput_myencoder_pin_changed_ISR() {
+    myinput.myencoder.updateClassic();
+    // myinput.myencoder.updateGray();
+}
+
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // setup
@@ -180,7 +202,7 @@ void setup() {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // setup sub-Parts
     animation.begin(Serial);
-    myinput.begin(Serial);
+    myinput.begin(Serial, myinput_myencoder_pin_changed_ISR);
     mymenu.begin(Serial);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

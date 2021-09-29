@@ -77,10 +77,10 @@ SOFTWARE.
 uint16_t MyAnimation::mymap_LEDBoard_4x4_16bit(uint8_t col, uint8_t row) {
     // """Map row and col to pixel_index."""
     // get Board position
-    uint8_t board_col = col / LEDBOARD_COL_COUNT;
-    uint8_t board_row = row / LEDBOARD_ROW_COUNT;
-    uint8_t board_sub_col = col % LEDBOARD_COL_COUNT;
-    uint8_t board_sub_row = row % LEDBOARD_ROW_COUNT;
+    uint16_t board_col = col / LEDBOARD_COL_COUNT;
+    uint16_t board_row = row / LEDBOARD_ROW_COUNT;
+    uint16_t board_sub_col = col % LEDBOARD_COL_COUNT;
+    uint16_t board_sub_row = row % LEDBOARD_ROW_COUNT;
 
     // Serial.println("mymap_LEDBoard_4x4_16bit");
     // Serial.print("  col: ");
@@ -99,8 +99,8 @@ uint16_t MyAnimation::mymap_LEDBoard_4x4_16bit(uint8_t col, uint8_t row) {
     // Serial.println(board_sub_row);
 
 
-    uint8_t board_index = BOARDS_ORDER[board_row][board_col];
-    uint8_t board_rotation = BOARDS_ROTATION[board_row][board_col];
+    uint16_t board_index = BOARDS_ORDER[board_row][board_col];
+    uint16_t board_rotation = BOARDS_ROTATION[board_row][board_col];
     // Serial.print("  board_index: ");
     // Serial.println(board_index);
     // Serial.print("  board_rotation: ");
@@ -110,7 +110,7 @@ uint16_t MyAnimation::mymap_LEDBoard_4x4_16bit(uint8_t col, uint8_t row) {
     // Serial.print("  board_pixel_offset: ");
     // Serial.println(board_pixel_offset);
 
-    uint8_t board_sub_pixel_offset =
+    uint16_t board_sub_pixel_offset =
         LEDBOARD_SINGLE[board_rotation][board_sub_row][board_sub_col];
     // Serial.print("  board_sub_pixel_offset: ");
     // Serial.println(board_sub_pixel_offset);
@@ -261,6 +261,51 @@ void MyAnimation::menu__set_pixel(Print &out, char *command) {
     out.println();
 
     tlc.setRGB(pixel_index, value, value, value);
+}
+
+void MyAnimation::menu__set_all_pixel(Print &out, char *command) {
+    out.print(F("Set all pixel to "));
+    // uint16_t value = atoi(&command[1]);
+    //
+    // tlc.setRGB(value, value, value);
+    // out.print(value);
+    // out.println();
+
+    uint16_t red = 0;
+    uint16_t green = 0;
+    uint16_t blue = 0;
+
+    // Z65535,65535,65535
+    // split string with help of tokenizer
+    // https://www.cplusplus.com/reference/cstring/strtok/#
+    char * command_pointer = &command[1];
+    // NOLINTNEXTLINE(runtime/threadsafe_fn)
+    command_pointer = strtok(command_pointer, " ,");
+    red = atoi(command_pointer);
+    // NOLINTNEXTLINE(runtime/threadsafe_fn)
+    command_pointer = strtok(NULL, " ,");
+    if (command_pointer == NULL) {
+        green = red;
+        blue = red;
+    } else {
+        green = atoi(command_pointer);
+        // NOLINTNEXTLINE(runtime/threadsafe_fn)
+        command_pointer = strtok(NULL, " ,");
+        blue = atoi(command_pointer);
+    }
+
+    if (red > brightness_max_i) {
+        red = brightness_max_i;
+    }
+    if (green > brightness_max_i) {
+        green = brightness_max_i;
+    }
+    if (blue > brightness_max_i) {
+        blue = brightness_max_i;
+    }
+
+    out.printf(" r:%5d, g:%5d, b:%5d\r\n", red, green, blue);
+    tlc.setRGB(red, green, blue);
 }
 
 void MyAnimation::menu__time_meassurements(Print &out) {
@@ -443,6 +488,15 @@ void MyAnimation::menu__set_hue(Print &out, char *command) {
     out.println();
 }
 
+void MyAnimation::menu__set_saturation(Print &out, char *command) {
+    out.print(F("Set saturation "));
+    uint8_t command_offset = 1;
+    float value = atof(&command[command_offset]);
+    out.print(value, 4);
+    hue = value;
+    out.println();
+}
+
 void MyAnimation::menu__set_contrast(Print &out, char *command) {
     out.print(F("Set contrast "));
     uint8_t command_offset = 1;
@@ -457,7 +511,9 @@ void MyAnimation::menu__set_brightness(Print &out, char *command) {
     uint8_t command_offset = 1;
     float value = atof(&command[command_offset]);
     out.print(value, 5);
-    brightness = value;
+    out.print(" --> ");
+    value = set_brightness(value);
+    out.print(value, 5);
     out.println();
 }
 
@@ -487,7 +543,7 @@ void MyAnimation::print_pmap(Print &out) {
         slight_DebugMenu::print_uint16_align_right(stream_out, col_i);
     }
     stream_out.println();
-    stream_out.println();
+    // stream_out.println();
     // print rows
     for (row_i = 0; row_i < count_row; row_i++) {
         // print row numer
@@ -527,10 +583,10 @@ void MyAnimation::print_2Dmatrix(Print &out) {
     // print header line
     col_i = 0;
     float col = normalize_to_01(col_i, 0, MATRIX_COL_COUNT-1);
-    stream_out.printf("int(float)     %3d(%3.2f)", col_i, col);
+    stream_out.printf("int(float)     %2d(%1.2f)", col_i, col);
     for (col_i = 1; col_i < count_col; col_i++) {
         col = normalize_to_01(col_i, 0, MATRIX_COL_COUNT-1);
-        stream_out.printf(", %3d(%3.2f)", col_i, col);
+        stream_out.printf(",%2d(%1.2f)", col_i, col);
     }
     stream_out.println();
 
@@ -544,15 +600,31 @@ void MyAnimation::print_2Dmatrix(Print &out) {
         float row = normalize_to_01(row_i, 0, MATRIX_ROW_COUNT-1);
 
         // print row numer
-        stream_out.printf("%03d(%3.2f) --> ", row_i, row);
+        stream_out.printf("%2d(%1.2f) -->   ", row_i, row);
 
         col_i = 0;
-        stream_out.printf(" %9d", pmap[col_i][row_i]);
+        stream_out.printf(" %7d", pmap[col_i][row_i]);
         for (col_i = 1; col_i < count_col; col_i++) {
-            stream_out.printf(", %9d", pmap[col_i][row_i]);
+            stream_out.printf(", %7d", pmap[col_i][row_i]);
         }
         stream_out.println();
     }
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// brightness
+
+float MyAnimation::set_brightness(float brightness_) {
+    brightness = clamp(brightness_, static_cast<float>(0.0), brightness_max);
+    // if (brightness_ <= 0) {
+    //     brightness = 0;
+    // }
+    // if (brightness_ > brightness_max) {
+    //     brightness = brightness_max;
+    // } else {
+    //     brightness = brightness_;
+    // }
+    return brightness;
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -631,7 +703,7 @@ void MyAnimation::animation_init(Stream &out) {
         // out.println(F("  Set all Pixel to 21845."));
         // tlc.setRGB(21845, 21845, 21845);
         out.println(F("  Set all Pixel to red=blue=100."));
-        tlc.setRGB(100, 0, 100);
+        tlc.setRGB(200, 50, 0);
         tlc.write();
 
         effect_start = micros();
@@ -706,7 +778,7 @@ void MyAnimation::calculate_effect_position() {
 
 
 void MyAnimation::effect__pixel_checker() {
-    uint8_t step = map_range_01_to(
+    uint16_t step = map_range_01_to(
         effect_position, 0, MATRIX_PIXEL_COUNT);
     tlc.setRGB(0, 0, 0);
     tlc.setRGB(step, 0, 0, 500);
@@ -831,9 +903,10 @@ CHSV MyAnimation::effect__wave(float col, float row, float offset) {
 
 CHSV MyAnimation::effect__mapping_checker(float col, float row, float offset) {
     // checker pattern
+    CHSV pixel_hsv = CHSV(0.7, 1.0, 0.1);
+
     float row_width = (1.0 / MATRIX_ROW_COUNT / 1.5);
     float col_width = (1.0 / MATRIX_COL_COUNT / 1.5);
-    CHSV pixel_hsv = CHSV(0.7, 1.0, 1.0);
     // float base = col * 0.2 + offset;
     float offset_half = map_range(offset, 0.0, 1.0, -0.5, 0.5);
     // float base = map_range(col, -0.5, 0.5, 0.0, 1.0);
@@ -908,12 +981,16 @@ CHSV MyAnimation::effect__sparkle(
 
 
 CHSV MyAnimation::effect_Matrix2D_get_pixel(
-    float col, float row,
-    uint16_t col_i, uint16_t row_i,
-    float offset
+    __attribute__((unused)) float col,
+    __attribute__((unused)) float row,
+    __attribute__((unused)) float offset
 ) {
-// CHSV MyAnimation::effect_Matrix2D_get_pixel(float col, float row, float offset) {
-    CHSV pixel_hsv = CHSV(0.5, 0.0, 1.0);
+// CHSV MyAnimation::effect_Matrix2D_get_pixel(
+//     float col, float row,
+//     uint16_t col_i, uint16_t row_i,
+//     float offset
+// ) {
+    CHSV pixel_hsv = CHSV(hue, saturation, 1.0);
 
     // plasma
     // CHSV plasma = effect__plasma(col, row, offset);
@@ -929,7 +1006,7 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(
     // pixel_hsv = sparkle;
 
     // pixel_hsv = effect__mapping_checker(col_i, row_i, offset);
-    pixel_hsv = effect__mapping_checker(col, row, offset);
+    // pixel_hsv = effect__mapping_checker(col, row, offset);
 
 
     // TODO(s-light): develop 'layer' / 'multiplyer' system...
@@ -975,8 +1052,8 @@ void MyAnimation::effect_Matrix2D() {
             // float col = normalize_to_01(col_i, 0, MATRIX_COL_COUNT-1);
 
             // ------------------------------------------
-            CHSV pixel_hsv = effect_Matrix2D_get_pixel(col, row, col_i, row_i, offset);
-            // CHSV pixel_hsv = effect_Matrix2D_get_pixel(col, row, offset);
+            // CHSV pixel_hsv = effect_Matrix2D_get_pixel(col, row, col_i, row_i, offset);
+            CHSV pixel_hsv = effect_Matrix2D_get_pixel(col, row, offset);
             // CHSV pixel_hsv = effect_Matrix2D_get_pixel(col, row, offset_PI);
 
             // ------------------------------------------
