@@ -1,6 +1,6 @@
 /******************************************************************************
 
-    animation_tester.ino
+    LEDMatrix_animation_base.ino
         develop nice animations for big LED-Matrix things
         debugout on usbserial interface: 115200baud
 
@@ -96,7 +96,7 @@ void sketchinfo_print(Print &out) {
     out.println(F("|                      ( _ )                     |"));
     out.println(F("|                       \" \"                      |"));
     out.println(F("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"));
-    out.println(F("| animation_tester.ino"));
+    out.println(F("| LEDMatrix_animation_base.ino"));
     out.println(F("|   develop nice animations for big LED-Matrix things"));
     out.println(F("|"));
     out.println(F("| This Sketch has a debug-menu:"));
