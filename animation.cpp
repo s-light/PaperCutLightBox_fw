@@ -627,6 +627,11 @@ float MyAnimation::set_brightness(float brightness_) {
     return brightness;
 }
 
+float MyAnimation::set_hue(float hue_) {
+    hue = clamp(hue_, static_cast<float>(0.0), static_cast<float>(1.0));
+    return hue;
+}
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TLC5957 / LED-Driver
 

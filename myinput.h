@@ -215,6 +215,7 @@ class MyInput {
     uint32_t light_loopcount = 0;
     float effect_position = 0.0;
 
+    bool encoder_mode_brightness = true;
     // int16_t counter = 0;
     // int16_t counter_last = 0;
 

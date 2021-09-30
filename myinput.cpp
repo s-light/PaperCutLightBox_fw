@@ -385,6 +385,7 @@ void MyInput::mybutton_event(slight_ButtonInput *instance) {
         case slight_ButtonInput::event_click_long : {
             Serial.print(F("click long "));
             Serial.println((*instance).getDurationActive());
+            encoder_mode_brightness != encoder_mode_brightness;
         } break;
         case slight_ButtonInput::event_click_double : {
             Serial.println(F("click double"));
@@ -437,9 +438,15 @@ void MyInput::myencoder_event(slight_RotaryEncoder *instance) {
             // Serial.print(F("  steps accelerated: "));
             // Serial.println(temp_stepsAccel);
             // counter += temp_stepsAccel;
-            animation.set_brightness(animation.brightness + temp_stepsAccel*0.0002);
-            Serial.print(F("  animation.brightness: "));
-            Serial.println(animation.brightness, 4);
+            if (encoder_mode_brightness) {
+                animation.set_brightness(animation.brightness + temp_stepsAccel*0.0002);
+                Serial.print(F("  animation.brightness: "));
+                Serial.println(animation.brightness, 4);
+            } else {
+                animation.set_hue(animation.hue + temp_stepsAccel*0.0002);
+                Serial.print(F("  animation.hue: "));
+                Serial.println(animation.hue, 4);
+            }
         } break;
         // currently there are no other events fired.
     }  // end switch
