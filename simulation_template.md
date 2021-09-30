@@ -1,4 +1,9 @@
-//https://editor.soulmatelights.com/gallery/1401-mapping-test
+
+template for the [soulmatelights online editor/simulation](https://editor.soulmatelights.com)
+
+this template can be found at [editor.soulmatelights.com/gallery/1401-mapping-test](https://editor.soulmatelights.com/gallery/1401-mapping-test)
+
+```cpp
 // Your pattern code goes here.
 // This draw() function is called repeatedly and the LEDs will be
 // printed after every loop.
@@ -465,3 +470,4 @@ void draw() {
   effect_Matrix2D();
 
 }
+```
