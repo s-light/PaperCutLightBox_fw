@@ -200,6 +200,7 @@ public:
 
     void print_pmap(Print &out);
     void print_2Dmatrix(Print &out);
+    void print_info(Print &out, const char* pre);
 
 private:
 

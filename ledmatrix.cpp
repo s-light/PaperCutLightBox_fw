@@ -309,3 +309,13 @@ void MyLEDMatrix::print_2Dmatrix(Print &out) {
         stream_out.println();
     }
 }
+
+void MyLEDMatrix::print_info(Print &out, const char* pre) {
+    out.printf("%sBOARDS_COUNT:       %4d\r\n", pre, BOARDS_COUNT);
+    out.printf("%sCHIPS_COUNT:        %4d\r\n", pre, CHIPS_COUNT);
+    out.printf("%sBOARDS_ROW_COUNT:   %4d\r\n", pre, BOARDS_ROW_COUNT);
+    out.printf("%sBOARDS_COL_COUNT:   %4d\r\n", pre, BOARDS_COL_COUNT);
+    out.printf("%sMATRIX_ROW_COUNT:   %4d\r\n", pre, MATRIX_ROW_COUNT);
+    out.printf("%sMATRIX_COL_COUNT:   %4d\r\n", pre, MATRIX_COL_COUNT);
+    out.printf("%sMATRIX_PIXEL_COUNT: %4d\r\n", pre, MATRIX_PIXEL_COUNT);
+}

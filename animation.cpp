@@ -49,15 +49,8 @@ SOFTWARE.
 // NOLINTNEXTLINE(build/include)
 #include "./animation.h"
 
-// namespace MCAnim = MyAnimation;
-
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// matrix definitions
-// please extract this to own file / fix linking errors with matrix.h
-
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // functions
-
 
 MyAnimation::MyAnimation() {
     ready = false;
@@ -118,8 +111,8 @@ void MyAnimation::menu__set_pixel_index(Print &out, char *command) {
         command_offset = command_offset +1;
     }
 
-    if (index >= MATRIX_COL_COUNT) {
-        index = MATRIX_COL_COUNT -1;
+    if (index >= MyLEDMatrix::MATRIX_COL_COUNT) {
+        index = MyLEDMatrix::MATRIX_COL_COUNT -1;
     }
 
     out.print(index);
@@ -149,14 +142,14 @@ void MyAnimation::menu__set_pixel(Print &out, char *command) {
     // uint16_t value = atoi(command_pointer);
     uint16_t value = 2000;
 
-    if (col_i >= MATRIX_COL_COUNT) {
-        col_i = MATRIX_COL_COUNT -1;
+    if (col_i >= MyLEDMatrix::MATRIX_COL_COUNT) {
+        col_i = MyLEDMatrix::MATRIX_COL_COUNT -1;
     }
-    if (row_i >= MATRIX_ROW_COUNT) {
-        row_i = MATRIX_ROW_COUNT -1;
+    if (row_i >= MyLEDMatrix::MATRIX_ROW_COUNT) {
+        row_i = MyLEDMatrix::MATRIX_ROW_COUNT -1;
     }
 
-    uint16_t pixel_index = pmap[col_i][row_i];
+    uint16_t pixel_index = matrix.pmap[col_i][row_i];
     out.print(F(" ("));
     out.print(col_i);
     out.print(F(","));
@@ -539,44 +532,48 @@ void MyAnimation::calculate_effect_position() {
 
 void MyAnimation::effect__pixel_checker() {
     uint16_t step = map_range_01_to(
-        effect_position, 0, MATRIX_PIXEL_COUNT);
+        effect_position, 0, MyLEDMatrix::MATRIX_PIXEL_COUNT);
     matrix.tlc.setRGB(0, 0, 0);
     matrix.tlc.setRGB(step, 0, 0, 500);
 }
 
 void MyAnimation::effect__line() {
     matrix.tlc.setRGB(0, 0, 0);
-    uint16_t col_i_highlight = map_range_01_to(effect_position, 0, MATRIX_COL_COUNT);
-    uint16_t row_i_highlight = map_range_01_to(effect_position, 0, MATRIX_ROW_COUNT);
-    // for (size_t row_i = 0; row_i < MATRIX_ROW_COUNT; row_i++) {
-    //     matrix.tlc.setRGB(pmap[col_i][row_i], 0, 0, 500);
+    uint16_t col_i_highlight = map_range_01_to(
+        effect_position,
+        0, MyLEDMatrix::MATRIX_COL_COUNT);
+    uint16_t row_i_highlight = map_range_01_to(
+        effect_position,
+        0, MyLEDMatrix::MATRIX_ROW_COUNT);
+    // for (size_t row_i = 0; row_i < MyLEDMatrix::MATRIX_ROW_COUNT; row_i++) {
+    //     matrix.tlc.setRGB(matrix.pmap[col_i][row_i], 0, 0, 500);
     // }
-    for (size_t row_i = 0; row_i < MATRIX_ROW_COUNT; row_i++) {
-        for (size_t col_i = 0; col_i < MATRIX_COL_COUNT; col_i++) {
+    for (size_t row_i = 0; row_i < MyLEDMatrix::MATRIX_ROW_COUNT; row_i++) {
+        for (size_t col_i = 0; col_i < MyLEDMatrix::MATRIX_COL_COUNT; col_i++) {
             if (row_i == row_i_highlight) {
-                matrix.tlc.setRGB(pmap[col_i][row_i], 0, 0, 1000);
+                matrix.tlc.setRGB(matrix.pmap[col_i][row_i], 0, 0, 1000);
             }
             if (col_i == col_i_highlight) {
-                matrix.tlc.setRGB(pmap[col_i][row_i], 0, 1000, 0);
+                matrix.tlc.setRGB(matrix.pmap[col_i][row_i], 0, 1000, 0);
             }
         }
     }
 }
 
 void MyAnimation::effect__rainbow() {
-    for (size_t row_i = 0; row_i < MATRIX_ROW_COUNT; row_i++) {
-        for (size_t col_i = 0; col_i < MATRIX_COL_COUNT; col_i++) {
+    for (size_t row_i = 0; row_i < MyLEDMatrix::MATRIX_ROW_COUNT; row_i++) {
+        for (size_t col_i = 0; col_i < MyLEDMatrix::MATRIX_COL_COUNT; col_i++) {
             // full rainbow
             CHSV color_hsv = CHSV(effect_position, 1.0, brightness);
             CRGB color_rgb = hsv2rgb(color_hsv);
             matrix.tlc.setRGB(
-                pmap[col_i][row_i],
+                matrix.pmap[col_i][row_i],
                 // convert float to uint16_t
                 color_rgb.r * 65535,
                 color_rgb.g * 65535,
                 color_rgb.b * 65535);
             // matrix.tlc.setRGB(
-            //     pmap[col_i][row_i],
+            //     matrix.pmap[col_i][row_i],
             //     0, col_i * step * 10 , row_i * 100);
         }
     }
@@ -635,11 +632,14 @@ CHSV MyAnimation::effect__wave(float col, float row, float offset) {
     // calculate wave
     // mostly inspired by
     // https://editor.soulmatelights.com/gallery/1015-circle
-    // double radius = normalize_to_01(MATRIX_COL_COUNT, const 0, MATRIX_COL_COUNT);
+    // double radius = normalize_to_01(
+    //     MyLEDMatrix::MATRIX_COL_COUNT,
+    //     const 0, MyLEDMatrix::MATRIX_COL_COUNT);
     double radius = 0.1;
 
     // double offset_y = map_range_01_to(offset, -radius, radius);
-    // double dist = calcDist(col, row, MATRIX_COL_COUNT/2, offset_y);
+    // double dist = calcDist(
+    //     col, row, MyLEDMatrix::MATRIX_COL_COUNT/2, offset_y);
     //
     // exclude outside of circle
     // TODO(s-light): blur edge
@@ -665,8 +665,8 @@ CHSV MyAnimation::effect__mapping_checker(float col, float row, float offset) {
     // checker pattern
     CHSV pixel_hsv = CHSV(0.7, 1.0, 0.1);
 
-    float row_width = (1.0 / MATRIX_ROW_COUNT / 1.5);
-    float col_width = (1.0 / MATRIX_COL_COUNT / 1.5);
+    float row_width = (1.0 / MyLEDMatrix::MATRIX_ROW_COUNT / 1.5);
+    float col_width = (1.0 / MyLEDMatrix::MATRIX_COL_COUNT / 1.5);
     // float base = col * 0.2 + offset;
     float offset_half = map_range(offset, 0.0, 1.0, -0.5, 0.5);
     // float base = map_range(col, -0.5, 0.5, 0.0, 1.0);
@@ -711,13 +711,20 @@ CHSV MyAnimation::effect__mapping_checker(float col, float row, float offset) {
     return pixel_hsv;
 }
 
-CHSV MyAnimation::effect__mapping_checker(uint16_t col, uint16_t row, float offset) {
+CHSV MyAnimation::effect__mapping_checker(
+    uint16_t col, uint16_t row, float offset
+) {
     // checker pattern
     // CHSV pixel_hsv = CHSV(offset, 1.0, 0.01);
     CHSV pixel_hsv = CHSV(0.7, 1.0, 1.0);
-    uint8_t offset_row = offset * MATRIX_ROW_COUNT;
-    uint8_t offset_col = offset * MATRIX_COL_COUNT;
-    // Serial.printf("%+2.2f:%02d  %02d|%02d\r\n", offset, offset_row, row, col);
+    uint8_t offset_row = offset * MyLEDMatrix::MATRIX_ROW_COUNT;
+    uint8_t offset_col = offset * MyLEDMatrix::MATRIX_COL_COUNT;
+    // Serial.printf(
+    //     "%+2.2f:%02d  %02d|%02d\r\n",
+    //     offset,
+    //     offset_row,
+    //     row,
+    //     col);
     if (offset_row == row) {
         pixel_hsv.hue = 0.1;
         pixel_hsv.value = 1.0;
@@ -777,7 +784,9 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(
 
 void MyAnimation::effect_Matrix2D() {
     // float offset = map_range_01_to(effect_position, 0.0, (PI * 30));
-    // float offset = map_range_01_to(effect_position, 0, MATRIX_ROW_COUNT);
+    // float offset = map_range_01_to(
+    //     effect_position,
+    //     0, MyLEDMatrix::MATRIX_ROW_COUNT);
     float offset = effect_position;
 
     // Serial.println("");
@@ -795,24 +804,31 @@ void MyAnimation::effect_Matrix2D() {
     //     // NOLINTNEXTLINE(whitespace/parens)
     // );
 
-    for (size_t row_i = 0; row_i < MATRIX_ROW_COUNT; row_i++) {
+    for (size_t row_i = 0; row_i < MyLEDMatrix::MATRIX_ROW_COUNT; row_i++) {
         // normalize row
         float row = map_range(
             row_i,
-            0, MATRIX_ROW_COUNT-1,
+            0, MyLEDMatrix::MATRIX_ROW_COUNT-1,
             -0.5, 0.5);
-        // float row = normalize_to_01(row_i, 0, MATRIX_ROW_COUNT-1);
-        for (size_t col_i = 0; col_i < MATRIX_COL_COUNT; col_i++) {
+        // float row = normalize_to_01(
+        //     row_i,
+        //     0, MyLEDMatrix::MATRIX_ROW_COUNT-1);
+        for (size_t col_i = 0; col_i < MyLEDMatrix::MATRIX_COL_COUNT; col_i++) {
             // normalize col
             // float col = map_range__int2float(
             float col = map_range(
                 col_i,
-                0, MATRIX_COL_COUNT-1,
+                0, MyLEDMatrix::MATRIX_COL_COUNT-1,
                 -0.5, 0.5);
-            // float col = normalize_to_01(col_i, 0, MATRIX_COL_COUNT-1);
+            // float col = normalize_to_01(
+            //     col_i,
+            //     0, MyLEDMatrix::MATRIX_COL_COUNT-1);
 
             // ------------------------------------------
-            // CHSV pixel_hsv = effect_Matrix2D_get_pixel(col, row, col_i, row_i, offset);
+            // CHSV pixel_hsv = effect_Matrix2D_get_pixel(
+            //     col, row,
+            //     col_i, row_i,
+            //     offset);
             CHSV pixel_hsv = effect_Matrix2D_get_pixel(col, row, offset);
             // CHSV pixel_hsv = effect_Matrix2D_get_pixel(col, row, offset_PI);
 
@@ -827,13 +843,13 @@ void MyAnimation::effect_Matrix2D() {
             // gamma & global brightness
             // fancyled.gamma_adjust(brightness=self.brightness);
             matrix.tlc.setRGB(
-                pmap[col_i][row_i],
+                matrix.pmap[col_i][row_i],
                 // convert float to uint16_t
                 pixel_rgb.r * 65535,
                 pixel_rgb.g * 65535,
                 pixel_rgb.b * 65535);
             // matrix.tlc.setRGB(
-            //     pmap[col_i][row_i],
+            //     matrix.pmap[col_i][row_i],
             //     10000,
             //     10000,
             //     0);

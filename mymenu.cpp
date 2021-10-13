@@ -353,13 +353,13 @@ void MyMenu::menu__print_help(Print &out) {
     // out.println(F("\t 'f': test fc 'f'"));
     out.println(F("\t 'u': tlc.write() 'u'"));
     // out.print(F("\t 'e': toggle ESPWM 'e' ("));
-    // out.print(animation.tlc.get_fc_ESPWM());
+    // out.print(animation.matrix.tlc.get_fc_ESPWM());
     // out.println(F(")"));
     // out.print(F("\t 'g': set grayscale frequency in MHz 'g1.0' ("));
     // out.print(animation.gsclock_get_frequency_MHz(), 4);
     // out.println(F("MHz)"));
     // out.print(F("\t 's': set spi baudrate in MHz 's1.0' ("));
-    // out.print(animation.tlc.spi_baudrate / (1000.0 * 1000), 4);
+    // out.print(animation.matrix.tlc.spi_baudrate / (1000.0 * 1000), 4);
     // out.println(F("MHz)"));
     out.println(F("\t 't': set buffer to test values 't'"));
     out.println(F("\t 'T': time_meassurements 'T'"));
@@ -450,12 +450,12 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
         // ---------------------
         case 'u': {
             out.println(F("write buffer to chips"));
-            animation.tlc.write();
+            animation.matrix.tlc.write();
         } break;
         // case 'e': {
         //     out.println(F("toggle ESPWM"));
-        //     animation.tlc.set_fc_ESPWM_all(!animation.tlc.get_fc_ESPWM());
-        //     animation.tlc.update_fc();
+        //     animation.matrix.tlc.set_fc_ESPWM_all(!animation.matrix.tlc.get_fc_ESPWM());
+        //     animation.matrix.tlc.update_fc();
         // } break;
         // case 'g': {
         //     out.print(F("set grayscale frequency - new value:"));
@@ -471,9 +471,9 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
         //     float value = atof(&command[1]);
         //     out.print(value, 4);
         //     out.println(F("MHz"));
-        //     animation.tlc.spi_baudrate = value * 1000 * 1000;
+        //     animation.matrix.tlc.spi_baudrate = value * 1000 * 1000;
         //     // out.print(F(" → "));
-        //     // out.print(animation.tlc.spi_baudrate);
+        //     // out.print(animation.matrix.tlc.spi_baudrate);
         //     // out.println();
         // } break;
         // case 't': {
@@ -490,31 +490,31 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
         } break;
         case 'z': {
             out.println(F("Set all Pixel to black."));
-            animation.tlc.setRGB(0, 0, 0);
+            animation.matrix.tlc.setRGB(0, 0, 0);
             out.println();
         } break;
         case 'Z': {
             animation.menu__set_all_pixel(out, command);
         } break;
         case 'q': {
-            animation.print_pmap(out);
+            animation.matrix.print_pmap(out);
         } break;
         case 'Q': {
-            animation.print_2Dmatrix(out);
+            animation.matrix.print_2Dmatrix(out);
         } break;
         // case 'Z': {
         //     out.println(F("Set all Pixel to 21845."));
-        //     animation.tlc.setRGB(21845, 21845, 21845);
+        //     animation.matrix.tlc.setRGB(21845, 21845, 21845);
         //     out.println();
         // } break;
         // case 'B': {
         //     out.println(F("Print Buffer:"));
-        //     animation.print_tlc_buffer(out);
+        //     animation.matrix.print_tlc_buffer(out);
         //     out.println();
         // } break;
         // case 'F': {
         //     out.println(F("Print buffer_fc:"));
-        //     animation.tlc.print_buffer_fc(out);
+        //     animation.matrix.tlc.print_buffer_fc(out);
         //     out.println();
         // } break;
         //---------------------------------------------------------------------

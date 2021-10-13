@@ -84,6 +84,13 @@
 #include "./myinput.h"
 #include "./mymenu.h"
 
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// definitions (global)
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MyAnimation animation = MyAnimation();
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Info
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -129,13 +136,7 @@ void sketchinfo_print(Print &out) {
     out.println(F("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"));
     out.println(F("|"));
     out.println(F("| LED Matrix:"));
-    out.printf("|   BOARDS_COUNT:       %4d\r\n", BOARDS_COUNT);
-    out.printf("|   CHIPS_COUNT:        %4d\r\n", CHIPS_COUNT);
-    out.printf("|   BOARDS_ROW_COUNT:   %4d\r\n", BOARDS_ROW_COUNT);
-    out.printf("|   BOARDS_COL_COUNT:   %4d\r\n", BOARDS_COL_COUNT);
-    out.printf("|   MATRIX_ROW_COUNT:   %4d\r\n", MATRIX_ROW_COUNT);
-    out.printf("|   MATRIX_COL_COUNT:   %4d\r\n", MATRIX_COL_COUNT);
-    out.printf("|   MATRIX_PIXEL_COUNT: %4d\r\n", MATRIX_PIXEL_COUNT);
+    animation.matrix.print_info(out, "|   ");
     out.println(F("|"));
     out.println(F("|"));
     out.println(F("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"));
@@ -148,14 +149,13 @@ void sketchinfo_print(Print &out) {
     // __BASE_FILE__ /tmp/arduino_build_330237/sketch/src_arduino.ino.cpp
 }
 
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // definitions (global)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-MyAnimation animation = MyAnimation();
 MyInput myinput = MyInput(animation);
 MyMenu mymenu = MyMenu(animation, myinput, sketchinfo_print);
+
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // ISR magic

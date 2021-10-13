@@ -91,7 +91,9 @@ MyInput::~MyInput() {
 }
 
 
-void MyInput::begin(Stream &out, slight_RotaryEncoder::tCallbackFunctionISR func_ISR) {
+void MyInput::begin(
+    Stream &out, slight_RotaryEncoder::tCallbackFunctionISR func_ISR
+) {
     // clean up..
     end();
     // start up...
@@ -388,7 +390,7 @@ void MyInput::mybutton_event(slight_ButtonInput *instance) {
         } break;
         case slight_ButtonInput::event_click_double : {
             Serial.println(F("click double"));
-            encoder_mode_brightness != encoder_mode_brightness;
+            encoder_mode_brightness = !encoder_mode_brightness;
             Serial.print(F("  encoder_mode_brightness: "));
             Serial.println(encoder_mode_brightness);
         } break;
