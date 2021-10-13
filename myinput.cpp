@@ -385,10 +385,12 @@ void MyInput::mybutton_event(slight_ButtonInput *instance) {
         case slight_ButtonInput::event_click_long : {
             Serial.print(F("click long "));
             Serial.println((*instance).getDurationActive());
-            encoder_mode_brightness != encoder_mode_brightness;
         } break;
         case slight_ButtonInput::event_click_double : {
             Serial.println(F("click double"));
+            encoder_mode_brightness != encoder_mode_brightness;
+            Serial.print(F("  encoder_mode_brightness: "));
+            Serial.println(encoder_mode_brightness);
         } break;
         case slight_ButtonInput::event_click_triple : {
             Serial.println(F("click triple"));
@@ -404,7 +406,9 @@ void MyInput::mybutton_event(slight_ButtonInput *instance) {
 // ------------------------------------------
 // slight_RotaryEncoder things
 
-void MyInput::encoder_init(Stream &out, slight_RotaryEncoder::tCallbackFunctionISR func_ISR) {
+void MyInput::encoder_init(
+    Stream &out, slight_RotaryEncoder::tCallbackFunctionISR func_ISR
+) {
     out.println(F("setup encoder input:"));
     out.println(F("  myencoder.begin()"));
     // myencoder.begin(myencoder_pin_changed_ISR__helper);
@@ -439,7 +443,9 @@ void MyInput::myencoder_event(slight_RotaryEncoder *instance) {
             // Serial.println(temp_stepsAccel);
             // counter += temp_stepsAccel;
             if (encoder_mode_brightness) {
-                animation.set_brightness(animation.brightness + temp_stepsAccel*0.0002);
+                animation.set_brightness(
+                    animation.brightness
+                    + temp_stepsAccel*0.0002);
                 Serial.print(F("  animation.brightness: "));
                 Serial.println(animation.brightness, 4);
             } else {

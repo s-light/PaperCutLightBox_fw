@@ -65,7 +65,7 @@ SOFTWARE.
 #include "./animation.h"
 
 #include "./color.h"
-// #include "./matrix.h"
+#include "./ledmatrix.h"
 #include "./mapping.h"
 
 // namespace MCAnim = MyAnimation;
@@ -73,78 +73,6 @@ SOFTWARE.
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // matrix definitions
 // please extract this to own file / fix linking errors with matrix.h
-
-uint16_t MyAnimation::mymap_LEDBoard_4x4_16bit(uint8_t col, uint8_t row) {
-    // """Map row and col to pixel_index."""
-    // get Board position
-    uint16_t board_col = col / LEDBOARD_COL_COUNT;
-    uint16_t board_row = row / LEDBOARD_ROW_COUNT;
-    uint16_t board_sub_col = col % LEDBOARD_COL_COUNT;
-    uint16_t board_sub_row = row % LEDBOARD_ROW_COUNT;
-
-    // Serial.println("mymap_LEDBoard_4x4_16bit");
-    // Serial.print("  col: ");
-    // Serial.println(col);
-    // Serial.print("  row: ");
-    // Serial.println(row);
-    //
-    // Serial.print("  board_col: ");
-    // Serial.println(board_col);
-    // Serial.print("  board_row: ");
-    // Serial.println(board_row);
-    //
-    // Serial.print("  board_sub_col: ");
-    // Serial.println(board_sub_col);
-    // Serial.print("  board_sub_row: ");
-    // Serial.println(board_sub_row);
-
-
-    uint16_t board_index = BOARDS_ORDER[board_row][board_col];
-    uint16_t board_rotation = BOARDS_ROTATION[board_row][board_col];
-    // Serial.print("  board_index: ");
-    // Serial.println(board_index);
-    // Serial.print("  board_rotation: ");
-    // Serial.println(board_rotation);
-
-    uint16_t board_pixel_offset = board_index * LEDBOARD_PIXEL_COUNT;
-    // Serial.print("  board_pixel_offset: ");
-    // Serial.println(board_pixel_offset);
-
-    uint16_t board_sub_pixel_offset =
-        LEDBOARD_SINGLE[board_rotation][board_sub_row][board_sub_col];
-    // Serial.print("  board_sub_pixel_offset: ");
-    // Serial.println(board_sub_pixel_offset);
-
-    uint16_t pixel_index = board_pixel_offset + board_sub_pixel_offset;
-    // Serial.print("  pixel_index: ");
-    // Serial.println(pixel_index);
-
-    return pixel_index;
-}
-
-void MyAnimation::pmap_init() {
-    // """Prepare Static Map."""
-    for (size_t row_index = 0; row_index < MATRIX_ROW_COUNT; row_index++) {
-        for (size_t col_index = 0; col_index < MATRIX_COL_COUNT; col_index++) {
-            // uint16_t index = mymap_LEDBoard_4x4_HD(
-            // uint16_t index = mymap_LEDBoard_4x4_HD_CrystalLightGuide(
-            uint16_t index = mymap_LEDBoard_4x4_16bit(col_index, row_index);
-            // Serial.print(row_index);
-            // Serial.print(" ");
-            // Serial.print(col_index);
-            // Serial.print(" ");
-            // Serial.print(index);
-            // Serial.println();
-            pmap[col_index][row_index] = index;
-        }
-    }
-}
-
-
-
-
-
-
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // functions
@@ -164,8 +92,7 @@ void MyAnimation::begin(Stream &out) {
     // start up...
     if (ready == false) {
         // setup
-        pmap_init();
-        tlc_init(out);
+        ledmatrix.begin(out);
         animation_init(out);
 
         // enable
@@ -175,13 +102,14 @@ void MyAnimation::begin(Stream &out) {
 
 void MyAnimation::end() {
     if (ready) {
-        // nothing to do..
+        // ledmatrix.end();
     }
 }
 
 void MyAnimation::update() {
     if (ready) {
         animation_update();
+        // ledmatrix.update);
     }
 }
 
@@ -518,98 +446,6 @@ void MyAnimation::menu__set_brightness(Print &out, char *command) {
 }
 
 
-void MyAnimation::print_pmap(Print &out) {
-    out.println(F("print pixel map"));
-
-    // slight_DebugMenu::print_uint16_array_2D(
-    //     out, pmap, MATRIX_COL_COUNT, MATRIX_ROW_COUNT);
-
-    Print &stream_out = out;
-    size_t count_col = MATRIX_COL_COUNT;
-    size_t count_row = MATRIX_ROW_COUNT;
-
-    size_t col_i = 0;
-    size_t row_i = 0;
-    // print_uint16_align_right(stream_out, row_i);
-    // stream_out.print(F(" --> "));
-    // print_uint16_align_right(stream_out, pmap[col_i][row_i]);
-
-    // print header line
-    stream_out.print(F("  row / col"));
-    col_i = 0;
-    slight_DebugMenu::print_uint16_align_right(stream_out, 0);
-    for (col_i = 1; col_i < count_col; col_i++) {
-        stream_out.print(F(", "));
-        slight_DebugMenu::print_uint16_align_right(stream_out, col_i);
-    }
-    stream_out.println();
-    // stream_out.println();
-    // print rows
-    for (row_i = 0; row_i < count_row; row_i++) {
-        // print row numer
-        slight_DebugMenu::print_uint16_align_right(stream_out, row_i);
-        stream_out.print(F("  --> "));
-        col_i = 0;
-        slight_DebugMenu::print_uint16_align_right(
-            stream_out, pmap[col_i][row_i]);
-        for (col_i = 1; col_i < count_col; col_i++) {
-            stream_out.print(F(", "));
-            slight_DebugMenu::print_uint16_align_right(
-                stream_out, pmap[col_i][row_i]);
-        }
-        stream_out.println();
-    }
-}
-
-
-void MyAnimation::print_2Dmatrix(Print &out) {
-    out.println(F("print 2DMatrix row col values"));
-    Print &stream_out = out;
-
-    // enable float support
-    // https://github.com/arduino/ArduinoCore-samd/issues/217
-    asm(".global _printf_float");
-
-
-    size_t count_col = MATRIX_COL_COUNT;
-    size_t count_row = MATRIX_ROW_COUNT;
-
-    size_t col_i = 0;
-    size_t row_i = 0;
-    // print_uint16_align_right(stream_out, row_i);
-    // stream_out.print(F(" --> "));
-    // print_uint16_align_right(stream_out, pmap[col_i][row_i]);
-
-    // print header line
-    col_i = 0;
-    float col = normalize_to_01(col_i, 0, MATRIX_COL_COUNT-1);
-    stream_out.printf("int(float)     %2d(%1.2f)", col_i, col);
-    for (col_i = 1; col_i < count_col; col_i++) {
-        col = normalize_to_01(col_i, 0, MATRIX_COL_COUNT-1);
-        stream_out.printf(",%2d(%1.2f)", col_i, col);
-    }
-    stream_out.println();
-
-    // print rows
-    for (row_i = 0; row_i < count_row; row_i++) {
-        // normalize row
-        // float row = map_range(
-        //     row_i,
-        //     0, MATRIX_ROW_COUNT-1,
-        //     -0.5, 0.5);
-        float row = normalize_to_01(row_i, 0, MATRIX_ROW_COUNT-1);
-
-        // print row numer
-        stream_out.printf("%2d(%1.2f) -->   ", row_i, row);
-
-        col_i = 0;
-        stream_out.printf(" %7d", pmap[col_i][row_i]);
-        for (col_i = 1; col_i < count_col; col_i++) {
-            stream_out.printf(", %7d", pmap[col_i][row_i]);
-        }
-        stream_out.println();
-    }
-}
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // brightness

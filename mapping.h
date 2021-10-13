@@ -76,6 +76,15 @@ const T& limit(const T& x, const T& top) {
 }
 
 
+template<class T>
+const T& overflow01(const T& x) {
+    while (x > 1.0) {
+        x -= 1.0;
+    }
+    return x;
+}
+
+
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // map_range
