@@ -53,16 +53,16 @@ SOFTWARE.
 
 #include "./mapping.h"
 
-class MyLEDMatrix {
-public:
 
-    static constexpr uint16_t LEDBOARD_COL_COUNT = 4;
-    static constexpr uint16_t LEDBOARD_ROW_COUNT = 4;
-    static constexpr uint16_t LEDBOARD_PIXEL_COUNT = (
+
+
+    const uint16_t LEDBOARD_COL_COUNT = 4;
+    const uint16_t LEDBOARD_ROW_COUNT = 4;
+    const uint16_t LEDBOARD_PIXEL_COUNT = (
         LEDBOARD_ROW_COUNT * LEDBOARD_COL_COUNT);
-    static constexpr uint16_t LEDBOARD_CHIP_COUNT = LEDBOARD_PIXEL_COUNT / 4;
+    const uint16_t LEDBOARD_CHIP_COUNT = LEDBOARD_PIXEL_COUNT / 4;
 
-    static constexpr uint8_t LEDBOARD_SINGLE
+    const uint8_t LEDBOARD_SINGLE
             [4][LEDBOARD_ROW_COUNT][LEDBOARD_COL_COUNT] = {
         // with all 4 rotations
         {
@@ -95,17 +95,17 @@ public:
         },
     };
 
-    // static constexpr uint8_t BOARDS_COL_COUNT = 5;
-    // static constexpr uint8_t BOARDS_ROW_COUNT = 7;
-    static constexpr uint8_t BOARDS_COL_COUNT = 7;
-    static constexpr uint8_t BOARDS_ROW_COUNT = 3;
-    // static constexpr uint8_t BOARDS_COL_COUNT = 1;
-    // static constexpr uint8_t BOARDS_ROW_COUNT = 1;
-    static constexpr uint8_t BOARDS_COUNT = BOARDS_COL_COUNT * BOARDS_ROW_COUNT;
+    // const uint8_t BOARDS_COL_COUNT = 5;
+    // const uint8_t BOARDS_ROW_COUNT = 7;
+    const uint8_t BOARDS_COL_COUNT = 7;
+    const uint8_t BOARDS_ROW_COUNT = 3;
+    // const uint8_t BOARDS_COL_COUNT = 1;
+    // const uint8_t BOARDS_ROW_COUNT = 1;
+    const uint8_t BOARDS_COUNT = BOARDS_COL_COUNT * BOARDS_ROW_COUNT;
 
-    static constexpr uint16_t CHIPS_COUNT = BOARDS_COUNT * LEDBOARD_CHIP_COUNT;
+    const uint16_t CHIPS_COUNT = BOARDS_COUNT * LEDBOARD_CHIP_COUNT;
 
-    // static constexpr uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+    // const uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
     //     {34, 33, 32, 31, 30},
     //     {29, 28, 27, 26, 25},
     //     {24, 23, 22, 21, 20},
@@ -115,7 +115,7 @@ public:
     //     {0, 4, 8, 12, 16},
     // };
     //
-    // static constexpr uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+    // const uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
     //     {2, 2, 2, 2, 2},
     //     {2, 2, 2, 2, 2},
     //     {2, 2, 2, 2, 2},
@@ -125,7 +125,7 @@ public:
     //     {3, 3, 3, 3, 3},
     // };
 
-    static constexpr uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+    const uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
         {20, 19, 18, 17, 16, 15, 14},
         {13, 12,  9,  8,  7,  3,  2},
         {11, 10,  6,  5,  4,  1,  0},
@@ -135,29 +135,34 @@ public:
     // 1 = 90° → socket at left
     // 2 = 180° → socket at top
     // 3 = 270° → socket at right
-    static constexpr uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+    const uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
         {2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2},
     };
 
-    // static constexpr uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+    // const uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
     //     // {3},
     //     // {2},
     //     // {1},
     //     {0},
     // };
     //
-    // static constexpr uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+    // const uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
     //     // {3},
     //     // {3},
     //     // {3},
     //     {3},
     // };
 
-    static constexpr uint8_t MATRIX_COL_COUNT = LEDBOARD_COL_COUNT * BOARDS_COL_COUNT;
-    static constexpr uint8_t MATRIX_ROW_COUNT = LEDBOARD_ROW_COUNT * BOARDS_ROW_COUNT;
-    static constexpr uint16_t MATRIX_PIXEL_COUNT = MATRIX_COL_COUNT * MATRIX_ROW_COUNT;
+    const uint8_t MATRIX_COL_COUNT = LEDBOARD_COL_COUNT * BOARDS_COL_COUNT;
+    const uint8_t MATRIX_ROW_COUNT = LEDBOARD_ROW_COUNT * BOARDS_ROW_COUNT;
+    const uint16_t MATRIX_PIXEL_COUNT = MATRIX_COL_COUNT * MATRIX_ROW_COUNT;
+
+
+
+class MyLEDMatrix {
+public:
 
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
