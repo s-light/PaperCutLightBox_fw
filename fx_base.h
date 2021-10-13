@@ -44,8 +44,8 @@ SOFTWARE.
 // include Core Arduino functionality
 #include <Arduino.h>
 
-#include "../color.h"
-#include "../mapping.h"
+#include "./color.h"
+#include "./mapping.h"
 
 class FXBase {
 public:
