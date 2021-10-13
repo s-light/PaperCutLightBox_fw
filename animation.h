@@ -59,9 +59,9 @@ SOFTWARE.
 #include "./ledmatrix.h"
 #include "./mapping.h"
 
-#include "./effects/fx_base.h"
-// #include "./effects/fx_line.h"
-// #include "./effects/fx_wave.h"
+#include ".//fx_base.h"
+// #include ".//fx_line.h"
+// #include ".//fx_wave.h"
 
 class MyAnimation {
 public:

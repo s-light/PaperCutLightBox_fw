@@ -46,9 +46,9 @@ SOFTWARE.
 
 #include "./fx_base.h"
 
-// #include "../color.h"
-// #include "../ledmatrix.h"
-// #include "../mapping.h"
+// #include "./color.h"
+// #include "./ledmatrix.h"
+// #include "./mapping.h"
 
 class FXLine : public FXBase{
 public:
