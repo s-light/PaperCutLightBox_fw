@@ -54,10 +54,6 @@ SOFTWARE.
 
 #include <slight_DebugMenu.h>
 
-#include <SPI.h>
-// #include <slight_TLC5957.h>
-#include <Tlc59711.h>
-
 #include "./color.h"
 #include "./ledmatrix.h"
 
@@ -77,19 +73,10 @@ public:
     //   const uint16_t defaultv;
     // };
 
-
-
-
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // matrix definitions
-    // please extract this to own file / fix linking errors with matrix.h
-
-
-
-
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // attributes
 
+    MyLEDMatrix matrix = MyLEDMatrix();
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // constructor
 

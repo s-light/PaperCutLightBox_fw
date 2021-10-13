@@ -5,7 +5,14 @@
         all things led matrix related
 
     libraries used:
-        ~
+        ~ slight_DebugMenu
+            written by stefan krueger (s-light),
+                github@s-light.eu, http://s-light.eu, https://github.com/s-light/
+            license: MIT
+        ~ Tlc59711.h
+            License: MIT
+            Copyright (c) 2016 Ulrich Stern
+            https://github.com/ulrichstern/Tlc59711
 
     written by stefan krueger (s-light),
         github@s-light.eu, http://s-light.eu, https://github.com/s-light/
@@ -42,15 +49,15 @@ SOFTWARE.
 #include "./ledmatrix.h"
 
 
-LEDMatrix::LEDMatrix() {
+MyLEDMatrix::MyLEDMatrix() {
     ready = false;
 }
 
-LEDMatrix::~LEDMatrix() {
+MyLEDMatrix::~MyLEDMatrix() {
     end();
 }
 
-void LEDMatrix::begin(Stream &out) {
+void MyLEDMatrix::begin(Stream &out) {
     // clean up..
     end();
     // start up...
@@ -58,23 +65,83 @@ void LEDMatrix::begin(Stream &out) {
         // setup
         pmap_init();
         tlc_init(out);
-        animation_init(out);
-
         // enable
         ready = true;
     }
 }
 
-void LEDMatrix::end() {
+void MyLEDMatrix::end() {
     if (ready) {
         // nothing to do..
     }
 }
 
-void LEDMatrix::update() {
+void MyLEDMatrix::update() {
     if (ready) {
-        animation_update();
+        // nothing to do..
     }
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TLC5957 / LED-Driver
+
+void MyLEDMatrix::tlc_init(Stream &out) {
+    out.println(F("setup tlc:"));
+
+    out.println(F("    tlc.beginFast()"));
+    // tlc.beginFast();
+
+    tlc.beginFast(
+        // bufferXfer (default: true)
+        false,
+        // spiClock (default: 10 * 1000 * 1000)
+        20 * 1000 * 1000
+        // postXferDelayMicros (default: 4)
+        // 4
+        // NOLINTNEXTLINE(whitespace/parens)
+    );
+
+    // tlc.setBrightness(127, 127, 127);
+
+    out.println(F("    start with leds off"));
+    tlc.setRGB();
+    tlc.write();
+
+    out.println(F("    set leds to 0, 0, 1"));
+    tlc.setRGB(0, 0, 1);
+    tlc.write();
+
+
+    // out.println(F("  set spi_baudrate"));
+    // 2MHz
+    // tlc.spi_baudrate = 2.0 * 1000 * 1000;
+    // 0.001MHz = 1000kHz
+    // tlc.spi_baudrate = 0.001 * 1000 * 1000;
+
+
+    // out.print(F("  tlc.pixel_count: "));
+    // out.print(tlc.pixel_count);
+    // out.println();
+    // out.print(F("  tlc.chip_count: "));
+    // out.print(tlc.chip_count);
+    // out.println();
+    // out.print(F("  tlc.buffer_byte_count: "));
+    // out.print(tlc.buffer_byte_count);
+    // out.println();
+    // out.print(F("  tlc.spi_baudrate: "));
+    // out.print(tlc.spi_baudrate);
+    // out.print(F("Hz"));
+    // out.print(F("  = "));
+    // out.print(tlc.spi_baudrate / 1000.0, 4);
+    // out.print(F("kHz"));
+    // out.print(F("  = "));
+    // out.print(tlc.spi_baudrate / (1000.0 * 1000.0), 4);
+    // out.println(F("MHz"));
+    //
+    // out.print(F("  tlc.get_fc_ESPWM(): "));
+    // out.print(tlc.get_fc_ESPWM());
+    out.println();
+    out.println(F("  finished."));
 }
 
 
@@ -83,7 +150,7 @@ void LEDMatrix::update() {
 // mapping
 
 // uint16_t mymap_LEDBoard_4x4_16bit(uint8_t col, uint8_t row) {
-uint16_t LEDMatrix::mymap_LEDBoard_4x4_16bit(uint8_t col, uint8_t row) {
+uint16_t MyLEDMatrix::mymap_LEDBoard_4x4_16bit(uint8_t col, uint8_t row) {
     // """Map row and col to pixel_index."""
     // get Board position
     uint16_t board_col = col / LEDBOARD_COL_COUNT;
@@ -132,7 +199,7 @@ uint16_t LEDMatrix::mymap_LEDBoard_4x4_16bit(uint8_t col, uint8_t row) {
 }
 
 // void pmap_init() {
-void LEDMatrix::pmap_init() {
+void MyLEDMatrix::pmap_init() {
     // """Prepare Static Map."""
     for (size_t row_index = 0; row_index < MATRIX_ROW_COUNT; row_index++) {
         for (size_t col_index = 0; col_index < MATRIX_COL_COUNT; col_index++) {
@@ -154,7 +221,7 @@ void LEDMatrix::pmap_init() {
 // menu
 
 
-void LEDMatrix::print_pmap(Print &out) {
+void MyLEDMatrix::print_pmap(Print &out) {
     out.println(F("print pixel map"));
 
     // slight_DebugMenu::print_uint16_array_2D(
@@ -198,7 +265,7 @@ void LEDMatrix::print_pmap(Print &out) {
 }
 
 
-void LEDMatrix::print_2Dmatrix(Print &out) {
+void MyLEDMatrix::print_2Dmatrix(Print &out) {
     out.println(F("print 2DMatrix row col values"));
     Print &stream_out = out;
 

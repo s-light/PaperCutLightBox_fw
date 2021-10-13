@@ -16,10 +16,6 @@
             written by stefan krueger (s-light),
                 github@s-light.eu, http://s-light.eu, https://github.com/s-light/
             license: MIT
-        ~ Tlc59711.h
-            License: MIT
-            Copyright (c) 2016 Ulrich Stern
-            https://github.com/ulrichstern/Tlc59711
 
     written by stefan krueger (s-light),
         github@s-light.eu, http://s-light.eu, https://github.com/s-light/
@@ -56,9 +52,6 @@ SOFTWARE.
 #include <slight_DebugMenu.h>
 #include <slight_FaderLin.h>
 
-#include <SPI.h>
-// #include <slight_TLC5957.h>
-#include <Tlc59711.h>
 
 // include own headerfile
 // NOLINTNEXTLINE(build/include)
@@ -92,7 +85,7 @@ void MyAnimation::begin(Stream &out) {
     // start up...
     if (ready == false) {
         // setup
-        ledmatrix.begin(out);
+        matrix.begin(out);
         animation_init(out);
 
         // enable
@@ -102,14 +95,14 @@ void MyAnimation::begin(Stream &out) {
 
 void MyAnimation::end() {
     if (ready) {
-        // ledmatrix.end();
+        // matrix.end();
     }
 }
 
 void MyAnimation::update() {
     if (ready) {
         animation_update();
-        // ledmatrix.update);
+        // matrix.update());
     }
 }
 
@@ -146,7 +139,7 @@ void MyAnimation::menu__set_pixel_index(Print &out, char *command) {
     // uint16_t value = atoi(&command[command_offset]);
     uint16_t value = 2000;
     out.print(value);
-    tlc.setRGB(index, value, value, value);
+    matrix.tlc.setRGB(index, value, value, value);
     out.println();
 }
 
@@ -188,14 +181,14 @@ void MyAnimation::menu__set_pixel(Print &out, char *command) {
     out.print(value);
     out.println();
 
-    tlc.setRGB(pixel_index, value, value, value);
+    matrix.tlc.setRGB(pixel_index, value, value, value);
 }
 
 void MyAnimation::menu__set_all_pixel(Print &out, char *command) {
     out.print(F("Set all pixel to "));
     // uint16_t value = atoi(&command[1]);
     //
-    // tlc.setRGB(value, value, value);
+    // matrix.tlc.setRGB(value, value, value);
     // out.print(value);
     // out.println();
 
@@ -233,7 +226,7 @@ void MyAnimation::menu__set_all_pixel(Print &out, char *command) {
     }
 
     out.printf(" r:%5d, g:%5d, b:%5d\r\n", red, green, blue);
-    tlc.setRGB(red, green, blue);
+    matrix.tlc.setRGB(red, green, blue);
 }
 
 void MyAnimation::menu__time_meassurements(Print &out) {
@@ -260,9 +253,9 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     out.print(F("us / call"));
     out.println();
 
-    out.print(F("tlc.write() 1:     "));
+    out.print(F("matrix.tlc.write() 1:     "));
     tm_start = micros();
-    tlc.write();
+    matrix.tlc.write();
     tm_end = micros();
     tm_duration = (tm_end - tm_start);
     out.print(tm_duration);
@@ -302,14 +295,14 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     // out.println();
 
 
-    out.print(F("tlc.write():       "));
+    out.print(F("matrix.tlc.write():       "));
     tm_start = 0;
     tm_end = 0;
     tm_duration = 0;
     tm_loop_count = 100;
     for (size_t i = 0; i < tm_loop_count; i++) {
         tm_start = micros();
-        tlc.write();
+        matrix.tlc.write();
         tm_end = micros();
         tm_duration += (tm_end - tm_start);
     }
@@ -468,69 +461,6 @@ float MyAnimation::set_hue(float hue_) {
     return hue;
 }
 
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TLC5957 / LED-Driver
-
-void MyAnimation::tlc_init(Stream &out) {
-    out.println(F("setup tlc:"));
-
-    out.println(F("    tlc.beginFast()"));
-    // tlc.beginFast();
-
-    tlc.beginFast(
-        // bufferXfer (default: true)
-        false,
-        // spiClock (default: 10 * 1000 * 1000)
-        20 * 1000 * 1000
-        // postXferDelayMicros (default: 4)
-        // 4
-        // NOLINTNEXTLINE(whitespace/parens)
-    );
-
-    // tlc.setBrightness(127, 127, 127);
-
-    out.println(F("    start with leds off"));
-    tlc.setRGB();
-    tlc.write();
-
-    out.println(F("    set leds to 0, 0, 1"));
-    tlc.setRGB(0, 0, 1);
-    tlc.write();
-
-
-    // out.println(F("  set spi_baudrate"));
-    // 2MHz
-    // tlc.spi_baudrate = 2.0 * 1000 * 1000;
-    // 0.001MHz = 1000kHz
-    // tlc.spi_baudrate = 0.001 * 1000 * 1000;
-
-
-    // out.print(F("  tlc.pixel_count: "));
-    // out.print(tlc.pixel_count);
-    // out.println();
-    // out.print(F("  tlc.chip_count: "));
-    // out.print(tlc.chip_count);
-    // out.println();
-    // out.print(F("  tlc.buffer_byte_count: "));
-    // out.print(tlc.buffer_byte_count);
-    // out.println();
-    // out.print(F("  tlc.spi_baudrate: "));
-    // out.print(tlc.spi_baudrate);
-    // out.print(F("Hz"));
-    // out.print(F("  = "));
-    // out.print(tlc.spi_baudrate / 1000.0, 4);
-    // out.print(F("kHz"));
-    // out.print(F("  = "));
-    // out.print(tlc.spi_baudrate / (1000.0 * 1000.0), 4);
-    // out.println(F("MHz"));
-    //
-    // out.print(F("  tlc.get_fc_ESPWM(): "));
-    // out.print(tlc.get_fc_ESPWM());
-    out.println();
-    out.println(F("  finished."));
-}
-
-
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // animation
@@ -542,10 +472,11 @@ void MyAnimation::animation_init(Stream &out) {
         out.println(F("ms"));
 
         // out.println(F("  Set all Pixel to 21845."));
-        // tlc.setRGB(21845, 21845, 21845);
+        // matrix.tlc.setRGB(21845, 21845, 21845);
         out.println(F("  Set all Pixel to red=blue=100."));
-        tlc.setRGB(200, 50, 0);
-        tlc.write();
+        matrix.tlc.setRGB(200, 50, 0);
+        matrix.tlc.write();
+
 
         effect_start = micros();
         effect_end = micros() + (effect_duration*1000);
@@ -563,7 +494,7 @@ void MyAnimation::animation_update() {
         effect_Matrix2D();
 
         // write data to chips
-        tlc.write();
+        matrix.tlc.write();
         effect_loopcount++;
     }
 }
@@ -621,24 +552,24 @@ void MyAnimation::calculate_effect_position() {
 void MyAnimation::effect__pixel_checker() {
     uint16_t step = map_range_01_to(
         effect_position, 0, MATRIX_PIXEL_COUNT);
-    tlc.setRGB(0, 0, 0);
-    tlc.setRGB(step, 0, 0, 500);
+    matrix.tlc.setRGB(0, 0, 0);
+    matrix.tlc.setRGB(step, 0, 0, 500);
 }
 
 void MyAnimation::effect__line() {
-    tlc.setRGB(0, 0, 0);
+    matrix.tlc.setRGB(0, 0, 0);
     uint16_t col_i_highlight = map_range_01_to(effect_position, 0, MATRIX_COL_COUNT);
     uint16_t row_i_highlight = map_range_01_to(effect_position, 0, MATRIX_ROW_COUNT);
     // for (size_t row_i = 0; row_i < MATRIX_ROW_COUNT; row_i++) {
-    //     tlc.setRGB(pmap[col_i][row_i], 0, 0, 500);
+    //     matrix.tlc.setRGB(pmap[col_i][row_i], 0, 0, 500);
     // }
     for (size_t row_i = 0; row_i < MATRIX_ROW_COUNT; row_i++) {
         for (size_t col_i = 0; col_i < MATRIX_COL_COUNT; col_i++) {
             if (row_i == row_i_highlight) {
-                tlc.setRGB(pmap[col_i][row_i], 0, 0, 1000);
+                matrix.tlc.setRGB(pmap[col_i][row_i], 0, 0, 1000);
             }
             if (col_i == col_i_highlight) {
-                tlc.setRGB(pmap[col_i][row_i], 0, 1000, 0);
+                matrix.tlc.setRGB(pmap[col_i][row_i], 0, 1000, 0);
             }
         }
     }
@@ -650,13 +581,13 @@ void MyAnimation::effect__rainbow() {
             // full rainbow
             CHSV color_hsv = CHSV(effect_position, 1.0, brightness);
             CRGB color_rgb = hsv2rgb(color_hsv);
-            tlc.setRGB(
+            matrix.tlc.setRGB(
                 pmap[col_i][row_i],
                 // convert float to uint16_t
                 color_rgb.r * 65535,
                 color_rgb.g * 65535,
                 color_rgb.b * 65535);
-            // tlc.setRGB(
+            // matrix.tlc.setRGB(
             //     pmap[col_i][row_i],
             //     0, col_i * step * 10 , row_i * 100);
         }
@@ -907,13 +838,13 @@ void MyAnimation::effect_Matrix2D() {
             CRGB pixel_rgb = hsv2rgb(pixel_hsv);
             // gamma & global brightness
             // fancyled.gamma_adjust(brightness=self.brightness);
-            tlc.setRGB(
+            matrix.tlc.setRGB(
                 pmap[col_i][row_i],
                 // convert float to uint16_t
                 pixel_rgb.r * 65535,
                 pixel_rgb.g * 65535,
                 pixel_rgb.b * 65535);
-            // tlc.setRGB(
+            // matrix.tlc.setRGB(
             //     pmap[col_i][row_i],
             //     10000,
             //     10000,
