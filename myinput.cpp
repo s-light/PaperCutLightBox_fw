@@ -92,7 +92,8 @@ MyInput::~MyInput() {
 
 
 void MyInput::begin(
-    Stream &out, slight_RotaryEncoder::tCallbackFunctionISR func_ISR
+    Stream &out,
+    slight_RotaryEncoder::tCallbackFunctionISR func_ISR
 ) {
     // clean up..
     end();

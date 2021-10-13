@@ -60,6 +60,10 @@ SOFTWARE.
 #include "./easing.h"
 #include "./ledmatrix.h"
 
+#include "./effects/fx_base.h"
+// #include "./effects/fx_line.h"
+// #include "./effects/fx_wave.h"
+
 class MyAnimation {
 public:
 
@@ -81,6 +85,11 @@ public:
 
     // pin_output_enable: 2
     MyLEDMatrix matrix = MyLEDMatrix(2);
+
+    FXBase fx_base = FXBase();
+    // FXLine fx_line = FXLine();
+    // FXWave fx_wave = FXWave();
+
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // constructor
