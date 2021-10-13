@@ -45,21 +45,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ******************************************************************************/
 
-
-// include Core Arduino functionality
-#include <Arduino.h>
-
-#include <slight_DebugMenu.h>
-#include <slight_FaderLin.h>
-
-
 // include own headerfile
 // NOLINTNEXTLINE(build/include)
 #include "./animation.h"
-
-#include "./color.h"
-#include "./ledmatrix.h"
-#include "./mapping.h"
 
 // namespace MCAnim = MyAnimation;
 

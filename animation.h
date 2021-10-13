@@ -53,9 +53,11 @@ SOFTWARE.
 #include <Arduino.h>
 
 #include <slight_DebugMenu.h>
+#include <slight_FaderLin.h>
 
 #include "./color.h"
 #include "./ledmatrix.h"
+#include "./mapping.h"
 
 class MyAnimation {
 public:

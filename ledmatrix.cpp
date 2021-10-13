@@ -42,10 +42,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ******************************************************************************/
 
-
-// include Core Arduino functionality
-#include <Arduino.h>
-
 #include "./ledmatrix.h"
 
 

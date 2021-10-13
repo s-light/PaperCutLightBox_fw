@@ -51,6 +51,8 @@ SOFTWARE.
 // used for print_uint16_align_right
 #include <slight_DebugMenu.h>
 
+#include "./mapping.h"
+
 class MyLEDMatrix {
 public:
 
