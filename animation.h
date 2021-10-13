@@ -59,6 +59,10 @@ SOFTWARE.
 #include "./ledmatrix.h"
 #include "./mapping.h"
 
+#include "./effects/fx_base.h"
+// #include "./effects/fx_line.h"
+// #include "./effects/fx_wave.h"
+
 class MyAnimation {
 public:
 
@@ -79,6 +83,12 @@ public:
     // attributes
 
     MyLEDMatrix matrix = MyLEDMatrix();
+
+    FXBase fx_base = FXBase();
+    // FXLine fx_line = FXLine();
+    // FXWave fx_wave = FXWave();
+
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // constructor
 
