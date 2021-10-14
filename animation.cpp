@@ -630,33 +630,26 @@ float MyAnimation::calcDist(float x, float y, float center_x, float center_y) {
 
 CHSV MyAnimation::effect__wave(float col, float row, float offset) {
     // calculate wave
-    // mostly inspired by
+    // online
     // https://editor.soulmatelights.com/gallery/1015-circle
-    // double radius = normalize_to_01(
-    //     MATRIX_COL_COUNT,
-    //     const 0, MATRIX_COL_COUNT);
-    double radius = 0.1;
 
-    // double offset_y = map_range_01_to(offset, -radius, radius);
-    // double dist = calcDist(
-    //     col, row, MATRIX_COL_COUNT/2, offset_y);
-    //
-    // exclude outside of circle
-    // TODO(s-light): blur edge
-    // double brightness = 0;
-    // if (dist <= radius) {
-    //     brightness = map_range_clamped(dist, 0.0, radius, 1.0, 0.0);
-    //     brightness += offset;
-    //     brightness = sin(brightness);
-    //     brightness = map_range_clamped(brightness, 0.0, 1.0, 0.4, 1.0);
-    // }
+    float dist = calcDist(x, y, 0.5, offset * 2);
+    float dist_f = dist / (radius * 1.0);
 
-    double dist = calcDist(col, row, 0.5, 0.5);
-    double brightness = 0;
-    brightness = map_range_clamped(dist, 0.0, radius, 1.0, 0.0);
+    float value = 1.0;
+    value = map_range(dist, 0, radius, 1.0, 0.0);
+    value += offset;
+    // map to *full circle* in radians
+    value = sin(map_range_01_to_0n(value, (360*PI/180)));
+
+    // exclude / blur outside of circle
+    value *= easeOut(1.0 - dist_f);
+    if (dist > radius) {
+        value_f = 0.0;
+    }
 
     // map to color
-    CHSV pixel_hsv = CHSV(0.2, 1.0, brightness);
+    CHSV pixel_hsv = CHSV(0.2, 1.0, value);
     return pixel_hsv;
 }
 
@@ -747,6 +740,8 @@ CHSV MyAnimation::effect__sparkle(
 }
 
 
+
+
 CHSV MyAnimation::effect_Matrix2D_get_pixel(
     __attribute__((unused)) float col,
     __attribute__((unused)) float row,
@@ -806,23 +801,19 @@ void MyAnimation::effect_Matrix2D() {
 
     for (size_t row_i = 0; row_i < MATRIX_ROW_COUNT; row_i++) {
         // normalize row
-        float row = map_range(
-            row_i,
-            0, MATRIX_ROW_COUNT-1,
-            -0.5, 0.5);
-        // float row = normalize_to_01(
+        // float row = map_range(
         //     row_i,
-        //     0, MATRIX_ROW_COUNT-1);
+        //     0, MATRIX_ROW_COUNT-1,
+        //     -0.5, 0.5);
+        float row = normalize_0n_to_01(row_i, MATRIX_ROW_COUNT-1);
         for (size_t col_i = 0; col_i < MATRIX_COL_COUNT; col_i++) {
             // normalize col
             // float col = map_range__int2float(
-            float col = map_range(
-                col_i,
-                0, MATRIX_COL_COUNT-1,
-                -0.5, 0.5);
-            // float col = normalize_to_01(
+            // float col = map_range(
             //     col_i,
-            //     0, MATRIX_COL_COUNT-1);
+            //     0, MATRIX_COL_COUNT-1,
+            //     -0.5, 0.5);
+            float col = normalize_0n_to_01(col_i, MATRIX_COL_COUNT-1);
 
             // ------------------------------------------
             // CHSV pixel_hsv = effect_Matrix2D_get_pixel(
@@ -830,7 +821,6 @@ void MyAnimation::effect_Matrix2D() {
             //     col_i, row_i,
             //     offset);
             CHSV pixel_hsv = effect_Matrix2D_get_pixel(col, row, offset);
-            // CHSV pixel_hsv = effect_Matrix2D_get_pixel(col, row, offset_PI);
 
             // ------------------------------------------
             // final conversions

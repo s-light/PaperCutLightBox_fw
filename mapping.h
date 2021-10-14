@@ -143,6 +143,20 @@ T3 map_range_01_to(T1 x, T2 out_min, T3 out_max) {
 // }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// map_range_01_to_0x
+
+template<class T1, class T2>
+T2 map_range_01_to_0n(T1 x, T2 out_max) {
+    return x * out_max;
+}
+
+// template<class T1, class T2, class T3>
+// T3 map_range_01_to_0n(T1 x, T2 out_max) {
+//     return x * out_max;
+// }
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // normalize_to_01
 
 template<class T1, class T2>
@@ -170,6 +184,17 @@ T3 normalize_to_01(T1 x, T2 in_min, T2 in_max) {
 // T3 normalize_to_01(T1 x, T2 in_min, T2 in_max) {
 //     return ((x - in_min) * 1.0) / (in_max - in_min);
 // }
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// map_range_0n_to_01
+
+template<class T1, class T2>
+T2 normalize_0n_to_01(T1 x, T1 in_max) {
+    return static_cast<T2>(1) * x / in_max;
+}
+
+
+
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // MultiMap / multi_map
