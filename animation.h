@@ -56,8 +56,9 @@ SOFTWARE.
 #include <slight_FaderLin.h>
 
 #include "./color.h"
-#include "./ledmatrix.h"
 #include "./mapping.h"
+#include "./easing.h"
+#include "./ledmatrix.h"
 
 class MyAnimation {
 public:
@@ -159,7 +160,10 @@ private:
     CHSV effect__mapping_checker(float col, float row, float offset);
     CHSV effect__mapping_checker(uint16_t col, uint16_t row, float offset);
 
+    float easeIn(float t);
+    float easeOut(float t);
     // int16_t calcDist(uint8_t x, uint8_t y, int8_t center_x, int8_t center_y);
+    float calcRadius(float x, float y);
     float calcDist(float x, float y, float center_x, float center_y);
 
     // others

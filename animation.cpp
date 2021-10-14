@@ -615,6 +615,11 @@ CHSV MyAnimation::effect__plasma(float col, float row, float offset) {
 }
 
 
+float MyAnimation::calcRadius(float x, float y) {
+  x *= x;
+  y *= y;
+  return sqrt(x + y);
+}
 
 // int16_t MyAnimation::calcDist(
 //     uint8_t x, uint8_t y, int8_t center_x, int8_t center_y
@@ -622,9 +627,7 @@ CHSV MyAnimation::effect__plasma(float col, float row, float offset) {
 float MyAnimation::calcDist(float x, float y, float center_x, float center_y) {
   float a = center_y - y;
   float b = center_x - x;
-  a *= a;
-  b *= b;
-  float dist = sqrt(a + b);
+  float dist = calcRadius(a, b);
   return dist;
 }
 
@@ -632,20 +635,23 @@ CHSV MyAnimation::effect__wave(float col, float row, float offset) {
     // calculate wave
     // online
     // https://editor.soulmatelights.com/gallery/1015-circle
+    float radius = 0.6;
 
-    float dist = calcDist(x, y, 0.5, offset * 2);
-    float dist_f = dist / (radius * 1.0);
+    float dist = calcDist(col, row, 0.5, offset * 2);
+    // what does this next line actually does???
+    dist = dist / radius;
 
     float value = 1.0;
-    value = map_range(dist, 0, radius, 1.0, 0.0);
+    value = 1.0 * normalize_0n_to_10(dist, radius);
+    // value = map_range(dist, 0.0, radius, 1.0, 0.0);
     value += offset;
     // map to *full circle* in radians
     value = sin(map_range_01_to_0n(value, (360*PI/180)));
 
     // exclude / blur outside of circle
-    value *= easeOut(1.0 - dist_f);
+    value *= easeOut(1.0 - dist);
     if (dist > radius) {
-        value_f = 0.0;
+        value = 0.0;
     }
 
     // map to color
