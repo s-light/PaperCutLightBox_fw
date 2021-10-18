@@ -423,6 +423,30 @@ void MyAnimation::menu__set_brightness(Print &out, char *command) {
 
 
 
+void MyAnimation::menu__test_colors(Print &out) {
+    CHSV color1 = CHSV(0.1, 1.0, 1.0);
+    CHSV color2 = CHSV(0.7, 1.0, 1.0);
+    out.print("color1  : ");
+    color1.print(out);
+    out.println();
+    out.print("color2  : ");
+    color2.print(out);
+    out.println();
+
+    CHSV color_multi = (color1 * color2);
+    out.print("color * : ");
+    CHSV::print(out, color_multi);
+    out.println();
+
+    CHSV color_add = (color1 + color2);
+    out.print("color + : ");
+    CHSV::print(out, color_add);
+    out.println();
+}
+
+
+
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // brightness
 
@@ -796,11 +820,13 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(
     // pixel_hsv = plasma;
 
     // wave
-    pixel_hsv *= effect__wave(col, row, offset);
+    // pixel_hsv *= effect__wave(col, row, offset);
+    pixel_hsv = effect__wave(col, row, offset);
     // pixel_hsv *= wave;
 
     // overlay
-    pixel_hsv *= effect__points(col_i, row_i, offset);
+    // pixel_hsv *= effect__points(col_i, row_i, offset);
+    // pixel_hsv = effect__points(col_i, row_i, offset);
 
     // sparkle
     // CHSV sparkle = effect__sparkle(col, row, offset);

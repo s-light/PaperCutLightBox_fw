@@ -44,6 +44,10 @@ SOFTWARE.
 // include Core Arduino functionality
 #include <Arduino.h>
 
+// enable float support
+// https://github.com/arduino/ArduinoCore-samd/issues/217
+asm(".global _printf_float");
+
 struct CHSV {
     // based on / copied partly from:
     // https://github.com/FastLED/FastLED/blob/master/pixeltypes.h
@@ -88,19 +92,28 @@ struct CHSV {
 
     CHSV operator * (const CHSV& obj) {
         CHSV temp;
-        temp.hue = hue * obj.hue;
-        temp.sat = sat * obj.sat;
-        temp.val = val * obj.val;
+        // temp.hue = hue * obj.hue;
+        // temp.sat = sat * obj.sat;
+        // temp.val = val * obj.val;
+        temp.hue = (hue + obj.hue) / 2;
+        temp.sat = (sat + obj.sat) / 2;
+        temp.val = (val + obj.val) / 2;
         return temp;
     }
 
     CHSV operator *= (const CHSV& obj) {
         CHSV temp;
-        temp.hue = hue * obj.hue;
-        temp.sat = sat * obj.sat;
-        temp.val = val * obj.val;
+        // temp.hue = hue * obj.hue;
+        // temp.sat = sat * obj.sat;
+        // temp.val = val * obj.val;
+        temp.hue = (hue + obj.hue) / 2;
+        temp.sat = (sat + obj.sat) / 2;
+        temp.val = (val + obj.val) / 2;
         return temp;
     }
+
+    static void print(Print &out, CHSV &color);
+    void print(Print &out);
 };
 
 struct CRGB {

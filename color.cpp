@@ -44,6 +44,19 @@ SOFTWARE.
 #include "./color.h"
 
 
+void CHSV::print(Print &out, CHSV &color) {
+    out.printf(
+        "h:%1.3f, s:%1.3f, v:%1.3f",
+        color.hue,
+        color.sat,
+        color.val);
+}
+
+void CHSV::print(Print &out) {
+    print(out, *this);
+}
+
+
 CRGB hsv2rgb(CHSV hsv) {
     // based on :
     // https://github.com/adafruit/Adafruit_CircuitPython_FancyLED/blob/master/adafruit_fancyled/adafruit_fancyled.py#L72

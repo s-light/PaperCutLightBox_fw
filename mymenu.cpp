@@ -312,12 +312,17 @@ void MyMenu::menu__time_meassurements(Print &out) {
 // }
 
 
-
-
-
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Menu System
+
+void MyMenu::tests(Print &out) {
+    out.println(F("__________"));
+    out.println(F("Tests:"));
+    // out.println(F("nothing to do."));
+
+    animation.menu__test_colors(out);
+    out.println(F("__________"));
+}
 
 void MyMenu::menu__print_help(Print &out) {
     // help
@@ -417,11 +422,7 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
             out.println(debugOut_LED_Enabled);
         } break;
         case 'x': {
-            // get state
-            out.println(F("__________"));
-            out.println(F("Tests:"));
-            out.println(F("nothing to do."));
-            out.println(F("__________"));
+            tests(out);
         } break;
         // ---------------------
         case 'r': {

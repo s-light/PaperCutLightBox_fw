@@ -106,6 +106,8 @@ public:
     void menu__set_contrast(Print &out, char *command);
     void menu__set_brightness(Print &out, char *command);
 
+    void menu__test_colors(Print &out);
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // helper
     float set_brightness(float brightness_);

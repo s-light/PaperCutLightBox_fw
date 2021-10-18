@@ -108,9 +108,13 @@ class MyMenu {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // public functions
 
+
     // menu & helper
+
     void menu__test_xxx(Print &out);
     void menu__set_yyy(Print &out, char *command);
+
+    void tests(Print &out);
 
     void menu__set_pixel(Print &out, char *command);
     void menu__set_board_dotstar(Print &out, char *command);
