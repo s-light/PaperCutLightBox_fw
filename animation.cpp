@@ -691,8 +691,8 @@ CHSV MyAnimation::effect__points(uint8_t col, uint8_t row, float offset) {
     // uint16_t offset_row = offset * MATRIX_ROW_COUNT;
     uint16_t offset_col = offset * MATRIX_COL_COUNT;
     if (
-        (row > (MATRIX_ROW_COUNT * 0.7) )
-        && (row < (MATRIX_ROW_COUNT * (0.7 + 0.1)))
+        (row > (MATRIX_ROW_COUNT * 0.45) )
+        && (row < (MATRIX_ROW_COUNT * (0.75)))
     ) {
         if (
           (col % 2)
@@ -824,9 +824,13 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(
     pixel_hsv = effect__wave(col, row, offset);
     // pixel_hsv *= wave;
 
-    // overlay
+    // points
     // pixel_hsv *= effect__points(col_i, row_i, offset);
-    // pixel_hsv = effect__points(col_i, row_i, offset);
+    CHSV pixel_points = effect__points(col_i, row_i, offset);
+    // overlay
+    if (pixel_points.value > 0.0) {
+        pixel_hsv = pixel_points;
+    }
 
     // sparkle
     // CHSV sparkle = effect__sparkle(col, row, offset);
