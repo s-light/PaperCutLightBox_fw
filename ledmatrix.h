@@ -95,16 +95,54 @@ SOFTWARE.
         },
     };
 
-    // const uint8_t BOARDS_COL_COUNT = 5;
-    // const uint8_t BOARDS_ROW_COUNT = 7;
-    const uint8_t BOARDS_COL_COUNT = 7;
-    const uint8_t BOARDS_ROW_COUNT = 3;
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Board Layout
+
+    // BOARDS_ROTATION
+    // 0 =  0° → socket at bottom
+    // 1 = 90° → socket at left
+    // 2 = 180° → socket at top
+    // 3 = 270° → socket at right
+
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Layout Minimal test
     // const uint8_t BOARDS_COL_COUNT = 1;
     // const uint8_t BOARDS_ROW_COUNT = 1;
-    const uint8_t BOARDS_COUNT = BOARDS_COL_COUNT * BOARDS_ROW_COUNT;
+    // const uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+    //     // {3},
+    //     // {2},
+    //     // {1},
+    //     {0},
+    // };
+    // const uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+    //     // {3},
+    //     // {3},
+    //     // {3},
+    //     {3},
+    // };
 
-    const uint16_t CHIPS_COUNT = BOARDS_COUNT * LEDBOARD_CHIP_COUNT;
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Layout BookCase
+    const uint8_t BOARDS_COL_COUNT = 7;
+    const uint8_t BOARDS_ROW_COUNT = 3;
+    const uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+        {19, 18, 17, 16, 15, 14, 20},
+        {13, 12,  9,  8,  7,  3,  2},
+        {11, 10,  6,  5,  4,  1,  0},
+    };
+    const uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+        {2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2},
+    };
 
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Layout BigMatrix Prototype
+    // const uint8_t BOARDS_COL_COUNT = 5;
+    // const uint8_t BOARDS_ROW_COUNT = 7;
     // const uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
     //     {34, 33, 32, 31, 30},
     //     {29, 28, 27, 26, 25},
@@ -114,7 +152,6 @@ SOFTWARE.
     //     {1, 5, 9, 13, 17},
     //     {0, 4, 8, 12, 16},
     // };
-    //
     // const uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
     //     {2, 2, 2, 2, 2},
     //     {2, 2, 2, 2, 2},
@@ -125,35 +162,9 @@ SOFTWARE.
     //     {3, 3, 3, 3, 3},
     // };
 
-    const uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
-        {20, 19, 18, 17, 16, 15, 14},
-        {13, 12,  9,  8,  7,  3,  2},
-        {11, 10,  6,  5,  4,  1,  0},
-    };
 
-    // 0 =  0° → socket at bottom
-    // 1 = 90° → socket at left
-    // 2 = 180° → socket at top
-    // 3 = 270° → socket at right
-    const uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
-        {2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2},
-    };
-
-    // const uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
-    //     // {3},
-    //     // {2},
-    //     // {1},
-    //     {0},
-    // };
-    //
-    // const uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
-    //     // {3},
-    //     // {3},
-    //     // {3},
-    //     {3},
-    // };
+    const uint8_t BOARDS_COUNT = BOARDS_COL_COUNT * BOARDS_ROW_COUNT;
+    const uint16_t CHIPS_COUNT = BOARDS_COUNT * LEDBOARD_CHIP_COUNT;
 
     const uint8_t MATRIX_COL_COUNT = LEDBOARD_COL_COUNT * BOARDS_COL_COUNT;
     const uint8_t MATRIX_ROW_COUNT = LEDBOARD_ROW_COUNT * BOARDS_ROW_COUNT;

@@ -717,10 +717,21 @@ CHSV MyAnimation::effect__mapping_checker(float col, float row, float offset) {
     // checker pattern
     CHSV pixel_hsv = CHSV(0.7, 1.0, 0.1);
 
-    float row_width = (1.0 / MATRIX_ROW_COUNT / 1.5);
-    float col_width = (1.0 / MATRIX_COL_COUNT / 1.5);
+
+    // if row and col value -0.5 .. 0.5 then use this:
+    // float row_width = (1.0 / MATRIX_ROW_COUNT / 1.5);
+    // float col_width = (1.0 / MATRIX_COL_COUNT / 1.5);
+    // float offset_half = map_range(offset, 0.0, 1.0, -0.5, 0.5);
+
+    // if row and col value 0.0 .. 1.0 then use this:
+    float row_width = (1.0 / MATRIX_ROW_COUNT);
+    float col_width = (1.0 / MATRIX_COL_COUNT);
+    float offset_half = offset;
+
+
+
+
     // float base = col * 0.2 + offset;
-    float offset_half = map_range(offset, 0.0, 1.0, -0.5, 0.5);
     // float base = map_range(col, -0.5, 0.5, 0.0, 1.0);
     // float base = map_range(col, -0.5, 0.5, 0.0, 1.0);
     // base = map_range(offset, 0, 1.0, 0.0, 0.1);
@@ -836,7 +847,7 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(
     // CHSV sparkle = effect__sparkle(col, row, offset);
     // pixel_hsv = sparkle;
 
-    // pixel_hsv = effect__mapping_checker(col_i, row_i, offset);
+    pixel_hsv = effect__mapping_checker(col_i, row_i, offset);
     // pixel_hsv = effect__mapping_checker(col, row, offset);
 
 

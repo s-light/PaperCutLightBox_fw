@@ -234,20 +234,29 @@ void MyLEDMatrix::print_pmap(Print &out) {
     // print_uint16_align_right(stream_out, pmap[col_i][row_i]);
 
     // print header line
-    stream_out.print(F("  row / col"));
+    stream_out.print(F("      col "));
     col_i = 0;
     slight_DebugMenu::print_uint16_align_right(stream_out, 0);
     for (col_i = 1; col_i < count_col; col_i++) {
-        stream_out.print(F(", "));
+        stream_out.print(F("  "));
         slight_DebugMenu::print_uint16_align_right(stream_out, col_i);
     }
     stream_out.println();
+
+    stream_out.print(F("  row     "));
+    col_i = 0;
+    stream_out.print(F("     | "));
+    for (col_i = 1; col_i < count_col; col_i++) {
+        stream_out.print(F("     | "));
+    }
+    stream_out.println();
+
     // stream_out.println();
     // print rows
     for (row_i = 0; row_i < count_row; row_i++) {
         // print row numer
         slight_DebugMenu::print_uint16_align_right(stream_out, row_i);
-        stream_out.print(F("  --> "));
+        stream_out.print(F("  __ "));
         col_i = 0;
         slight_DebugMenu::print_uint16_align_right(
             stream_out, pmap[col_i][row_i]);
