@@ -149,19 +149,18 @@ private:
     void effect__rainbow();
 
     void effect_Matrix2D();
-    CHSV effect_Matrix2D_get_pixel(float col, float row, float offset);
-    // CHSV effect_Matrix2D_get_pixel(
-    //     float col, float row,
-    //     uint16_t col_i, uint16_t row_i,
-    //     float offset);
+    // CHSV effect_Matrix2D_get_pixel(float col, float row, float offset);
+    CHSV effect_Matrix2D_get_pixel(
+        float col, float row,
+        uint16_t col_i, uint16_t row_i,
+        float offset);
     CHSV effect__plasma(float col, float row, float offset);
     CHSV effect__wave(float col, float row, float offset);
+    CHSV effect__points(uint8_t col, uint8_t row, float offset);
     CHSV effect__sparkle(float col, float row, float offset);
     CHSV effect__mapping_checker(float col, float row, float offset);
     CHSV effect__mapping_checker(uint16_t col, uint16_t row, float offset);
 
-    float easeIn(float t);
-    float easeOut(float t);
     // int16_t calcDist(uint8_t x, uint8_t y, int8_t center_x, int8_t center_y);
     float calcRadius(float x, float y);
     float calcDist(float x, float y, float center_x, float center_y);

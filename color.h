@@ -69,6 +69,38 @@ struct CHSV {
     inline CHSV( float ih, float is, float iv) __attribute__((always_inline))
         : h(ih), s(is), v(iv) {}
 
+    CHSV operator + (const CHSV& obj) {
+        CHSV temp;
+        temp.hue = hue + obj.hue;
+        temp.sat = sat + obj.sat;
+        temp.val = val + obj.val;
+        return temp;
+    }
+
+    CHSV operator += (const CHSV& obj) {
+        // return this + obj;
+        CHSV temp;
+        temp.hue = hue + obj.hue;
+        temp.sat = sat + obj.sat;
+        temp.val = val + obj.val;
+        return temp;
+    }
+
+    CHSV operator * (const CHSV& obj) {
+        CHSV temp;
+        temp.hue = hue * obj.hue;
+        temp.sat = sat * obj.sat;
+        temp.val = val * obj.val;
+        return temp;
+    }
+
+    CHSV operator *= (const CHSV& obj) {
+        CHSV temp;
+        temp.hue = hue * obj.hue;
+        temp.sat = sat * obj.sat;
+        temp.val = val * obj.val;
+        return temp;
+    }
 };
 
 struct CRGB {

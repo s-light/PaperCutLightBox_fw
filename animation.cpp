@@ -49,6 +49,8 @@ SOFTWARE.
 // NOLINTNEXTLINE(build/include)
 #include "./animation.h"
 
+#include "./easing.h"
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // functions
 
@@ -659,6 +661,33 @@ CHSV MyAnimation::effect__wave(float col, float row, float offset) {
     return pixel_hsv;
 }
 
+CHSV MyAnimation::effect__points(uint8_t col, uint8_t row, float offset) {
+    // https://editor.soulmatelights.com/gallery/1450-points-int
+    float value = 0.0;
+    // uint16_t offset_row = offset * MATRIX_ROW_COUNT;
+    uint16_t offset_col = offset * MATRIX_COL_COUNT;
+    if (
+        (row > (MATRIX_ROW_COUNT * 0.7) )
+        && (row < (MATRIX_ROW_COUNT * (0.7 + 0.1)))
+    ) {
+        if (
+          (col % 2)
+          && (offset_col >= col)
+        ) {
+          value = 1.0;
+        }
+        // value_i = ((offset_col % MATRIX_COL_COUNT) - col + 1) * 255;
+        // value_i = (col % 2) * 80;
+        // value_i = (
+        //     (col % 2)
+        //     * ((offset_col % MATRIX_COL_COUNT) - col + 1)
+        //     * 255);
+    }
+    // map to color
+    CHSV pixel_hsv = CHSV(0.7, 1.0, value);
+    return pixel_hsv;
+}
+
 
 CHSV MyAnimation::effect__mapping_checker(float col, float row, float offset) {
     // checker pattern
@@ -748,16 +777,18 @@ CHSV MyAnimation::effect__sparkle(
 
 
 
+// CHSV MyAnimation::effect_Matrix2D_get_pixel(
+//     __attribute__((unused)) float col,
+//     __attribute__((unused)) float row,
+//     __attribute__((unused)) float offset
+// ) {
 CHSV MyAnimation::effect_Matrix2D_get_pixel(
     __attribute__((unused)) float col,
     __attribute__((unused)) float row,
+    __attribute__((unused)) uint16_t col_i,
+    __attribute__((unused)) uint16_t row_i,
     __attribute__((unused)) float offset
 ) {
-// CHSV MyAnimation::effect_Matrix2D_get_pixel(
-//     float col, float row,
-//     uint16_t col_i, uint16_t row_i,
-//     float offset
-// ) {
     CHSV pixel_hsv = CHSV(hue, saturation, 1.0);
 
     // plasma
@@ -765,9 +796,11 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(
     // pixel_hsv = plasma;
 
     // wave
-    // pixel_hsv = effect__wave(col, row, offset);
-    // pixel_hsv = wave;
+    pixel_hsv *= effect__wave(col, row, offset);
+    // pixel_hsv *= wave;
 
+    // overlay
+    pixel_hsv *= effect__points(col_i, row_i, offset);
 
     // sparkle
     // CHSV sparkle = effect__sparkle(col, row, offset);
@@ -822,11 +855,11 @@ void MyAnimation::effect_Matrix2D() {
             float col = normalize_0n_to_01(col_i, MATRIX_COL_COUNT-1);
 
             // ------------------------------------------
-            // CHSV pixel_hsv = effect_Matrix2D_get_pixel(
-            //     col, row,
-            //     col_i, row_i,
-            //     offset);
-            CHSV pixel_hsv = effect_Matrix2D_get_pixel(col, row, offset);
+            CHSV pixel_hsv = effect_Matrix2D_get_pixel(
+                col, row,
+                col_i, row_i,
+                offset);
+            // CHSV pixel_hsv = effect_Matrix2D_get_pixel(col, row, offset);
 
             // ------------------------------------------
             // final conversions
