@@ -663,14 +663,14 @@ CHSV MyAnimation::effect__wave(float col, float row, float offset) {
     // https://editor.soulmatelights.com/gallery/1015-circle
     float radius = 0.6;
 
-    float dist = calcDist(col, row, 0.5, offset * 2);
+    float dist = calcDist(col, row, 0.5, offset);
     // what does this next line actually does???
     dist = dist / radius;
 
     float value = 1.0;
     value = 1.0 * normalize_0n_to_10(dist, radius);
     // value = map_range(dist, 0.0, radius, 1.0, 0.0);
-    value += offset;
+    value += offset * 3;
     // map to *full circle* in radians
     value = sin(map_range_01_to_0n(value, (360*PI/180)));
 
