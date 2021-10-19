@@ -410,8 +410,10 @@ void MyAnimation::menu__set_saturation(Print &out, char *command) {
     out.print(F("Set saturation "));
     uint8_t command_offset = 1;
     float value = atof(&command[command_offset]);
-    out.print(value, 4);
-    hue = value;
+    out.print(value, 5);
+    out.print(" --> ");
+    value = set_saturation(value);
+    out.print(value, 5);
     out.println();
 }
 
@@ -428,10 +430,10 @@ void MyAnimation::menu__set_brightness(Print &out, char *command) {
     out.print(F("Set brightness "));
     uint8_t command_offset = 1;
     float value = atof(&command[command_offset]);
-    out.print(value, 7);
+    out.print(value, 5);
     out.print(" --> ");
     value = set_brightness(value);
-    out.print(value, 7);
+    out.print(value, 5);
     out.println();
 }
 
@@ -480,6 +482,12 @@ float MyAnimation::set_brightness(float brightness_) {
 float MyAnimation::set_hue(float hue_) {
     hue = clamp(hue_, static_cast<float>(0.0), static_cast<float>(1.0));
     return hue;
+}
+
+float MyAnimation::set_saturation(float saturation_) {
+    saturation = clamp(
+        saturation_, static_cast<float>(0.0), static_cast<float>(1.0));
+    return saturation;
 }
 
 

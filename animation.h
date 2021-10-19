@@ -116,6 +116,7 @@ public:
     // helper
     float set_brightness(float brightness_);
     float set_hue(float hue_);
+    float set_saturation(float saturation_);
     uint16_t set_max_fps(uint32_t fps_);
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
