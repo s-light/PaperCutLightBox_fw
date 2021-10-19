@@ -45,7 +45,8 @@ SOFTWARE.
 #include "./ledmatrix.h"
 
 
-MyLEDMatrix::MyLEDMatrix() {
+MyLEDMatrix::MyLEDMatrix(uint8_t pin_output_enable_) {
+    pin_output_enable = pin_output_enable_;
     ready = false;
 }
 
@@ -84,14 +85,24 @@ void MyLEDMatrix::update() {
 void MyLEDMatrix::tlc_init(Stream &out) {
     out.println(F("setup tlc:"));
 
+
+    out.println(F("    prepare output_enable pin"));
+    // enable spi output on Levelshifter
+    pinMode(pin_output_enable, OUTPUT);
+    out.println(F("    output_enable LOW"));
+    digitalWrite(pin_output_enable, LOW);
+    delay(1000);
+    out.println(F("    output_enable HIGH"));
+    digitalWrite(pin_output_enable, HIGH);
+
     out.println(F("    tlc.beginFast()"));
     // tlc.beginFast();
-
     tlc.beginFast(
         // bufferXfer (default: true)
         false,
         // spiClock (default: 10 * 1000 * 1000)
-        20 * 1000 * 1000
+        // 20 * 1000 * 1000
+        10 * 1000 * 1000
         // postXferDelayMicros (default: 4)
         // 4
         // NOLINTNEXTLINE(whitespace/parens)

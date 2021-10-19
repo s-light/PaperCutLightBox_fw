@@ -46,7 +46,8 @@ T easeIn(T t) {
 template<class T>
 T easeOut(T t) {
     t = 1.0 - t;
-    return 1.0 - (t * t * t);
+    // return 1.0 - (t * t * t);
+    return 1.0 - (t * t);
 }
 
 #endif  // easing_H_

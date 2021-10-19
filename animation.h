@@ -79,7 +79,9 @@ public:
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // attributes
 
-    MyLEDMatrix matrix = MyLEDMatrix();
+    // pin_output_enable: 2
+    MyLEDMatrix matrix = MyLEDMatrix(2);
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // constructor
 
@@ -95,6 +97,8 @@ public:
     void end();
 
     // menu & helper
+    void menu__set_max_fps(Print &out, char *command);
+
     void menu__set_pixel_index(Print &out, char *command);
     void menu__set_pixel(Print &out, char *command);
     void menu__set_all_pixel(Print &out, char *command);
@@ -112,6 +116,7 @@ public:
     // helper
     float set_brightness(float brightness_);
     float set_hue(float hue_);
+    uint16_t set_max_fps(uint32_t fps_);
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // configurations
@@ -178,6 +183,10 @@ private:
     uint32_t effect_loopcount = 0;
     // double effect_position = 0.0;
     float effect_position = 0.0;
+
+    uint16_t max_fps = 10000;
+    uint32_t effect_update_last_us = 0;
+    uint32_t effect_update_delay_us = 100;
 
 };  // class MyAnimation
 

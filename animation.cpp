@@ -94,6 +94,19 @@ void MyAnimation::update() {
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // menu
 
+void MyAnimation::menu__set_max_fps(Print &out, char *command) {
+    out.print(F("Set max_fps "));
+    uint8_t command_offset = 1;
+    uint16_t value = atoi(&command[command_offset]);
+    out.print(value);
+    out.print(" --> ");
+    value = set_max_fps(value);
+    out.print(value);
+    out.println();
+}
+
+
+
 void MyAnimation::menu__test_buffer(Print &out) {
     out.println(F("SetBuffer:"));
     out.println(F("--- old"));
@@ -227,7 +240,7 @@ void MyAnimation::menu__time_meassurements(Print &out) {
 
 
 
-    out.print(F("effect_Matrix2D 1: "));
+    out.print(F("effect_Matrix2D 1:         "));
     tm_start = micros();
     effect_Matrix2D();
     tm_end = micros();
@@ -236,7 +249,7 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     out.print(F("us / call"));
     out.println();
 
-    out.print(F("matrix.tlc.write() 1:     "));
+    out.print(F("matrix.tlc.write() 1:      "));
     tm_start = micros();
     matrix.tlc.write();
     tm_end = micros();
@@ -247,7 +260,7 @@ void MyAnimation::menu__time_meassurements(Print &out) {
 
 
 
-    out.print(F("effect_Matrix2D:   "));
+    out.print(F("effect_Matrix2D:           "));
     tm_total_start = millis();;
     tm_total_end = 0;
     tm_total_duration = 0;
@@ -278,7 +291,7 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     // out.println();
 
 
-    out.print(F("matrix.tlc.write():       "));
+    out.print(F("matrix.tlc.write():        "));
     tm_start = 0;
     tm_end = 0;
     tm_duration = 0;
@@ -316,7 +329,8 @@ void MyAnimation::menu__time_meassurements(Print &out) {
 
 
 
-    out.println(F("animation_update:"));
+    out.print(F("animation_update:          "));
+    // out.println();
 
     tm_start = 0;
     tm_end = 0;
@@ -344,10 +358,10 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     out.print((tm_duration / static_cast<float>(tm_loop_count)) / 1000);
     out.print(F("ms / call"));
     out.println();
-    out.print(F("tm_total_duration: "));
-    out.print(tm_total_duration);
-    out.print(F("ms"));
-    out.println();
+    // out.print(F("tm_total_duration: "));
+    // out.print(tm_total_duration);
+    // out.print(F("ms"));
+    // out.println();
 
     animation_run = animation_run_backup;
 
@@ -414,10 +428,10 @@ void MyAnimation::menu__set_brightness(Print &out, char *command) {
     out.print(F("Set brightness "));
     uint8_t command_offset = 1;
     float value = atof(&command[command_offset]);
-    out.print(value, 5);
+    out.print(value, 7);
     out.print(" --> ");
     value = set_brightness(value);
-    out.print(value, 5);
+    out.print(value, 7);
     out.println();
 }
 
@@ -448,7 +462,7 @@ void MyAnimation::menu__test_colors(Print &out) {
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// brightness
+// setter
 
 float MyAnimation::set_brightness(float brightness_) {
     brightness = clamp(brightness_, static_cast<float>(0.0), brightness_max);
@@ -466,6 +480,13 @@ float MyAnimation::set_brightness(float brightness_) {
 float MyAnimation::set_hue(float hue_) {
     hue = clamp(hue_, static_cast<float>(0.0), static_cast<float>(1.0));
     return hue;
+}
+
+
+uint16_t MyAnimation::set_max_fps(uint32_t fps_) {
+    max_fps = clamp(fps_, 1ul, 2000ul);
+    effect_update_delay_us = (1000 * 1000) / max_fps;
+    return max_fps;
 }
 
 
@@ -494,15 +515,19 @@ void MyAnimation::animation_init(Stream &out) {
 void MyAnimation::animation_update() {
     calculate_effect_position();
     if (animation_run) {
-        // effect__pixel_checker();
-        // effect__line();
-        // effect__rainbow();
+        // enfoce max fps
+        // if (micros() - effect_update_last_us >= effect_update_delay_us) {
+        //     effect_update_last_us = micros();
+            // effect__pixel_checker();
+            // effect__line();
+            // effect__rainbow();
 
-        effect_Matrix2D();
+            effect_Matrix2D();
 
-        // write data to chips
-        matrix.tlc.write();
-        effect_loopcount++;
+            // write data to chips
+            matrix.tlc.write();
+            effect_loopcount++;
+        // }
     }
 }
 
@@ -662,8 +687,9 @@ CHSV MyAnimation::effect__wave(float col, float row, float offset) {
     // online
     // https://editor.soulmatelights.com/gallery/1015-circle
     float radius = 0.6;
+    float offset_y = map_range_01_to(offset, -(radius-0.2), 1.0 + (radius-0.2));
 
-    float dist = calcDist(col, row, 0.5, offset);
+    float dist = calcDist(col, row, 0.5, offset_y);
     // what does this next line actually does???
     dist = dist / radius;
 
@@ -676,7 +702,8 @@ CHSV MyAnimation::effect__wave(float col, float row, float offset) {
 
     // exclude / blur outside of circle
     value *= easeOut(1.0 - dist);
-    if (dist > radius) {
+    // value = map_range_01_to(value, 0.9, 1.0);
+    if (dist > (radius+0.1)) {
         value = 0.0;
     }
 
@@ -832,22 +859,23 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(
 
     // wave
     // pixel_hsv *= effect__wave(col, row, offset);
-    pixel_hsv = effect__wave(col, row, offset);
-    // pixel_hsv *= wave;
+    // CHSV pixel_wave = effect__wave(col, row, offset);
+    // if (pixel_wave.value > 0.0) {
+    //     pixel_hsv = pixel_wave;
+    // }
 
     // points
     // pixel_hsv *= effect__points(col_i, row_i, offset);
-    CHSV pixel_points = effect__points(col_i, row_i, offset);
-    // overlay
-    if (pixel_points.value > 0.0) {
-        pixel_hsv = pixel_points;
-    }
+    // CHSV pixel_points = effect__points(col_i, row_i, offset);
+    // if (pixel_points.value > 0.0) {
+    //     pixel_hsv = pixel_points;
+    // }
 
     // sparkle
     // CHSV sparkle = effect__sparkle(col, row, offset);
     // pixel_hsv = sparkle;
 
-    pixel_hsv = effect__mapping_checker(col_i, row_i, offset);
+    // pixel_hsv = effect__mapping_checker(col_i, row_i, offset);
     // pixel_hsv = effect__mapping_checker(col, row, offset);
 
 

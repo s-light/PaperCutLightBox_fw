@@ -197,7 +197,7 @@ public:
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // constructor
 
-    MyLEDMatrix();
+    MyLEDMatrix(uint8_t pin_output_enable_);
     ~MyLEDMatrix();
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -230,6 +230,7 @@ private:
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // attributes
     bool ready;
+    uint8_t pin_output_enable = false;
 
 };  // class MyLEDMatrix
 
