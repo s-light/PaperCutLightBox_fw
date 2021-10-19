@@ -124,7 +124,7 @@ public:
 
     bool animation_run = true;
 
-    uint16_t effect_duration = 5 * 1000; //ms
+    uint16_t effect_duration = 3 * 1000; //ms
 
     // lounge blue - night
     // float hue = 0.7;
@@ -135,7 +135,7 @@ public:
     float hue = 0.05;
     float saturation = 1.0;
     float contrast = 1.70;
-    float brightness = 0.001;
+    float brightness = 0.006;
     const float brightness_max = 0.37;
     const uint16_t brightness_max_i = 25000;
 

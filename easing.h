@@ -38,16 +38,33 @@ SOFTWARE.
 // include Core Arduino functionality
 #include <Arduino.h>
 
+// easing functions inspired by https://easings.net
+
 template<class T>
 T easeIn(T t) {
-    return t * t * t;
+    // return t * t * t * t * t * t * t * t * t * t * t;
+    return t * t * t * t * t * t * t;
+    // return t * t * t * t * t * t;
+    // return t * t * t;
+    // return t * t;
 }
+
+// double easeIn_double(double t) {
+//     return t * t * t * t * t * t * t * t * t * t * t;
+// }
 
 template<class T>
 T easeOut(T t) {
     t = 1.0 - t;
+    // return 1.0 - (t * t * t * t * t);
     // return 1.0 - (t * t * t);
-    return 1.0 - (t * t);
+    // return 1.0 - (t * t);
+    return 1.0 - (t);
+}
+
+template<class T>
+T easeInExpo(T t) {
+    return (t == 0) ? 0 : pow(2, 10 * t - 10);
 }
 
 #endif  // easing_H_

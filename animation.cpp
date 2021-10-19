@@ -694,29 +694,43 @@ CHSV MyAnimation::effect__wave(float col, float row, float offset) {
     // calculate wave
     // online
     // https://editor.soulmatelights.com/gallery/1015-circle
-    float radius = 0.6;
-    float offset_y = map_range_01_to(offset, -(radius-0.2), 1.0 + (radius-0.2));
+    float radius = 0.7;
+    float offset_y = map_range_01_to(
+        offset,
+        -(radius-0.02),
+        1.0 + (radius-0.2));
 
     float dist = calcDist(col, row, 0.5, offset_y);
+    // float dist = calcDist(col, row, 0.5, 0.9);
     // what does this next line actually does???
     dist = dist / radius;
 
     float value = 1.0;
     value = 1.0 * normalize_0n_to_10(dist, radius);
     // value = map_range(dist, 0.0, radius, 1.0, 0.0);
-    value += offset * 3;
+    value += offset * 3.5;
+    // value += offset;
     // map to *full circle* in radians
     value = sin(map_range_01_to_0n(value, (360*PI/180)));
-
+    // shift black point
+    value = map_range_01_to(value, 0.5, 1.0);
     // exclude / blur outside of circle
-    value *= easeOut(1.0 - dist);
-    // value = map_range_01_to(value, 0.9, 1.0);
-    if (dist > (radius+0.1)) {
-        value = 0.0;
+    float mask = 1.0;
+    // mask *= easeIn_double(dist);
+    mask *= easeIn(normalize_0n_to_10(dist*1.0, radius*2.0));
+    // mask *= easeIn(normalize_0n_to_10(dist*1.0, radius*1.0));
+    // mask *= easeIn((1.0 - dist)*1.4);
+    // mask *= easeInExpo(1.0 * normalize_0n_to_10(dist*1.0, radius*1.1));
+    // mask = clamp01(mask);
+    if (dist > (radius+0.08)) {
+        mask = 0.0;
     }
+    value *= mask;
+    // value = mask;
+    // value = map_range_01_to(value, 0.9, 1.0);
 
     // map to color
-    CHSV pixel_hsv = CHSV(0.2, 1.0, value);
+    CHSV pixel_hsv = CHSV(0.3, 1.0, value);
     return pixel_hsv;
 }
 
@@ -726,14 +740,14 @@ CHSV MyAnimation::effect__points(uint8_t col, uint8_t row, float offset) {
     // uint16_t offset_row = offset * MATRIX_ROW_COUNT;
     uint16_t offset_col = offset * MATRIX_COL_COUNT;
     if (
-        (row > (MATRIX_ROW_COUNT * 0.45) )
-        && (row < (MATRIX_ROW_COUNT * (0.75)))
+        (row > (MATRIX_ROW_COUNT * 0.2) )
+        && (row < (MATRIX_ROW_COUNT * (0.7)))
     ) {
         if (
           (col % 2)
           && (offset_col >= col)
         ) {
-          value = 1.0;
+          value = 0.3;
         }
         // value_i = ((offset_col % MATRIX_COL_COUNT) - col + 1) * 255;
         // value_i = (col % 2) * 80;
@@ -859,31 +873,31 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(
     __attribute__((unused)) uint16_t row_i,
     __attribute__((unused)) float offset
 ) {
-    CHSV pixel_hsv = CHSV(hue, saturation, 1.0);
+    CHSV pixel_hsv = CHSV(hue, saturation, 0.001);
 
     // plasma
     // CHSV plasma = effect__plasma(col, row, offset);
     // pixel_hsv = plasma;
 
     // wave
-    // pixel_hsv *= effect__wave(col, row, offset);
-    // CHSV pixel_wave = effect__wave(col, row, offset);
-    // if (pixel_wave.value > 0.0) {
-    //     pixel_hsv = pixel_wave;
-    // }
+    // pixel_hsv = effect__wave(col, row, offset);
+    CHSV pixel_wave = effect__wave(col, row, offset);
+    if (pixel_wave.value > 0.0) {
+        pixel_hsv = pixel_wave;
+    }
 
     // points
     // pixel_hsv *= effect__points(col_i, row_i, offset);
-    // CHSV pixel_points = effect__points(col_i, row_i, offset);
-    // if (pixel_points.value > 0.0) {
-    //     pixel_hsv = pixel_points;
-    // }
+    CHSV pixel_points = effect__points(col_i, row_i, offset);
+    if (pixel_points.value > 0.0) {
+        pixel_hsv = pixel_points;
+    }
 
     // sparkle
     // CHSV sparkle = effect__sparkle(col, row, offset);
     // pixel_hsv = sparkle;
 
-    pixel_hsv = effect__mapping_checker(col_i, row_i, offset);
+    // pixel_hsv = effect__mapping_checker(col_i, row_i, offset);
     // pixel_hsv = effect__mapping_checker(col, row, offset);
 
 

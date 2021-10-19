@@ -64,6 +64,13 @@ const T& clamp(const T& n, const T& lower, const T& upper) {
     return std::max(lower, std::min(n, upper));
 }
 
+template <typename T>
+const T& clamp01(const T& n) {
+    const T& lower = 0.0;
+    const T& upper = 1.0;
+    return std::max(lower, std::min(n, upper));
+}
+
 // template <typename T1, typename T2, typename T3>
 // const T1& clamp(const T1& n, const T2& lower, const T3& upper) {
 //     return std::max(lower, std::min(n, upper));
