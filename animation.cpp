@@ -875,7 +875,7 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(
     // CHSV sparkle = effect__sparkle(col, row, offset);
     // pixel_hsv = sparkle;
 
-    // pixel_hsv = effect__mapping_checker(col_i, row_i, offset);
+    pixel_hsv = effect__mapping_checker(col_i, row_i, offset);
     // pixel_hsv = effect__mapping_checker(col, row, offset);
 
 

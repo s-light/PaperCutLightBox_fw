@@ -102,7 +102,8 @@ void MyLEDMatrix::tlc_init(Stream &out) {
         false,
         // spiClock (default: 10 * 1000 * 1000)
         // 20 * 1000 * 1000
-        10 * 1000 * 1000
+        // 10 * 1000 * 1000
+        2 * 1000 * 1000
         // postXferDelayMicros (default: 4)
         // 4
         // NOLINTNEXTLINE(whitespace/parens)
