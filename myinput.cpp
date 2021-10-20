@@ -96,6 +96,15 @@ void MyInput::begin(
 ) {
     // clean up..
     end();
+
+    // find board definition
+    // https://arduino.stackexchange.com/questions/19892/list-of-arduino-board-preprocessor-defines
+    // grep board= `find ~/.arduino15 -name boards.txt` | cut -f2 -d= | sort -u
+    // usage:
+    // #if defined(ITSYBITSY_M4)
+    // special code for this board here..
+    // #endif
+
     // start up...
     if (ready == false) {
         // setup

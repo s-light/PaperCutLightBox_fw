@@ -740,14 +740,14 @@ CHSV MyAnimation::effect__points(uint8_t col, uint8_t row, float offset) {
     // uint16_t offset_row = offset * MATRIX_ROW_COUNT;
     uint16_t offset_col = offset * MATRIX_COL_COUNT;
     if (
-        (row > (MATRIX_ROW_COUNT * 0.2) )
-        && (row < (MATRIX_ROW_COUNT * (0.7)))
+        (row > (MATRIX_ROW_COUNT * 0.3) )
+        && (row < (MATRIX_ROW_COUNT * (0.5)))
     ) {
         if (
           (col % 2)
           && (offset_col >= col)
         ) {
-          value = 0.3;
+          value = 0.2;
         }
         // value_i = ((offset_col % MATRIX_COL_COUNT) - col + 1) * 255;
         // value_i = (col % 2) * 80;
@@ -873,7 +873,7 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(
     __attribute__((unused)) uint16_t row_i,
     __attribute__((unused)) float offset
 ) {
-    CHSV pixel_hsv = CHSV(hue, saturation, 0.001);
+    CHSV pixel_hsv = CHSV(hue, saturation, 0.0001);
 
     // plasma
     // CHSV plasma = effect__plasma(col, row, offset);
