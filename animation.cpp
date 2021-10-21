@@ -94,13 +94,13 @@ void MyAnimation::update() {
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // menu
 
-void MyAnimation::menu__set_max_fps(Print &out, char *command) {
-    out.print(F("Set max_fps "));
+void MyAnimation::menu__set_fps(Print &out, char *command) {
+    out.print(F("Set fps "));
     uint8_t command_offset = 1;
     uint16_t value = atoi(&command[command_offset]);
     out.print(value);
     out.print(" --> ");
-    value = set_max_fps(value);
+    value = set_fps(value);
     out.print(value);
     out.println();
 }
@@ -491,10 +491,14 @@ float MyAnimation::set_saturation(float saturation_) {
 }
 
 
-uint16_t MyAnimation::set_max_fps(uint32_t fps_) {
-    max_fps = clamp(fps_, 1ul, 2000ul);
-    effect_update_delay_us = (1000 * 1000) / max_fps;
-    return max_fps;
+uint16_t MyAnimation::set_fps(uint16_t fps_) {
+    fps = clamp(fps_, fps_min, fps_max);
+    effect_update_delay_us = (1000 * 1000) / fps;
+    return fps;
+}
+
+uint16_t MyAnimation::get_fps() {
+    return fps;
 }
 
 

@@ -354,6 +354,9 @@ void MyMenu::menu__print_help(Print &out) {
     out.print(F("\t 'b': set brightness 'b1.0' ("));
     out.print(animation.brightness, 5);
     out.println(F(")"));
+    out.print(F("\t 'f': set fps 'f500' ("));
+    out.print(animation.get_fps());
+    out.println(F(")"));
     out.println();
     // out.println(F("\t 'f': test fc 'f'"));
     out.println(F("\t 'u': tlc.write() 'u'"));
@@ -447,6 +450,9 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
         } break;
         case 'b': {
             animation.menu__set_brightness(out, command);
+        } break;
+        case 'f': {
+            animation.menu__set_fps(out, command);
         } break;
         // ---------------------
         case 'u': {

@@ -97,7 +97,7 @@ public:
     void end();
 
     // menu & helper
-    void menu__set_max_fps(Print &out, char *command);
+    void menu__set_fps(Print &out, char *command);
 
     void menu__set_pixel_index(Print &out, char *command);
     void menu__set_pixel(Print &out, char *command);
@@ -117,7 +117,8 @@ public:
     float set_brightness(float brightness_);
     float set_hue(float hue_);
     float set_saturation(float saturation_);
-    uint16_t set_max_fps(uint32_t fps_);
+    uint16_t set_fps(uint16_t fps_);
+    uint16_t get_fps();
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // configurations
@@ -185,7 +186,9 @@ private:
     // double effect_position = 0.0;
     float effect_position = 0.0;
 
-    uint16_t max_fps = 10000;
+    const uint16_t fps_min = 1;
+    const uint16_t fps_max = 10000;
+    uint16_t fps = 10000;
     uint32_t effect_update_last_us = 0;
     uint32_t effect_update_delay_us = 100;
 
