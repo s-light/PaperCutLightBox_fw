@@ -106,6 +106,15 @@ void MyAnimation::menu__set_fps(Print &out, char *command) {
 }
 
 
+void MyAnimation::menu__start_loop_n_times(Print &out, char *command) {
+    uint8_t command_offset = 1;
+    float value = atoi(&command[command_offset]);
+    out.print("Start loop %d times.", value);
+    start_loop_n_times(value);
+    out.println();
+}
+
+
 
 void MyAnimation::menu__test_buffer(Print &out) {
     out.println(F("SetBuffer:"));
@@ -501,6 +510,12 @@ uint16_t MyAnimation::get_fps() {
     return fps;
 }
 
+void MyAnimation::start_loop_n_times(uint16_t count) {
+    // animation_run = false;
+    animation_reset();
+    animation_loopcount = count;
+    animation_run = true;
+}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // animation
@@ -538,50 +553,67 @@ void MyAnimation::animation_update() {
 
             // write data to chips
             matrix.tlc.write();
-            effect_loopcount++;
+            effect_fps_loopcount++;
         // }
+    }
+}
+
+
+void MyAnimation::animation_reset() {
+    effect_position = 0.0;
+    // float duration_seconds = (millis() - effect_start) / 1000.0;
+    uint32_t duration_us = micros() - effect_start;
+    float duration_seconds =  duration_us / (1000.0 * 1000);
+    float fps = effect_fps_loopcount / duration_seconds;
+
+    // if (animation_run) {
+    //     Serial.print("millis():");
+    //     Serial.print(millis());
+    //     Serial.println();
+    //     Serial.print("effect_start:");
+    //     Serial.print(effect_start);
+    //     Serial.println();
+    //     Serial.print("duration_ms:");
+    //     Serial.print(duration_ms);
+    //     Serial.println();
+    //     Serial.print("duration_seconds:");
+    //     Serial.print(duration_seconds);
+    //     Serial.println();
+    //     Serial.print("effect_fps_loopcount:");
+    //     Serial.print(effect_fps_loopcount);
+    //     Serial.println();
+    // }
+
+    effect_fps_loopcount = 0;
+    effect_start = micros();
+    effect_end = micros() + (effect_duration*1000);
+
+    if (animation_run) {
+        Serial.print("----- effect_position loop restart (");
+        Serial.print(fps);
+        Serial.print("FPS)");
+        // Serial.print("   !!! millis() timming is off - ");
+        // Serial.print("so this calculation is currently wrong !!!");
+        Serial.println();
     }
 }
 
 void MyAnimation::calculate_effect_position() {
     effect_position = normalize_to_01(micros(), effect_start, effect_end);
 
-    // effect_loopcount++;
+    // effect_fps_loopcount++;
     if (effect_position >  1.0) {
-        effect_position = 0.0;
-        // float duration_seconds = (millis() - effect_start) / 1000.0;
-        uint32_t duration_us = micros() - effect_start;
-        float duration_seconds =  duration_us / (1000.0 * 1000);
-        float fps = effect_loopcount / duration_seconds;
+        animation_reset();
 
-        // if (animation_run) {
-        //     Serial.print("millis():");
-        //     Serial.print(millis());
-        //     Serial.println();
-        //     Serial.print("effect_start:");
-        //     Serial.print(effect_start);
-        //     Serial.println();
-        //     Serial.print("duration_ms:");
-        //     Serial.print(duration_ms);
-        //     Serial.println();
-        //     Serial.print("duration_seconds:");
-        //     Serial.print(duration_seconds);
-        //     Serial.println();
-        //     Serial.print("effect_loopcount:");
-        //     Serial.print(effect_loopcount);
-        //     Serial.println();
-        // }
-
-        effect_loopcount = 0;
-        effect_start = micros();
-        effect_end = micros() + (effect_duration*1000);
-
-        if (animation_run) {
-            Serial.print("----- effect_position loop restart (");
-            Serial.print(fps);
-            Serial.print("FPS)");
-            // Serial.print("   !!! millis() timming is off - ");
-            // Serial.print("so this calculation is currently wrong !!!");
+        // animation_loopcount == 0 == infinite
+        if (animation_loopcount !== 0) {
+            // loopcount is active
+            if (animation_loopcount == 1) {
+                animation_run = false;
+            }
+            animation_loopcount -= 1;
+            Serial.print("----- animation_loopcount: ");
+            Serial.print(animation_loopcount);
             Serial.println();
         }
     }

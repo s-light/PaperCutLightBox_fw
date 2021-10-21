@@ -99,13 +99,21 @@ void MyLEDMatrix::tlc_init(Stream &out) {
     // tlc.beginFast();
     tlc.beginFast(
         // bufferXfer (default: true)
-        false,
+        true,
         // spiClock (default: 10 * 1000 * 1000)
-        // 20 * 1000 * 1000
-        // 10 * 1000 * 1000
-        2 * 1000 * 1000
+        // working: 20, 12, 5,
+        // not working: 16
+        // 20 * 1000 * 1000,
+        // 16 * 1000 * 1000,
+        // 12 * 1000 * 1000,
+        // 5 * 1000 * 1000,
+        // 10 * 1000 * 1000,
+        1 * 1000 * 1000,
         // postXferDelayMicros (default: 4)
-        // 4
+        // min: 666ns; max 2.74ms
+        // min as of diagram: 1.34us
+        // https://www.ti.com/lit/ds/symlink/tlc5971.pdf?ts=1634744586475#page=25&zoom=250,-44,774
+        4
         // NOLINTNEXTLINE(whitespace/parens)
     );
 

@@ -210,7 +210,7 @@ CRGBX hsv2rgb(CHSVX hsv) {
 uint16_t effect_duration = 5 * 1000; //ms
 uint32_t effect_start = 0;
 uint32_t effect_end = 0;
-uint32_t effect_loopcount = 0;
+uint32_t effect_fps_loopcount = 0;
 float effect_position = 0.0;
 
 float hue = 0.05;
@@ -224,7 +224,7 @@ float brightness = 0.1;
 void calculate_effect_position() {
   //effect_position = normalize_to_01(micros(), effect_start, effect_end);
   effect_position += 0.01;
-  // effect_loopcount++;
+  // effect_fps_loopcount++;
   if (effect_position > 1.0) {
     effect_position = 0.0;
     effect_start = micros();

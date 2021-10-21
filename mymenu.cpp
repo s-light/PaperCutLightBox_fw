@@ -339,6 +339,9 @@ void MyMenu::menu__print_help(Print &out) {
     out.print(F("\t 'r': toggle animation_run 'r' ("));
     out.print(animation.animation_run);
     out.println(F(")"));
+    out.print(F("\t 'l': start loop n times 'l3' ("));
+    out.print(animation.animation_loopcount);
+    out.println(F(")"));
     out.print(F("\t 'd': set effect_duration 'd1000' ("));
     out.print(animation.effect_duration);
     out.println(F("ms)"));
@@ -431,6 +434,9 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
         case 'r': {
             out.println(F("toggle animation_run"));
             animation.animation_run = !animation.animation_run;
+        } break;
+        case 'l': {
+            animation.menu__start_loop_n_times(out, command);
         } break;
         case 'd': {
             out.println(F("set effect_duration:"));

@@ -98,6 +98,7 @@ public:
 
     // menu & helper
     void menu__set_fps(Print &out, char *command);
+    void menu__start_loop_n_times(Print &out, char *command);
 
     void menu__set_pixel_index(Print &out, char *command);
     void menu__set_pixel(Print &out, char *command);
@@ -120,10 +121,13 @@ public:
     uint16_t set_fps(uint16_t fps_);
     uint16_t get_fps();
 
+    void start_loop_n_times(uint16_t count);
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // configurations
 
     bool animation_run = true;
+    uint16_t animation_loopcount = 0;
 
     uint16_t effect_duration = 3 * 1000; //ms
 
@@ -152,6 +156,8 @@ private:
     void animation_init(Stream &out);
     void animation_update();
     void calculate_effect_position();
+    void animation_reset();
+
 
     void effect__pixel_checker();
     void effect__line();
@@ -182,7 +188,7 @@ private:
 
     uint32_t effect_start = 0;
     uint32_t effect_end = 0;
-    uint32_t effect_loopcount = 0;
+    uint32_t effect_fps_loopcount = 0;
     // double effect_position = 0.0;
     float effect_position = 0.0;
 
