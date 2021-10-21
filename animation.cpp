@@ -108,8 +108,10 @@ void MyAnimation::menu__set_fps(Print &out, char *command) {
 
 void MyAnimation::menu__start_loop_n_times(Print &out, char *command) {
     uint8_t command_offset = 1;
-    float value = atoi(&command[command_offset]);
-    out.print("Start loop %d times.", value);
+    uint16_t value = atoi(&command[command_offset]);
+    out.print("Start loop ");
+    out.print(value);
+    out.println(" times.");
     start_loop_n_times(value);
     out.println();
 }
@@ -606,7 +608,7 @@ void MyAnimation::calculate_effect_position() {
         animation_reset();
 
         // animation_loopcount == 0 == infinite
-        if (animation_loopcount !== 0) {
+        if (animation_loopcount != 0) {
             // loopcount is active
             if (animation_loopcount == 1) {
                 animation_run = false;
