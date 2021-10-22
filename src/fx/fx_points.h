@@ -59,8 +59,11 @@ public:
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // attributes
-    uint8_t point_count = 10;
+    const uint8_t point_count_max = 10;
+    uint8_t point_count = 2;
 
+    const float row_start = 0.3;
+    const float row_end = 0.55;
 private:
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

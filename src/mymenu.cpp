@@ -342,8 +342,14 @@ void MyMenu::menu__print_help(Print &out) {
     out.print(F("\t 'l': start loop n times 'l3' ("));
     out.print(animation.animation_loopcount);
     out.println(F(")"));
-    out.print(F("\t 'L': start wave singleshot 'L'"));
+    out.print(F("\t 'j': fx_wave start singleshot 'j'"));
     out.println();
+    out.print(F("\t 'J': fx_wave start loop n times 'l3' ("));
+    out.print(animation.fx_wave->loopcount);
+    out.println(F(
+    out.print(F("\t 'k': set fx_points point_count 'k10' ("));
+    out.print(static_cast<FXPoints*>(animation.fx_points)->point_count);
+    out.println(F(")"));
     out.print(F("\t 'd': set effect_duration 'd1000' ("));
     out.print(animation.effect_duration);
     out.println(F("ms)"));
@@ -440,11 +446,25 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
         case 'l': {
             animation.menu__start_loop_n_times(out, command);
         } break;
-        case 'L': {
+        case 'k': {
+            out.println(F("set point_count:"));
+            uint8_t value = atoi(&command[1]);
+            out.print(value);
+            static_cast<FXPoints*>(animation.fx_points)->point_count = value;
+            out.println();
+        } break;
+        case 'j': {
             out.println(F("fx_wave start_singleshot"));
             // set to 1s
             animation.fx_wave->duration = 1000;
             animation.fx_wave->start_singleshot();
+        } break;
+        case 'J': {
+            out.println(F("fx_wave start loop n-times:"));
+            uint8_t value = atoi(&command[1]);
+            out.print(value);
+            animation.fx_wave->start_loop_n_times(value);
+            out.println();
         } break;
         case 'd': {
             out.println(F("set effect_duration:"));

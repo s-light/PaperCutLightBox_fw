@@ -88,7 +88,7 @@ CHSV FXWave::get_pixel(__attribute__((unused)) PixelPos * pixel_pos) {
     dist = dist / radius;
 
     float value = brightness;
-    value = 1.0 * normalize_0n_to_10(dist, radius);
+    value = 1.0 * map_range_0n_to_10(dist, radius);
     // value = map_range(dist, 0.0, radius, 1.0, 0.0);
     value += position * 3.5;
     // value += position;
@@ -99,10 +99,10 @@ CHSV FXWave::get_pixel(__attribute__((unused)) PixelPos * pixel_pos) {
     // exclude / blur outside of circle
     float mask = 1.0;
     // mask *= easeIn_double(dist);
-    mask *= easeIn(normalize_0n_to_10(dist*1.0, radius*2.0));
-    // mask *= easeIn(normalize_0n_to_10(dist*1.0, radius*1.0));
+    mask *= easeIn(map_range_0n_to_10(dist*1.0, radius*2.0));
+    // mask *= easeIn(map_range_0n_to_10(dist*1.0, radius*1.0));
     // mask *= easeIn((1.0 - dist)*1.4);
-    // mask *= easeInExpo(1.0 * normalize_0n_to_10(dist*1.0, radius*1.1));
+    // mask *= easeInExpo(1.0 * map_range_0n_to_10(dist*1.0, radius*1.1));
     // mask = clamp01(mask);
     if (dist > (radius+0.08)) {
         mask = 0.0;

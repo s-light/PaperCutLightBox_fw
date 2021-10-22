@@ -547,6 +547,7 @@ void MyAnimation::animation_init(Stream &out) {
         out.println(F("  Set predefined values for different effects."));
         fx_wave->hue = 0.1;
         fx_wave->brightness = 0.1;
+        fx_wave->run(false);
     }
     out.println(F("  finished."));
 }
@@ -748,7 +749,7 @@ void MyAnimation::effect_Matrix2D() {
         //     0, MATRIX_ROW_COUNT-1,
         //     -0.5, 0.5);
         pixel_pos->row_i = row_i;
-        pixel_pos->row = normalize_0n_to_01(row_i, MATRIX_ROW_COUNT-1);
+        pixel_pos->row = map_range_0n_to_01(row_i, MATRIX_ROW_COUNT-1);
         for (size_t col_i = 0; col_i < MATRIX_COL_COUNT; col_i++) {
             // normalize col
             // float col = map_range__int2float(
@@ -757,7 +758,7 @@ void MyAnimation::effect_Matrix2D() {
             //     0, MATRIX_COL_COUNT-1,
             //     -0.5, 0.5);
             pixel_pos->col_i = col_i;
-            pixel_pos->col = normalize_0n_to_01(col_i, MATRIX_COL_COUNT-1);
+            pixel_pos->col = map_range_0n_to_01(col_i, MATRIX_COL_COUNT-1);
             // ------------------------------------------
             CHSV pixel_hsv = effect_Matrix2D_get_pixel(pixel_pos);
 

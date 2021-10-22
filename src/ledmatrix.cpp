@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ******************************************************************************/
 
+// NOLINTNEXTLINE(build/include)
 #include "./ledmatrix.h"
 
 
@@ -312,10 +313,10 @@ void MyLEDMatrix::print_2Dmatrix(Print &out) {
 
     // print header line
     col_i = 0;
-    float col = normalize_to_01(col_i, 0, MATRIX_COL_COUNT-1);
+    float col = map_range_0n_to_01(col_i, MATRIX_COL_COUNT-1);
     stream_out.printf("int(float)     %2d(%1.2f)", col_i, col);
     for (col_i = 1; col_i < count_col; col_i++) {
-        col = normalize_to_01(col_i, 0, MATRIX_COL_COUNT-1);
+        col = map_range_0n_to_01(col_i, MATRIX_COL_COUNT-1);
         stream_out.printf(",%2d(%1.2f)", col_i, col);
     }
     stream_out.println();
@@ -327,7 +328,7 @@ void MyLEDMatrix::print_2Dmatrix(Print &out) {
         //     row_i,
         //     0, MATRIX_ROW_COUNT-1,
         //     -0.5, 0.5);
-        float row = normalize_to_01(row_i, 0, MATRIX_ROW_COUNT-1);
+        float row = map_range_0n_to_01(row_i, MATRIX_ROW_COUNT-1);
 
         // print row numer
         stream_out.printf("%2d(%1.2f) -->   ", row_i, row);
