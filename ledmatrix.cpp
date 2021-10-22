@@ -103,17 +103,19 @@ void MyLEDMatrix::tlc_init(Stream &out) {
         // spiClock (default: 10 * 1000 * 1000)
         // working: 20, 12, 5,
         // not working: 16
+        // on SAMD 51 - 20 results in 24MHz Clock.
+        // so we use something that results in under 20MHz
+        // the first setting that results in less is 12MHz...
         // 20 * 1000 * 1000,
-        // 16 * 1000 * 1000,
-        // 12 * 1000 * 1000,
-        // 5 * 1000 * 1000,
-        // 10 * 1000 * 1000,
-        1 * 1000 * 1000,
+        12 * 1000 * 1000,
         // postXferDelayMicros (default: 4)
         // min: 666ns; max 2.74ms
         // min as of diagram: 1.34us
         // https://www.ti.com/lit/ds/symlink/tlc5971.pdf?ts=1634744586475#page=25&zoom=250,-44,774
-        4
+        // we can use 0 here as the main loop needs long enough
+        // before the next tlc.write is called..
+        0
+        // 4
         // NOLINTNEXTLINE(whitespace/parens)
     );
 

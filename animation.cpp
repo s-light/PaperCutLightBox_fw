@@ -239,6 +239,9 @@ void MyAnimation::menu__set_all_pixel(Print &out, char *command) {
 void MyAnimation::menu__time_meassurements(Print &out) {
     out.println(F("time_meassurements:"));
 
+    bool animation_run_temp = animation_run;
+    animation_run = false;
+    animation_reset();
 
     uint32_t tm_total_start = 0;
     uint32_t tm_total_end = 0;
@@ -405,6 +408,9 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     //
     // out.println();
     // out.println();
+
+    animation_run = animation_run_temp;
+    animation_reset();
 }
 
 
@@ -918,7 +924,7 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(
     // pixel_hsv = plasma;
 
     // wave
-    // pixel_hsv = effect__wave(col, row, offset);
+    pixel_hsv = effect__wave(col, row, offset);
     CHSV pixel_wave = effect__wave(col, row, offset);
     if (pixel_wave.value > 0.0) {
         pixel_hsv = pixel_wave;
