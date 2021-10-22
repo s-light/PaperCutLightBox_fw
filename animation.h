@@ -61,8 +61,12 @@ SOFTWARE.
 #include "./ledmatrix.h"
 
 #include "./fx_base.h"
+#include ".//fx_rainbow.h"
 #include ".//fx_line.h"
-// #include ".//fx_wave.h"
+#include ".//fx_wave.h"
+#include ".//fx_plasma.h"
+#include ".//fx_points.h"
+#include ".//fx_sparkle.h"
 
 class MyAnimation {
 public:
@@ -86,9 +90,36 @@ public:
     // pin_output_enable: 2
     MyLEDMatrix matrix = MyLEDMatrix(2);
 
-    FXBase fx_base = FXBase();
-    FXLine fx_line = FXLine();
-    // FXWave fx_wave = FXWave();
+    // enum fx_names {
+    //     // FX_base,
+    //     FX_line,
+    //     // FX_rainbow,
+    //     // FX_sparkle,
+    //     FX_plasma,
+    //     FX_wave,
+    //     FX_points,
+    // };
+    //
+    // FXBase * fx_list[] = {
+    //     // new FXBase(),
+    //     new FXLine(),
+    //     // new FXRainbow(),
+    //     // new FXSparkle(),
+    //     new FXPlasma(),
+    //     new FXWave(),
+    //     new FXPoints(),
+    // };
+
+    // we need to do the `FXBase *` pointer thing -
+    // otherwise the newly created class is *sliced*
+    // and only the parts of the base class is available...
+    // FXBase * fx_base = new FXBase();
+    // FXBase * fx_line = new FXLine();
+    // FXBase * fx_rainbow = new FXRainbow();
+    // FXBase * fx_sparkle = new FXSparkle();
+    // FXBase * fx_plasma = new FXPlasma();
+    FXBase * fx_wave = new FXWave();
+    FXBase * fx_points = new FXPoints();
 
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -148,7 +179,7 @@ public:
     // forest green - daylight
     float hue = 0.05;
     float saturation = 1.0;
-    float contrast = 1.70;
+    float contrast = 1.0;
     float brightness = 0.006;
     const float brightness_max = 0.37;
     const uint16_t brightness_max_i = 25000;
@@ -170,25 +201,14 @@ private:
 
     void effect__pixel_checker();
     void effect__line();
-    void effect__rainbow();
 
     void effect_Matrix2D();
+    CHSV effect_Matrix2D_get_pixel( __attribute__((unused)) PixelPos * pixel_pos);
     // CHSV effect_Matrix2D_get_pixel(float col, float row, float offset);
-    CHSV effect_Matrix2D_get_pixel(
-        float col, float row,
-        uint16_t col_i, uint16_t row_i,
-        float offset);
-    CHSV effect__plasma(float col, float row, float offset);
-    CHSV effect__wave(float col, float row, float offset);
-    CHSV effect__points(uint8_t col, uint8_t row, float offset);
-    CHSV effect__sparkle(float col, float row, float offset);
-    CHSV effect__mapping_checker(float col, float row, float offset);
-    CHSV effect__mapping_checker(uint16_t col, uint16_t row, float offset);
-
-    // int16_t calcDist(uint8_t x, uint8_t y, int8_t center_x, int8_t center_y);
-    float calcRadius(float x, float y);
-    float calcDist(float x, float y, float center_x, float center_y);
-
+    // CHSV effect_Matrix2D_get_pixel(
+    //     float col, float row,
+    //     uint16_t col_i, uint16_t row_i,
+    //     float offset);
     // others
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

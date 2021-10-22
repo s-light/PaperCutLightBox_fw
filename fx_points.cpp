@@ -3,7 +3,8 @@
 /******************************************************************************
 
     __doc__ = """
-    simple line for mapping-check
+    plasma :-)
+    the old school way...
     Enjoy the colors :-)
     """
 
@@ -37,76 +38,52 @@ SOFTWARE.
 
 // include own headerfile
 // NOLINTNEXTLINE(build/include)
-#include "./fx_line.h"
+#include "./fx_points.h"
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // functions
 //
-// // FXLine::FXLine(uint32_t duration_ = 5 * 1000) {
-// FXLine::FXLine() {
+// // FXPointsþ::FXPoints(uint32_t duration_ = 5 * 1000) {
+// FXPoints::FXPoints() {
 //     // duration = duration_;
 // }
 //
-// FXLine::~FXLine() {
+// FXPoints::~FXPoints() {
 // }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // animation
 
-CHSV FXLine::get_pixel(PixelPos * pixel_pos) {
-    CHSV pixel_hsv = CHSV(hue, saturation, brightness);
+CHSV FXPoints::get_pixel(__attribute__((unused)) PixelPos * pixel_pos) {
+    // https://editor.soulmatelights.com/gallery/1450-points-int
+    float value = 0.0;
+    // uint16_t position_row = position * MATRIX_ROW_COUNT;
+    uint16_t position_col = position * MATRIX_COL_COUNT;
 
-    // if row and col value -0.5 .. 0.5 then use this:
-    // float row_width = (1.0 / MATRIX_ROW_COUNT / 1.5);
-    // float col_width = (1.0 / MATRIX_COL_COUNT / 1.5);
-    // float offset_half = map_range(position, 0.0, 1.0, -0.5, 0.5);
+    // TODO(s-light): implement usage of point_count
 
-    // if row and col value 0.0 .. 1.0 then use this:
-    const float row_width = (1.0 / MATRIX_ROW_COUNT);
-    const float col_width = (1.0 / MATRIX_COL_COUNT);
-    // float position_half = position;
-
-    // float base = col * 0.2 + position;
-    // float base = map_range(col, -0.5, 0.5, 0.0, 1.0);
-    // float base = map_range(col, -0.5, 0.5, 0.0, 1.0);
-    // base = map_range(position, 0, 1.0, 0.0, 0.1);
-    // base *= 10.0;
-    // // base *= 5.0;
-    // float position_PI = position * (3.141592 / 2);
-    // base += position_PI;
-    // // base += (position*2);
-    // Serial.printf("(%+2.2f|%+2.2f): %2.3f\r\n", col, row, base);
-    // pixel_hsv.value = sin(base);
-    // pixel_hsv.hue = sin(base);
-    // pixel_hsv.value = base;
-
-    // Serial.printf(
-    //     "%+2.2f  "
-    //     "%+2.2f|%+2.2f  "
-    //     "%+2.2f|%+2.2f\r\n",
-    //     position,
-    //     row, col,
-    //     row_width, abs(position - row));
-    // Serial.printf(
-    //     "%+2.2f  "
-    //     "%+2.2f  "
-    //     "%+2.2f  "
-    //     "%+2.2f\r\n",
-    //     position_half,
-    //     row,
-    //     row_width,
-    //     abs(position_half - row));
-
-    // if (abs(position_half - row) <= row_width) {
-    if (abs(position - pixel_pos->row) <= row_width) {
-        pixel_hsv.hue = 0.1;
-        pixel_hsv.value = 1.0;
+    if (
+        (pixel_pos->row_i > (MATRIX_ROW_COUNT * 0.3) )
+        && (pixel_pos->row_i < (MATRIX_ROW_COUNT * (0.5)))
+    ) {
+        if (
+          (pixel_pos->col_i % 2)
+          && (position_col >= pixel_pos->col_i)
+        ) {
+          value = brightness;
+        }
+        // value_i =
+        //     ((position_col % MATRIX_COL_COUNT) - pixel_pos->col + 1) * 255;
+        // value_i = (pixel_pos->col % 2) * 80;
+        // value_i = (
+        //     (pixel_pos->col % 2)
+        //     * ((position_col % MATRIX_COL_COUNT) - pixel_pos->col + 1)
+        //     * 255);
     }
-    // if (abs(position_half - col) <= col_width) {
-    if (abs(position - pixel_pos->col) <= col_width) {
-        pixel_hsv.hue = 0.4;
-        pixel_hsv.value = 1.0;
-    }
+
+    // CHSV pixel_hsv = CHSV(hue, saturation, brightness);
+    // map to color
+    CHSV pixel_hsv = CHSV(hue, saturation, value);
 
     pixel_hsv.value *= visibility;
     return pixel_hsv;

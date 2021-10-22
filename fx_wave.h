@@ -38,37 +38,29 @@ SOFTWARE.
 
 
 
-#ifndef FXLine_H_
-#define FXLine_H_
-
-// include Core Arduino functionality
-#include <Arduino.h>
+#ifndef FXWave_H_
+#define FXWave_H_
 
 #include "./fx_base.h"
 
-// #include "./color.h"
-// #include "./ledmatrix.h"
-// #include "./mapping.h"
-
-class FXLine : public FXBase{
+class FXWave : public FXBase{
 public:
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // constructor
 
-    // FXLine();
-    // ~FXLine();
+    // FXWave();
+    // ~FXWave();
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // public functions
 
     // void update_position();
-    virtual CHSV get_pixel(PixelPos * pixel_pos);
+    CHSV get_pixel(PixelPos * pixel_pos);
 
 private:
+    // int16_t calcDist(uint8_t x, uint8_t y, int8_t center_x, int8_t center_y);
+    float calcRadius(float x, float y);
+    float calcDist(float x, float y, float center_x, float center_y);
+};  // class FXWave
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // attributes
-
-};  // class FXLine
-
-#endif  // FXLine_H_
+#endif  // FXWave_H_

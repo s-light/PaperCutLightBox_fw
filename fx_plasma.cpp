@@ -3,7 +3,8 @@
 /******************************************************************************
 
     __doc__ = """
-    simple line for mapping-check
+    plasma :-)
+    the old school way...
     Enjoy the colors :-)
     """
 
@@ -37,77 +38,53 @@ SOFTWARE.
 
 // include own headerfile
 // NOLINTNEXTLINE(build/include)
-#include "./fx_line.h"
+#include "./fx_plasma.h"
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // functions
 //
-// // FXLine::FXLine(uint32_t duration_ = 5 * 1000) {
-// FXLine::FXLine() {
+// // FXPlasmaþ::FXPlasma(uint32_t duration_ = 5 * 1000) {
+// FXPlasma::FXPlasma() {
 //     // duration = duration_;
 // }
 //
-// FXLine::~FXLine() {
+// FXPlasma::~FXPlasma() {
 // }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // animation
 
-CHSV FXLine::get_pixel(PixelPos * pixel_pos) {
-    CHSV pixel_hsv = CHSV(hue, saturation, brightness);
-
-    // if row and col value -0.5 .. 0.5 then use this:
-    // float row_width = (1.0 / MATRIX_ROW_COUNT / 1.5);
-    // float col_width = (1.0 / MATRIX_COL_COUNT / 1.5);
-    // float offset_half = map_range(position, 0.0, 1.0, -0.5, 0.5);
-
-    // if row and col value 0.0 .. 1.0 then use this:
-    const float row_width = (1.0 / MATRIX_ROW_COUNT);
-    const float col_width = (1.0 / MATRIX_COL_COUNT);
-    // float position_half = position;
-
-    // float base = col * 0.2 + position;
-    // float base = map_range(col, -0.5, 0.5, 0.0, 1.0);
-    // float base = map_range(col, -0.5, 0.5, 0.0, 1.0);
-    // base = map_range(position, 0, 1.0, 0.0, 0.1);
-    // base *= 10.0;
-    // // base *= 5.0;
-    // float position_PI = position * (3.141592 / 2);
-    // base += position_PI;
-    // // base += (position*2);
-    // Serial.printf("(%+2.2f|%+2.2f): %2.3f\r\n", col, row, base);
-    // pixel_hsv.value = sin(base);
-    // pixel_hsv.hue = sin(base);
-    // pixel_hsv.value = base;
-
-    // Serial.printf(
-    //     "%+2.2f  "
-    //     "%+2.2f|%+2.2f  "
-    //     "%+2.2f|%+2.2f\r\n",
-    //     position,
-    //     row, col,
-    //     row_width, abs(position - row));
-    // Serial.printf(
-    //     "%+2.2f  "
-    //     "%+2.2f  "
-    //     "%+2.2f  "
-    //     "%+2.2f\r\n",
-    //     position_half,
-    //     row,
-    //     row_width,
-    //     abs(position_half - row));
-
-    // if (abs(position_half - row) <= row_width) {
-    if (abs(position - pixel_pos->row) <= row_width) {
-        pixel_hsv.hue = 0.1;
-        pixel_hsv.value = 1.0;
-    }
-    // if (abs(position_half - col) <= col_width) {
-    if (abs(position - pixel_pos->col) <= col_width) {
-        pixel_hsv.hue = 0.4;
-        pixel_hsv.value = 1.0;
-    }
-
+CHSV FXPlasma::get_pixel(__attribute__((unused)) PixelPos * pixel_pos) {
+    // calculate plasma
+    // mostly inspired by
+    // https://www.bidouille.org/prog/plasma
+    // moving rings
+    float cx = pixel_pos->col + 0.5 * sin(position / 5);
+    float cy = pixel_pos->row + 0.5 * cos(position / 3);
+    // double xy_value = sin(
+    float xy_value = sin(
+        sqrt(100 * (cx*cx + cy*cy) + 1)
+        + position);
+    // mapping
+    float pixel_hue = map_range(
+        xy_value,
+        -1.0, 1.0,
+        // self._hue_min, self._hue_max
+        // 0.0, 0.08
+        hue - 0.05, hue + 0.2);
+    float pixel_saturation = map_range(
+        xy_value,
+        -1.0, 1.0,
+        1.0, 1.0);
+    float pixel_value = map_range(
+        xy_value,
+        1.0, -1.0,
+        // self._contrast_min, self._contrast_max
+        // -0.005, 1.0
+        1.0 - contrast, 1.0);
+    // map to color
+    CHSV pixel_hsv = CHSV(pixel_hue, pixel_saturation, pixel_value);
+    // CHSV pixel_hsv = CHSV(hue, saturation, brightness);
     pixel_hsv.value *= visibility;
     return pixel_hsv;
 }

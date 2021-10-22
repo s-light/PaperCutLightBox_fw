@@ -1,7 +1,7 @@
 /******************************************************************************
 
     __doc__ = """
-    base class for effects
+    simple line for mapping-check
     Enjoy the colors :-)
     """
 
@@ -38,96 +38,30 @@ SOFTWARE.
 
 
 
-#ifndef FXBase_H_
-#define FXBase_H_
+#ifndef FXRainbow_H_
+#define FXRainbow_H_
 
-// include Core Arduino functionality
-#include <Arduino.h>
+#include "./fx_base.h"
 
-#include "./color.h"
-#include "./mapping.h"
-#include "./easing.h"
-
-#include "./ledmatrix.h"
-
-class PixelPos {
-public:
-    float progress;
-    float col;
-    float row;
-    // uint32_t offset_;
-    uint8_t row_i;
-    uint8_t col_i;
-};
-
-class FXBase {
+class FXRainbow : public FXBase{
 public:
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // constructor
 
-    FXBase();
-    ~FXBase();
+    // FXRainbow();
+    // ~FXRainbow();
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // public functions
 
-    void run(bool run_);
-    void start_singleshot();
-    void start_loop_n_times(uint16_t count);
-    void reset();
-
-    virtual void update_position();
+    // void update_position();
     virtual CHSV get_pixel(PixelPos * pixel_pos);
-    // void get_all();
 
-
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // helper
-    // float set_brightness(float brightness_);
-    // float get_brightness(float brightness_);
-    // float set_hue(float hue_);
-    float set_position(float position_);
-    float get_position();
-    // uint16_t set_fps(uint16_t fps_);
-    // uint16_t get_fps();
-
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // menu helper
-
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // configurations
-
-
-    uint32_t duration = 5 * 1000; //ms
-    float hue = 0.5;
-    float saturation = 1.0;
-    float brightness = 1.0;
-    float contrast = 1.00;
-    float visibility = 1.00;
-
-    // const float PI = 3.141592;
-    // is already defined by arduino or some other defaults...
-
-protected:
-
-    // int16_t calcDist(uint8_t x, uint8_t y, int8_t center_x, int8_t center_y);
-    // float calcDist(float x, float y, float center_x, float center_y);
+private:
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // attributes
-    bool running = true;
-    uint16_t loopcount = 0;
-    // bool single_shot = false;
-    uint32_t start = 0;
-    uint32_t end = 0;
-    // double position = 0.0;
-    float position = 0.0;
 
-    const uint16_t fps_min = 1;
-    const uint16_t fps_max = 10000;
-    uint16_t fps = 10000;
-    uint32_t fps_loopcount = 0;
+};  // class FXRainbow
 
-};  // class FXBase
-
-#endif  // FXBase_H_
+#endif  // FXRainbow_H_

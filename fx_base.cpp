@@ -128,10 +128,7 @@ void FXBase::reset() {
 }
 
 
-CHSV FXBase::get_pixel(
-    __attribute__((unused)) float col,
-    __attribute__((unused)) float row
-) {
+CHSV FXBase::get_pixel(__attribute__((unused)) PixelPos * pixel_pos) {
     CHSV pixel_hsv = CHSV(hue, saturation, brightness);
 
     pixel_hsv.value *= visibility;

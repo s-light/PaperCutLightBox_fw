@@ -3,7 +3,8 @@
 /******************************************************************************
 
     __doc__ = """
-    simple line for mapping-check
+    plasma :-)
+    the old school way...
     Enjoy the colors :-)
     """
 
@@ -37,77 +38,25 @@ SOFTWARE.
 
 // include own headerfile
 // NOLINTNEXTLINE(build/include)
-#include "./fx_line.h"
+#include "./fx_sparkle.h"
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // functions
 //
-// // FXLine::FXLine(uint32_t duration_ = 5 * 1000) {
-// FXLine::FXLine() {
+// // FXSparkleþ::FXSparkle(uint32_t duration_ = 5 * 1000) {
+// FXSparkle::FXSparkle() {
 //     // duration = duration_;
 // }
 //
-// FXLine::~FXLine() {
+// FXSparkle::~FXSparkle() {
 // }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // animation
 
-CHSV FXLine::get_pixel(PixelPos * pixel_pos) {
+CHSV FXSparkle::get_pixel(__attribute__((unused)) PixelPos * pixel_pos) {
     CHSV pixel_hsv = CHSV(hue, saturation, brightness);
-
-    // if row and col value -0.5 .. 0.5 then use this:
-    // float row_width = (1.0 / MATRIX_ROW_COUNT / 1.5);
-    // float col_width = (1.0 / MATRIX_COL_COUNT / 1.5);
-    // float offset_half = map_range(position, 0.0, 1.0, -0.5, 0.5);
-
-    // if row and col value 0.0 .. 1.0 then use this:
-    const float row_width = (1.0 / MATRIX_ROW_COUNT);
-    const float col_width = (1.0 / MATRIX_COL_COUNT);
-    // float position_half = position;
-
-    // float base = col * 0.2 + position;
-    // float base = map_range(col, -0.5, 0.5, 0.0, 1.0);
-    // float base = map_range(col, -0.5, 0.5, 0.0, 1.0);
-    // base = map_range(position, 0, 1.0, 0.0, 0.1);
-    // base *= 10.0;
-    // // base *= 5.0;
-    // float position_PI = position * (3.141592 / 2);
-    // base += position_PI;
-    // // base += (position*2);
-    // Serial.printf("(%+2.2f|%+2.2f): %2.3f\r\n", col, row, base);
-    // pixel_hsv.value = sin(base);
-    // pixel_hsv.hue = sin(base);
-    // pixel_hsv.value = base;
-
-    // Serial.printf(
-    //     "%+2.2f  "
-    //     "%+2.2f|%+2.2f  "
-    //     "%+2.2f|%+2.2f\r\n",
-    //     position,
-    //     row, col,
-    //     row_width, abs(position - row));
-    // Serial.printf(
-    //     "%+2.2f  "
-    //     "%+2.2f  "
-    //     "%+2.2f  "
-    //     "%+2.2f\r\n",
-    //     position_half,
-    //     row,
-    //     row_width,
-    //     abs(position_half - row));
-
-    // if (abs(position_half - row) <= row_width) {
-    if (abs(position - pixel_pos->row) <= row_width) {
-        pixel_hsv.hue = 0.1;
-        pixel_hsv.value = 1.0;
-    }
-    // if (abs(position_half - col) <= col_width) {
-    if (abs(position - pixel_pos->col) <= col_width) {
-        pixel_hsv.hue = 0.4;
-        pixel_hsv.value = 1.0;
-    }
-
+    // TODO(s-light): implement sparkle effect
     pixel_hsv.value *= visibility;
     return pixel_hsv;
 }

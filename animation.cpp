@@ -541,9 +541,12 @@ void MyAnimation::animation_init(Stream &out) {
         matrix.tlc.setRGB(200, 50, 0);
         matrix.tlc.write();
 
-
         effect_start = micros();
         effect_end = micros() + (effect_duration*1000);
+
+        out.println(F("  Set predefined values for different effects."));
+        fx_wave->hue = 0.1;
+        fx_wave->brightness = 0.1;
     }
     out.println(F("  finished."));
 }
@@ -566,7 +569,6 @@ void MyAnimation::animation_update() {
         // }
     }
 }
-
 
 void MyAnimation::animation_reset() {
     effect_position = 0.0;
@@ -608,10 +610,12 @@ void MyAnimation::animation_reset() {
 }
 
 void MyAnimation::calculate_effect_position() {
-    fx_base.update_position();
-    fx_line.update_position();
-    fx_wave.update_position();
-    // fx_points.update_position();
+    // fx_base->update_position();
+    // fx_line->update_position();
+    // fx_rainbow->update_position();
+    // fx_plasma->update_position();
+    fx_wave->update_position();
+    fx_points->update_position();
 
     effect_position = normalize_to_01(micros(), effect_start, effect_end);
 
@@ -636,6 +640,7 @@ void MyAnimation::calculate_effect_position() {
     //     Serial.println(effect_position);
     // }
 }
+
 
 
 
@@ -669,158 +674,6 @@ void MyAnimation::effect__line() {
     }
 }
 
-void MyAnimation::effect__rainbow() {
-    for (size_t row_i = 0; row_i < MATRIX_ROW_COUNT; row_i++) {
-        for (size_t col_i = 0; col_i < MATRIX_COL_COUNT; col_i++) {
-            // full rainbow
-            CHSV color_hsv = CHSV(effect_position, 1.0, brightness);
-            CRGB color_rgb = hsv2rgb(color_hsv);
-            matrix.tlc.setRGB(
-                matrix.pmap[col_i][row_i],
-                // convert float to uint16_t
-                color_rgb.r * 65535,
-                color_rgb.g * 65535,
-                color_rgb.b * 65535);
-            // matrix.tlc.setRGB(
-            //     matrix.pmap[col_i][row_i],
-            //     0, col_i * step * 10 , row_i * 100);
-        }
-    }
-}
-
-
-
-CHSV MyAnimation::effect__plasma(float col, float row, float offset) {
-    // calculate plasma
-    // mostly inspired by
-    // https://www.bidouille.org/prog/plasma
-    // moving rings
-    float cx = col + 0.5 * sin(offset / 5);
-    float cy = row + 0.5 * cos(offset / 3);
-    // double xy_value = sin(
-    float xy_value = sin(
-        sqrt(100 * (cx*cx + cy*cy) + 1)
-        + offset);
-    // mapping
-    float pixel_hue = map_range(
-        xy_value,
-        -1.0, 1.0,
-        // self._hue_min, self._hue_max
-        // 0.0, 0.08
-        hue - 0.05, hue + 0.2);
-    float pixel_saturation = map_range(
-        xy_value,
-        -1.0, 1.0,
-        1.0, 1.0);
-    float pixel_value = map_range(
-        xy_value,
-        1.0, -1.0,
-        // self._contrast_min, self._contrast_max
-        // -0.005, 1.0
-        1.0 - contrast, 1.0);
-    // map to color
-    CHSV pixel_hsv = CHSV(pixel_hue, pixel_saturation, pixel_value);
-    return pixel_hsv;
-}
-
-
-float MyAnimation::calcRadius(float x, float y) {
-  x *= x;
-  y *= y;
-  return sqrt(x + y);
-}
-
-// int16_t MyAnimation::calcDist(
-//     uint8_t x, uint8_t y, int8_t center_x, int8_t center_y
-// ) {
-float MyAnimation::calcDist(float x, float y, float center_x, float center_y) {
-  float a = center_y - y;
-  float b = center_x - x;
-  float dist = calcRadius(a, b);
-  return dist;
-}
-
-CHSV MyAnimation::effect__wave(float col, float row, float offset) {
-    // calculate wave
-    // online
-    // https://editor.soulmatelights.com/gallery/1015-circle
-    float radius = 0.7;
-    float offset_y = map_range_01_to(
-        offset,
-        -(radius-0.02),
-        1.0 + (radius-0.2));
-
-    float dist = calcDist(col, row, 0.5, offset_y);
-    // float dist = calcDist(col, row, 0.5, 0.9);
-    // what does this next line actually does???
-    dist = dist / radius;
-
-    float value = 1.0;
-    value = 1.0 * normalize_0n_to_10(dist, radius);
-    // value = map_range(dist, 0.0, radius, 1.0, 0.0);
-    value += offset * 3.5;
-    // value += offset;
-    // map to *full circle* in radians
-    value = sin(map_range_01_to_0n(value, (360*PI/180)));
-    // shift black point
-    value = map_range_01_to(value, 0.5, 1.0);
-    // exclude / blur outside of circle
-    float mask = 1.0;
-    // mask *= easeIn_double(dist);
-    mask *= easeIn(normalize_0n_to_10(dist*1.0, radius*2.0));
-    // mask *= easeIn(normalize_0n_to_10(dist*1.0, radius*1.0));
-    // mask *= easeIn((1.0 - dist)*1.4);
-    // mask *= easeInExpo(1.0 * normalize_0n_to_10(dist*1.0, radius*1.1));
-    // mask = clamp01(mask);
-    if (dist > (radius+0.08)) {
-        mask = 0.0;
-    }
-    value *= mask;
-    // value = mask;
-    // value = map_range_01_to(value, 0.9, 1.0);
-
-    // map to color
-    CHSV pixel_hsv = CHSV(0.3, 1.0, value);
-    return pixel_hsv;
-}
-
-CHSV MyAnimation::effect__points(uint8_t col, uint8_t row, float offset) {
-    // https://editor.soulmatelights.com/gallery/1450-points-int
-    float value = 0.0;
-    // uint16_t offset_row = offset * MATRIX_ROW_COUNT;
-    uint16_t offset_col = offset * MATRIX_COL_COUNT;
-    if (
-        (row > (MATRIX_ROW_COUNT * 0.3) )
-        && (row < (MATRIX_ROW_COUNT * (0.5)))
-    ) {
-        if (
-          (col % 2)
-          && (offset_col >= col)
-        ) {
-          value = 0.2;
-        }
-        // value_i = ((offset_col % MATRIX_COL_COUNT) - col + 1) * 255;
-        // value_i = (col % 2) * 80;
-        // value_i = (
-        //     (col % 2)
-        //     * ((offset_col % MATRIX_COL_COUNT) - col + 1)
-        //     * 255);
-    }
-    // map to color
-    CHSV pixel_hsv = CHSV(0.7, 1.0, value);
-    return pixel_hsv;
-}
-
-// NOLINT(legal/copyright)
-CHSV MyAnimation::effect__sparkle(
-    __attribute__((unused)) float col,
-    __attribute__((unused)) float row,
-    __attribute__((unused)) float offset
-) {
-    CHSV pixel_hsv = CHSV(0.5, 1.0, 1.0);
-    return pixel_hsv;
-}
-
 
 
 
@@ -829,67 +682,38 @@ CHSV MyAnimation::effect__sparkle(
 //     __attribute__((unused)) float row,
 //     __attribute__((unused)) float offset
 // ) {
-CHSV MyAnimation::effect_Matrix2D_get_pixel(
-    __attribute__((unused)) float col,
-    __attribute__((unused)) float row,
-    __attribute__((unused)) uint16_t col_i,
-    __attribute__((unused)) uint16_t row_i,
-    __attribute__((unused)) float offset
-) {
+CHSV MyAnimation::effect_Matrix2D_get_pixel(PixelPos * pixel_pos) {
     CHSV pixel_hsv = CHSV(hue, saturation, 0.0001);
 
-    // plasma
-    // CHSV plasma = effect__plasma(col, row, offset);
-    // pixel_hsv = plasma;
-
-    // base
-    CHSV fx_base_pixel = fx_base.get_pixel(col, row);
-    if (fx_base_pixel.value > 0.0) {
-        pixel_hsv = fx_base_pixel;
-    }
-
-    // line
-    CHSV fx_line_pixel = fx_line.get_pixel(col, row);
-    if (fx_line_pixel.value > 0.0) {
-        pixel_hsv = fx_line_pixel;
-    }
-
-    // wave
-    // CHSV fx_wave_pixel = fx_wave.get_pixel(col, row);
-    // if (fx_wave_pixel.value > 0.0) {
-    //     pixel_hsv = fx_wave_pixel;
+    // // base
+    // CHSV fx_base_pixel = fx_base->get_pixel(pixel_pos);
+    // if (fx_base_pixel.value > 0.0) {
+    //     pixel_hsv = fx_base_pixel;
     // }
 
-    // points
-    // CHSV fx_points_pixel = fx_points.get_pixel(col, row);
+    // // line
+    // CHSV fx_line_pixel = fx_line->get_pixel(pixel_pos);
+    // if (fx_line_pixel.value > 0.0) {
+    //     pixel_hsv = fx_line_pixel;
+    // }
+
+    // // plasma
+    // CHSV fx_plasma_pixel = fx_plasma->get_pixel(pixel_pos);
+    // if (fx_plasma_pixel.value > 0.0) {
+    //     pixel_hsv = fx_plasma_pixel;
+    // }
+
+    // wave
+    CHSV fx_wave_pixel = fx_wave->get_pixel(pixel_pos);
+    if (fx_wave_pixel.value > 0.0) {
+        pixel_hsv = fx_wave_pixel;
+    }
+
+    // // points
+    // CHSV fx_points_pixel = fx_points->get_pixel(pixel_pos);
     // if (fx_points_pixel.value > 0.0) {
     //     pixel_hsv = fx_points_pixel;
     // }
-
-    // // wave
-    // // pixel_hsv = effect__wave(col, row, offset);
-    // CHSV pixel_wave = effect__wave(col, row, offset);
-    // if (pixel_wave.value > 0.0) {
-    //     pixel_hsv = pixel_wave;
-    // }
-    //
-    // // points
-    // // pixel_hsv *= effect__points(col_i, row_i, offset);
-    // CHSV pixel_points = effect__points(col_i, row_i, offset);
-    // if (pixel_points.value > 0.0) {
-    //     pixel_hsv = pixel_points;
-    // }
-
-    // sparkle
-    // CHSV sparkle = effect__sparkle(col, row, offset);
-    // pixel_hsv = sparkle;
-
-    // pixel_hsv = effect__mapping_checker(col_i, row_i, offset);
-    // pixel_hsv = effect__mapping_checker(col, row, offset);
-
-
-    // TODO(s-light): develop 'layer' / 'multiplyer' system...
-    // merge layers
 
     return pixel_hsv;
 }
@@ -899,8 +723,9 @@ void MyAnimation::effect_Matrix2D() {
     // float offset = map_range_01_to(
     //     effect_position,
     //     0, MATRIX_ROW_COUNT);
-    float offset = effect_position;
 
+    PixelPos * pixel_pos = new PixelPos();
+    pixel_pos->progress = effect_position;
     // Serial.println("");
 
     // float offset_PI = map_range(offset, 0.0, 1.0, 0.0, (3.14/2));
@@ -922,7 +747,8 @@ void MyAnimation::effect_Matrix2D() {
         //     row_i,
         //     0, MATRIX_ROW_COUNT-1,
         //     -0.5, 0.5);
-        float row = normalize_0n_to_01(row_i, MATRIX_ROW_COUNT-1);
+        pixel_pos->row_i = row_i;
+        pixel_pos->row = normalize_0n_to_01(row_i, MATRIX_ROW_COUNT-1);
         for (size_t col_i = 0; col_i < MATRIX_COL_COUNT; col_i++) {
             // normalize col
             // float col = map_range__int2float(
@@ -930,14 +756,10 @@ void MyAnimation::effect_Matrix2D() {
             //     col_i,
             //     0, MATRIX_COL_COUNT-1,
             //     -0.5, 0.5);
-            float col = normalize_0n_to_01(col_i, MATRIX_COL_COUNT-1);
-
+            pixel_pos->col_i = col_i;
+            pixel_pos->col = normalize_0n_to_01(col_i, MATRIX_COL_COUNT-1);
             // ------------------------------------------
-            CHSV pixel_hsv = effect_Matrix2D_get_pixel(
-                col, row,
-                col_i, row_i,
-                offset);
-            // CHSV pixel_hsv = effect_Matrix2D_get_pixel(col, row, offset);
+            CHSV pixel_hsv = effect_Matrix2D_get_pixel(pixel_pos);
 
             // ------------------------------------------
             // final conversions
