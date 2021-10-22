@@ -60,13 +60,13 @@ SOFTWARE.
 #include "./easing.h"
 #include "./ledmatrix.h"
 
-#include "./fx_base.h"
-#include ".//fx_rainbow.h"
-#include ".//fx_line.h"
-#include ".//fx_wave.h"
-#include ".//fx_plasma.h"
-#include ".//fx_points.h"
-#include ".//fx_sparkle.h"
+#include "./fx/fx_base.h"
+#include "./fx/fx_rainbow.h"
+#include "./fx/fx_line.h"
+#include "./fx/fx_wave.h"
+#include "./fx/fx_plasma.h"
+#include "./fx/fx_points.h"
+#include "./fx/fx_sparkle.h"
 
 class MyAnimation {
 public:

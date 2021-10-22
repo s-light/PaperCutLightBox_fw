@@ -44,11 +44,11 @@ SOFTWARE.
 // include Core Arduino functionality
 #include <Arduino.h>
 
-#include "./color.h"
-#include "./mapping.h"
-#include "./easing.h"
+#include "../color.h"
+#include "../mapping.h"
+#include "../easing.h"
 
-#include "./ledmatrix.h"
+#include "../ledmatrix.h"
 
 class PixelPos {
 public:

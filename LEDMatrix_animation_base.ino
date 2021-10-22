@@ -80,9 +80,9 @@
 // #include <slight_ButtonInput.h>
 // #include <slight_RotaryEncoder.h>
 
-#include "./animation.h"
-#include "./myinput.h"
-#include "./mymenu.h"
+#include "./src/animation.h"
+#include "./src/myinput.h"
+#include "./src/mymenu.h"
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
