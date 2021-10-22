@@ -242,6 +242,7 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     bool animation_run_temp = animation_run;
     animation_run = false;
     animation_reset();
+    effect_position = 0.5;
 
     uint32_t tm_total_start = 0;
     uint32_t tm_total_end = 0;
@@ -607,6 +608,11 @@ void MyAnimation::animation_reset() {
 }
 
 void MyAnimation::calculate_effect_position() {
+    fx_base.update_position();
+    fx_line.update_position();
+    fx_wave.update_position();
+    // fx_points.update_position();
+
     effect_position = normalize_to_01(micros(), effect_start, effect_end);
 
     // effect_fps_loopcount++;
@@ -805,93 +811,6 @@ CHSV MyAnimation::effect__points(uint8_t col, uint8_t row, float offset) {
     return pixel_hsv;
 }
 
-
-CHSV MyAnimation::effect__mapping_checker(float col, float row, float offset) {
-    // checker pattern
-    CHSV pixel_hsv = CHSV(0.7, 1.0, 0.1);
-
-
-    // if row and col value -0.5 .. 0.5 then use this:
-    // float row_width = (1.0 / MATRIX_ROW_COUNT / 1.5);
-    // float col_width = (1.0 / MATRIX_COL_COUNT / 1.5);
-    // float offset_half = map_range(offset, 0.0, 1.0, -0.5, 0.5);
-
-    // if row and col value 0.0 .. 1.0 then use this:
-    float row_width = (1.0 / MATRIX_ROW_COUNT);
-    float col_width = (1.0 / MATRIX_COL_COUNT);
-    float offset_half = offset;
-
-
-
-
-    // float base = col * 0.2 + offset;
-    // float base = map_range(col, -0.5, 0.5, 0.0, 1.0);
-    // float base = map_range(col, -0.5, 0.5, 0.0, 1.0);
-    // base = map_range(offset, 0, 1.0, 0.0, 0.1);
-    // base *= 10.0;
-    // // base *= 5.0;
-    // float offset_PI = offset * (3.141592 / 2);
-    // base += offset_PI;
-    // // base += (offset*2);
-    // Serial.printf("(%+2.2f|%+2.2f): %2.3f\r\n", col, row, base);
-    // pixel_hsv.value = sin(base);
-    // pixel_hsv.hue = sin(base);
-    // pixel_hsv.value = base;
-
-    // Serial.printf(
-    //     "%+2.2f  "
-    //     "%+2.2f|%+2.2f  "
-    //     "%+2.2f|%+2.2f\r\n",
-    //     offset,
-    //     row, col,
-    //     row_width, abs(offset - row));
-    // Serial.printf(
-    //     "%+2.2f  "
-    //     "%+2.2f  "
-    //     "%+2.2f  "
-    //     "%+2.2f\r\n",
-    //     offset_half,
-    //     row,
-    //     row_width,
-    //     abs(offset_half - row));
-
-    if (abs(offset_half - row) <= row_width) {
-        pixel_hsv.hue = 0.1;
-        pixel_hsv.value = 1.0;
-    }
-    if (abs(offset_half - col) <= col_width) {
-        pixel_hsv.hue = 0.4;
-        pixel_hsv.value = 1.0;
-    }
-
-    return pixel_hsv;
-}
-
-CHSV MyAnimation::effect__mapping_checker(
-    uint16_t col, uint16_t row, float offset
-) {
-    // checker pattern
-    // CHSV pixel_hsv = CHSV(offset, 1.0, 0.01);
-    CHSV pixel_hsv = CHSV(0.7, 1.0, 1.0);
-    uint8_t offset_row = offset * MATRIX_ROW_COUNT;
-    uint8_t offset_col = offset * MATRIX_COL_COUNT;
-    // Serial.printf(
-    //     "%+2.2f:%02d  %02d|%02d\r\n",
-    //     offset,
-    //     offset_row,
-    //     row,
-    //     col);
-    if (offset_row == row) {
-        pixel_hsv.hue = 0.1;
-        pixel_hsv.value = 1.0;
-    }
-    if (offset_col == col) {
-        pixel_hsv.hue = 0.4;
-        pixel_hsv.value = 1.0;
-    }
-    return pixel_hsv;
-}
-
 // NOLINT(legal/copyright)
 CHSV MyAnimation::effect__sparkle(
     __attribute__((unused)) float col,
@@ -923,19 +842,43 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(
     // CHSV plasma = effect__plasma(col, row, offset);
     // pixel_hsv = plasma;
 
-    // wave
-    pixel_hsv = effect__wave(col, row, offset);
-    CHSV pixel_wave = effect__wave(col, row, offset);
-    if (pixel_wave.value > 0.0) {
-        pixel_hsv = pixel_wave;
+    // base
+    CHSV fx_base_pixel = fx_base.get_pixel(col, row);
+    if (fx_base_pixel.value > 0.0) {
+        pixel_hsv = fx_base_pixel;
     }
 
-    // points
-    // pixel_hsv *= effect__points(col_i, row_i, offset);
-    CHSV pixel_points = effect__points(col_i, row_i, offset);
-    if (pixel_points.value > 0.0) {
-        pixel_hsv = pixel_points;
+    // line
+    CHSV fx_line_pixel = fx_line.get_pixel(col, row);
+    if (fx_line_pixel.value > 0.0) {
+        pixel_hsv = fx_line_pixel;
     }
+
+    // wave
+    // CHSV fx_wave_pixel = fx_wave.get_pixel(col, row);
+    // if (fx_wave_pixel.value > 0.0) {
+    //     pixel_hsv = fx_wave_pixel;
+    // }
+
+    // points
+    // CHSV fx_points_pixel = fx_points.get_pixel(col, row);
+    // if (fx_points_pixel.value > 0.0) {
+    //     pixel_hsv = fx_points_pixel;
+    // }
+
+    // // wave
+    // // pixel_hsv = effect__wave(col, row, offset);
+    // CHSV pixel_wave = effect__wave(col, row, offset);
+    // if (pixel_wave.value > 0.0) {
+    //     pixel_hsv = pixel_wave;
+    // }
+    //
+    // // points
+    // // pixel_hsv *= effect__points(col_i, row_i, offset);
+    // CHSV pixel_points = effect__points(col_i, row_i, offset);
+    // if (pixel_points.value > 0.0) {
+    //     pixel_hsv = pixel_points;
+    // }
 
     // sparkle
     // CHSV sparkle = effect__sparkle(col, row, offset);

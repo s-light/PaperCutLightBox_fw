@@ -80,12 +80,16 @@ void FXBase::run(bool run_ = true) {
 }
 
 void FXBase::start_singleshot() {
-    running = true;
-    position = 0.0;
-    loopcount = 0;
-    start = micros();
-    end = micros() + (duration*1000);
+    start_loop_n_times(1);
 }
+
+void FXBase::start_loop_n_times(uint16_t count) {
+    // animation_run = false;
+    reset();
+    loopcount = count;
+    running = true;
+}
+
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // animation
@@ -95,43 +99,7 @@ void FXBase::update_position() {
 
     // loopcount++;
     if (position >  1.0) {
-        position = 0.0;
-
-        // float duration_seconds = (millis() - start) / 1000.0;
-        uint32_t duration_us = micros() - start;
-        float duration_seconds =  duration_us / (1000.0 * 1000);
-        float fps = loopcount / duration_seconds;
-
-        // if (running) {
-        //     Serial.print("millis():");
-        //     Serial.print(millis());
-        //     Serial.println();
-        //     Serial.print("start:");
-        //     Serial.print(start);
-        //     Serial.println();
-        //     Serial.print("duration_ms:");
-        //     Serial.print(duration_ms);
-        //     Serial.println();
-        //     Serial.print("duration_seconds:");
-        //     Serial.print(duration_seconds);
-        //     Serial.println();
-        //     Serial.print("loopcount:");
-        //     Serial.print(loopcount);
-        //     Serial.println();
-        // }
-
-        loopcount = 0;
-        start = micros();
-        end = micros() + (duration*1000);
-
-        if (running) {
-            Serial.print("----- position loop restart (");
-            Serial.print(fps);
-            Serial.print("FPS)");
-            // Serial.print("   !!! millis() timming is off - ");
-            // Serial.print("so this calculation is currently wrong !!!");
-            Serial.println();
-        }
+        reset();
     }
     // if (running) {
     //     Serial.print("p:");
@@ -139,12 +107,34 @@ void FXBase::update_position() {
     // }
 }
 
+
+void FXBase::reset() {
+    position = 0.0;
+    // uint32_t duration_us = micros() - start;
+    // float duration_seconds =  duration_us / (1000.0 * 1000);
+    // float fps = fps_loopcount / duration_seconds;
+    // fps_loopcount = 0;
+    start = micros();
+    end = micros() + (duration * 1000);
+
+    // if (animation_run) {
+    //     Serial.print("----- position loop restart (");
+    //     Serial.print(fps);
+    //     Serial.print("FPS)");
+    //     // Serial.print("   !!! millis() timming is off - ");
+    //     // Serial.print("so this calculation is currently wrong !!!");
+    //     Serial.println();
+    // }
+}
+
+
 CHSV FXBase::get_pixel(
     __attribute__((unused)) float col,
     __attribute__((unused)) float row
 ) {
-    CHSV pixel_hsv = CHSV(hue, saturation, 1.0);
+    CHSV pixel_hsv = CHSV(hue, saturation, brightness);
 
+    pixel_hsv.value *= visibility;
     return pixel_hsv;
 }
 

@@ -57,10 +57,67 @@ CHSV FXLine::get_pixel(
     __attribute__((unused)) float col,
     __attribute__((unused)) float row
 ) {
-    CHSV pixel_hsv = CHSV(hue, saturation, 1.0);
+    CHSV pixel_hsv = CHSV(hue, saturation, brightness);
 
+    // if row and col value -0.5 .. 0.5 then use this:
+    // float row_width = (1.0 / MATRIX_ROW_COUNT / 1.5);
+    // float col_width = (1.0 / MATRIX_COL_COUNT / 1.5);
+    // float offset_half = map_range(position, 0.0, 1.0, -0.5, 0.5);
+
+    // if row and col value 0.0 .. 1.0 then use this:
+    const float row_width = (1.0 / MATRIX_ROW_COUNT);
+    const float col_width = (1.0 / MATRIX_COL_COUNT);
+    // float position_half = position;
+
+    // float base = col * 0.2 + position;
+    // float base = map_range(col, -0.5, 0.5, 0.0, 1.0);
+    // float base = map_range(col, -0.5, 0.5, 0.0, 1.0);
+    // base = map_range(position, 0, 1.0, 0.0, 0.1);
+    // base *= 10.0;
+    // // base *= 5.0;
+    // float position_PI = position * (3.141592 / 2);
+    // base += position_PI;
+    // // base += (position*2);
+    // Serial.printf("(%+2.2f|%+2.2f): %2.3f\r\n", col, row, base);
+    // pixel_hsv.value = sin(base);
+    // pixel_hsv.hue = sin(base);
+    // pixel_hsv.value = base;
+
+    // Serial.printf(
+    //     "%+2.2f  "
+    //     "%+2.2f|%+2.2f  "
+    //     "%+2.2f|%+2.2f\r\n",
+    //     position,
+    //     row, col,
+    //     row_width, abs(position - row));
+    // Serial.printf(
+    //     "%+2.2f  "
+    //     "%+2.2f  "
+    //     "%+2.2f  "
+    //     "%+2.2f\r\n",
+    //     position_half,
+    //     row,
+    //     row_width,
+    //     abs(position_half - row));
+
+    // if (abs(position_half - row) <= row_width) {
+    if (abs(position - row) <= row_width) {
+        pixel_hsv.hue = 0.1;
+        pixel_hsv.value = 1.0;
+    }
+    // if (abs(position_half - col) <= col_width) {
+    if (abs(position - col) <= col_width) {
+        pixel_hsv.hue = 0.4;
+        pixel_hsv.value = 1.0;
+    }
+
+    pixel_hsv.value *= visibility;
     return pixel_hsv;
 }
+
+
+
+
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

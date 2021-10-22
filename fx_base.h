@@ -44,6 +44,7 @@ SOFTWARE.
 // include Core Arduino functionality
 #include <Arduino.h>
 
+#include "./ledmatrix.h"
 #include "./color.h"
 #include "./mapping.h"
 
@@ -58,6 +59,11 @@ public:
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // public functions
 
+    void run(bool run_);
+    void start_singleshot();
+    void start_loop_n_times(uint16_t count);
+    void reset();
+
     void update_position();
     CHSV get_pixel(float col, float row);
     // CHSV get_pixel(
@@ -66,13 +72,19 @@ public:
     //     float offset);
     // void get_all();
 
-    void run(bool run_);
-    void start_singleshot();
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // helper
     // float set_brightness(float brightness_);
+    // float get_brightness(float brightness_);
     // float set_hue(float hue_);
+    float set_position(float position_);
+    float get_position();
+    // uint16_t set_fps(uint16_t fps_);
+    // uint16_t get_fps();
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // menu helper
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // configurations
@@ -83,24 +95,30 @@ public:
     float saturation = 1.0;
     float brightness = 1.0;
     float contrast = 1.00;
+    float visibility = 1.00;
 
     // const float PI = 3.141592;
     // is already defined by arduino or some other defaults...
 
-private:
+protected:
 
     // int16_t calcDist(uint8_t x, uint8_t y, int8_t center_x, int8_t center_y);
-    float calcDist(float x, float y, float center_x, float center_y);
+    // float calcDist(float x, float y, float center_x, float center_y);
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // attributes
     bool running = true;
-    bool single_shot = false;
+    uint16_t loopcount = 0;
+    // bool single_shot = false;
     uint32_t start = 0;
     uint32_t end = 0;
-    uint32_t loopcount = 0;
     // double position = 0.0;
     float position = 0.0;
+
+    const uint16_t fps_min = 1;
+    const uint16_t fps_max = 10000;
+    uint16_t fps = 10000;
+    uint32_t fps_loopcount = 0;
 
 };  // class FXBase
 
