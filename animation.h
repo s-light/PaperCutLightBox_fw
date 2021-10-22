@@ -64,6 +64,10 @@ SOFTWARE.
 // #include ".//fx_line.h"
 // #include ".//fx_wave.h"
 
+#include ".//fx_base.h"
+// #include ".//fx_line.h"
+// #include ".//fx_wave.h"
+
 class MyAnimation {
 public:
 
@@ -83,8 +87,12 @@ public:
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // attributes
 
+<<<<<<< HEAD
     // pin_output_enable: 2
     MyLEDMatrix matrix = MyLEDMatrix(2);
+=======
+    MyLEDMatrix matrix = MyLEDMatrix();
+>>>>>>> 7a6b416894489cad01720e004c0d8ecd84ff4673
 
     FXBase fx_base = FXBase();
     // FXLine fx_line = FXLine();
