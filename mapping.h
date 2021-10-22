@@ -35,9 +35,12 @@ SOFTWARE.
 #ifndef mapping_H_
 #define mapping_H_
 
+
 // include Core Arduino functionality
 #include <Arduino.h>
 
+#include <algorithm>
+#include <array>
 
 
 
