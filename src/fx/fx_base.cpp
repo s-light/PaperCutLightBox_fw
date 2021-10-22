@@ -77,6 +77,8 @@ FXBase::~FXBase() {
 
 void FXBase::run(bool run_ = true) {
     running = run_;
+    // set to infinite loop:
+    loopcount = 0;
 }
 
 void FXBase::start_singleshot() {
@@ -84,7 +86,7 @@ void FXBase::start_singleshot() {
 }
 
 void FXBase::start_loop_n_times(uint16_t count) {
-    // animation_run = false;
+    // run = false;
     reset();
     loopcount = count;
     running = true;
@@ -95,16 +97,28 @@ void FXBase::start_loop_n_times(uint16_t count) {
 // animation
 
 void FXBase::update_position() {
-    position = normalize_to_01(micros(), start, end);
+    if (running) {
+        position = normalize_to_01(micros(), start, end);
 
-    // loopcount++;
-    if (position >  1.0) {
-        reset();
+        // loopcount++;
+        if (position >  1.0) {
+            reset();
+
+            // loopcount == 0 == infinite
+            if (loopcount != 0) {
+                // loopcount is active
+                if (loopcount == 1) {
+                    running = false;
+                }
+                loopcount -= 1;
+                // Serial.print("----- fx_base loopcount: ");
+                // Serial.print(loopcount);
+                // Serial.println();
+            }
+        }
+        // Serial.print("p:");
+        // Serial.println(position);
     }
-    // if (running) {
-    //     Serial.print("p:");
-    //     Serial.println(position);
-    // }
 }
 
 
@@ -117,7 +131,7 @@ void FXBase::reset() {
     start = micros();
     end = micros() + (duration * 1000);
 
-    // if (animation_run) {
+    // if (run) {
     //     Serial.print("----- position loop restart (");
     //     Serial.print(fps);
     //     Serial.print("FPS)");

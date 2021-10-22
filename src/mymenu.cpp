@@ -342,6 +342,8 @@ void MyMenu::menu__print_help(Print &out) {
     out.print(F("\t 'l': start loop n times 'l3' ("));
     out.print(animation.animation_loopcount);
     out.println(F(")"));
+    out.print(F("\t 'L': start wave singleshot 'L'"));
+    out.println();
     out.print(F("\t 'd': set effect_duration 'd1000' ("));
     out.print(animation.effect_duration);
     out.println(F("ms)"));
@@ -437,6 +439,12 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
         } break;
         case 'l': {
             animation.menu__start_loop_n_times(out, command);
+        } break;
+        case 'L': {
+            out.println(F("fx_wave start_singleshot"));
+            // set to 1s
+            animation.fx_wave->duration = 1000;
+            animation.fx_wave->start_singleshot();
         } break;
         case 'd': {
             out.println(F("set effect_duration:"));

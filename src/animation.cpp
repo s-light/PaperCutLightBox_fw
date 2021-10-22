@@ -709,11 +709,11 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(PixelPos * pixel_pos) {
         pixel_hsv = fx_wave_pixel;
     }
 
-    // // points
-    // CHSV fx_points_pixel = fx_points->get_pixel(pixel_pos);
-    // if (fx_points_pixel.value > 0.0) {
-    //     pixel_hsv = fx_points_pixel;
-    // }
+    // points
+    CHSV fx_points_pixel = fx_points->get_pixel(pixel_pos);
+    if (fx_points_pixel.value > 0.0) {
+        pixel_hsv = fx_points_pixel;
+    }
 
     return pixel_hsv;
 }
