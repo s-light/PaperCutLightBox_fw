@@ -74,6 +74,7 @@ public:
     void run(bool run_);
     void start_singleshot();
     void start_loop_n_times(uint16_t count);
+    uint16_t  get_loopcount();
     void reset();
 
     virtual void update_position();

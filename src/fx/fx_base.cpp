@@ -92,6 +92,10 @@ void FXBase::start_loop_n_times(uint16_t count) {
     running = true;
 }
 
+uint16_t FXBase::get_loopcount() {
+    return loopcount;
+}
+
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // animation

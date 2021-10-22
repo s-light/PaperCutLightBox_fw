@@ -345,8 +345,8 @@ void MyMenu::menu__print_help(Print &out) {
     out.print(F("\t 'j': fx_wave start singleshot 'j'"));
     out.println();
     out.print(F("\t 'J': fx_wave start loop n times 'l3' ("));
-    out.print(animation.fx_wave->loopcount);
-    out.println(F(
+    out.print(animation.fx_wave->get_loopcount());
+    out.println(F(")"));
     out.print(F("\t 'k': set fx_points point_count 'k10' ("));
     out.print(static_cast<FXPoints*>(animation.fx_points)->point_count);
     out.println(F(")"));
