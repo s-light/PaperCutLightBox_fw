@@ -196,6 +196,7 @@ private:
     void animation_init(Stream &out);
     void animation_update();
     void calculate_effect_position();
+    void set_effect_position(float position);
     void animation_reset();
 
 

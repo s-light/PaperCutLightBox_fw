@@ -129,8 +129,9 @@ void MyLEDMatrix::tlc_init(Stream &out) {
             // https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp32-hal-spi.c#L1210
             // @ 11MHz this results in an inter-Package gab of 1.43us
             // maximum allowed by TLC5971 before latch puls would be ~750ns
-            // 1 * 1000 * 1000,
-            500 * 1000,
+            20 * 1000 * 1000,
+            // 500 * 1000,
+            // @ 20MHz: gap: 1.41us >  50ns * 8 =  400ns → BAD but very fast an so not as disruptive
             // @ 11MHz: gap: 1.43us >  83ns * 8 =  664ns → BAD
             // @  9MHz: gap: 1.46us > 111ns * 8 =  888ns → BAD
             // @  5MHz: gap: 1.63us > 200ns * 8 = 1600ns → BAD

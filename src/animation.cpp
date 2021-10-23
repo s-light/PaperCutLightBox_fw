@@ -240,6 +240,8 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     out.println(F("time_meassurements:"));
 
     bool animation_run_temp = animation_run;
+    uint32_t effect_duration_temp = effect_duration;
+    effect_duration = 10 * 1000;
     animation_run = false;
     animation_reset();
     effect_position = 0.5;
@@ -255,7 +257,16 @@ void MyAnimation::menu__time_meassurements(Print &out) {
 
 
 
-    out.print(F("effect_Matrix2D 1:         "));
+    out.print(F("update_position:         "));
+    tm_start = micros();
+    update_position();
+    tm_end = micros();
+    tm_duration = (tm_end - tm_start);
+    out.print(tm_duration);
+    out.print(F("us / call"));
+    out.println();
+
+    out.print(F("effect_Matrix2D:         "));
     tm_start = micros();
     effect_Matrix2D();
     tm_end = micros();
@@ -264,7 +275,7 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     out.print(F("us / call"));
     out.println();
 
-    out.print(F("matrix.tlc.write() 1:      "));
+    out.print(F("matrix.tlc.write():      "));
     tm_start = micros();
     matrix.tlc.write();
     tm_end = micros();
@@ -274,8 +285,36 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     out.println();
 
 
+    PixelPos * pixel_pos = new PixelPos();
+    pixel_pos->row = 0.5;
+    pixel_pos->col = 0.5;
+    pixel_pos->row_i = 0.5 * MATRIX_ROW_COUNT;
+    pixel_pos->col_i = 0.5 * MATRIX_COL_COUNT;
+    pixel_pos->progress = 0.5;
+    pixel_pos->progress = 0.5;
+
+    out.print(F("fx_wave->get_pixel():    "));
+    tm_start = micros();
+    fx_wave->get_pixel(pixel_pos);
+    tm_end = micros();
+    tm_duration = (tm_end - tm_start);
+    out.print(tm_duration);
+    out.print(F("us / call"));
+    out.println();
+
+    out.print(F("fx_points->get_pixel():    "));
+    tm_start = micros();
+    fx_points->get_pixel(pixel_pos);
+    tm_end = micros();
+    tm_duration = (tm_end - tm_start);
+    out.print(tm_duration);
+    out.print(F("us / call"));
+    out.println();
+
+
 
     out.print(F("effect_Matrix2D:           "));
+    // we also set the effect_position as the timing is dependend on the shown effects..
     tm_total_start = millis();;
     tm_total_end = 0;
     tm_total_duration = 0;
@@ -285,6 +324,7 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     tm_loop_count = 100;
 
     for (size_t i = 0; i < tm_loop_count; i++) {
+        set_effect_position(map_range_0n_to_01(i, tm_loop_count));
         tm_start = millis();
         effect_Matrix2D();
         tm_end = millis();
@@ -306,42 +346,6 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     // out.println();
 
 
-    out.print(F("matrix.tlc.write():        "));
-    tm_start = 0;
-    tm_end = 0;
-    tm_duration = 0;
-    tm_loop_count = 100;
-    for (size_t i = 0; i < tm_loop_count; i++) {
-        tm_start = micros();
-        matrix.tlc.write();
-        tm_end = micros();
-        tm_duration += (tm_end - tm_start);
-    }
-    out.print((tm_duration / static_cast<float>(tm_loop_count)) / 1000);
-    out.print(F("ms / call"));
-    out.println();
-
-
-
-
-    out.print(F("calculate_effect_position: "));
-
-    tm_start = 0;
-    tm_end = 0;
-    tm_duration = 0;
-    tm_loop_count = 100;
-    for (size_t i = 0; i < tm_loop_count; i++) {
-        tm_start = micros();
-        calculate_effect_position();
-        tm_end = micros();
-        tm_duration += (tm_end - tm_start);
-    }
-    out.print((tm_duration / static_cast<float>(tm_loop_count)) / 1000);
-    out.print(F("ms / call"));
-    out.println();
-
-
-
 
 
     out.print(F("animation_update:          "));
@@ -356,14 +360,25 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     tm_total_end = 0;
     tm_total_duration = 0;
 
-    bool animation_run_backup = animation_run;
     animation_run = true;
+    animation_reset();
+
     effect_start = micros();
     effect_end = micros() + (1000*1000);  // 1sec
 
     for (size_t i = 0; i < tm_loop_count; i++) {
         tm_start = micros();
-        animation_update();
+        // animation_update();
+        // we use a simulated animation_update to be able to set the position manually..
+        calculate_effect_position();
+        tm_end = micros();
+        tm_duration += (tm_end - tm_start);
+        // exclude manual setting of position from time meassurements
+        set_effect_position(map_range_0n_to_01(i, tm_loop_count));
+        tm_start = micros();
+        effect_Matrix2D();
+        // write data to chips
+        matrix.tlc.write();
         tm_end = micros();
         tm_duration += (tm_end - tm_start);
     }
@@ -377,8 +392,6 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     // out.print(tm_total_duration);
     // out.print(F("ms"));
     // out.println();
-
-    animation_run = animation_run_backup;
 
 
 
@@ -411,6 +424,7 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     // out.println();
 
     animation_run = animation_run_temp;
+    effect_duration = effect_duration_temp;
     animation_reset();
 }
 
@@ -611,6 +625,17 @@ void MyAnimation::animation_reset() {
         // Serial.print("so this calculation is currently wrong !!!");
         Serial.println();
     }
+}
+
+void MyAnimation::set_effect_position(float position) {
+    // fx_base->set_position(position);
+    // fx_line->set_position(position);
+    // fx_rainbow->set_position(position);
+    // fx_plasma->set_position(position);
+    fx_wave->set_position(position);
+    fx_points->set_position(position);
+
+    effect_position = position;
 }
 
 void MyAnimation::calculate_effect_position() {
