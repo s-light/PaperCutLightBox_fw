@@ -559,6 +559,7 @@ void MyAnimation::animation_init(Stream &out) {
         fx_wave->run(false);
     }
     out.println(F("  finished."));
+}
 
 void MyAnimation::animation_update() {
     calculate_effect_position();
