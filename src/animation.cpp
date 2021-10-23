@@ -548,6 +548,18 @@ void MyAnimation::animation_init(Stream &out) {
         fx_wave->hue = 0.1;
         fx_wave->brightness = 0.1;
         fx_wave->run(false);
+        
+        out.println(F("  animation_update()"));
+        animation_update();
+        out.print(F("  ."));
+        delay(1000);
+        out.print(F("."));
+        delay(1000);
+        out.print(F("."));
+        delay(1000);
+        out.print(F("."));
+        delay(1000);
+        out.println(F("."));
     }
     out.println(F("  finished."));
 }
