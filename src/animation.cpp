@@ -540,17 +540,6 @@ void MyAnimation::animation_init(Stream &out) {
         out.println(F("  Set all Pixel to red=blue=100."));
         matrix.tlc.setRGB(200, 50, 0);
         matrix.tlc.write();
-
-        effect_start = micros();
-        effect_end = micros() + (effect_duration*1000);
-
-        out.println(F("  Set predefined values for different effects."));
-        fx_wave->hue = 0.1;
-        fx_wave->brightness = 0.1;
-        fx_wave->run(false);
-        
-        out.println(F("  animation_update()"));
-        animation_update();
         out.print(F("  ."));
         delay(1000);
         out.print(F("."));
@@ -560,9 +549,16 @@ void MyAnimation::animation_init(Stream &out) {
         out.print(F("."));
         delay(1000);
         out.println(F("."));
+
+        effect_start = micros();
+        effect_end = micros() + (effect_duration*1000);
+
+        out.println(F("  Set predefined values for different effects."));
+        fx_wave->hue = 0.1;
+        fx_wave->brightness = 0.1;
+        fx_wave->run(false);
     }
     out.println(F("  finished."));
-}
 
 void MyAnimation::animation_update() {
     calculate_effect_position();
