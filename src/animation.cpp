@@ -542,12 +542,6 @@ void MyAnimation::animation_init(Stream &out) {
         matrix.tlc.write();
         out.print(F("  ."));
         delay(1000);
-        out.print(F("."));
-        delay(1000);
-        out.print(F("."));
-        delay(1000);
-        out.print(F("."));
-        delay(1000);
         out.println(F("."));
 
         effect_start = micros();

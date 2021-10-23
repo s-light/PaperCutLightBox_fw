@@ -97,28 +97,62 @@ void MyLEDMatrix::tlc_init(Stream &out) {
     digitalWrite(pin_output_enable, HIGH);
 
     out.println(F("    tlc.beginFast()"));
-    // tlc.beginFast();
-    tlc.beginFast(
-        // bufferXfer (default: true)
-        true,
-        // spiClock (default: 10 * 1000 * 1000)
-        // working: 20, 12, 5,
-        // not working: 16
-        // on SAMD 51 - 20 results in 24MHz Clock.
-        // so we use something that results in under 20MHz
-        // the first setting that results in less is 12MHz...
-        // 20 * 1000 * 1000,
-        12 * 1000 * 1000,
-        // postXferDelayMicros (default: 4)
-        // min: 666ns; max 2.74ms
-        // min as of diagram: 1.34us
-        // https://www.ti.com/lit/ds/symlink/tlc5971.pdf?ts=1634744586475#page=25&zoom=250,-44,774
-        // we can use 0 here as the main loop needs long enough
-        // before the next tlc.write is called..
-        0
-        // 4
-        // NOLINTNEXTLINE(whitespace/parens)
-    );
+    #if defined(ITSYBITSY_M4)
+        tlc.beginFast(
+            // bufferXfer (default: true)
+            true,
+            // spiClock (default: 10 * 1000 * 1000)
+            // on SAMD51 - 20 results in 24MHz Clock.
+            // so we use something that results in under 20MHz
+            // this is 12MHz...
+            12 * 1000 * 1000,
+            // postXferDelayMicros (default: 4)
+            // min: 666ns; max 2.74ms
+            // min as of diagram: 1.34us
+            // https://www.ti.com/lit/ds/symlink/tlc5971.pdf?ts=1634744586475#page=25&zoom=250,-44,774
+            // we can use 0 here as the main loop needs long enough
+            // before the next tlc.write is called..
+            0
+            // 4
+            // NOLINTNEXTLINE(whitespace/parens)
+        );
+    #elif defined(ESP32_DEV)
+        tlc.beginFast(
+            // bufferXfer (default: true)
+            true,
+
+            // spiClock (default: 10 * 1000 * 1000)
+            // ESP32 sends 32bit in one block
+            // between the blocks it needs to copy the buffer.
+            // details at
+            // https://github.com/espressif/arduino-esp32/blob/master/libraries/SPI/src/SPI.cpp
+            // https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp32-hal-spi.c#L1210
+            // @ 11MHz this results in an inter-Package gab of 1.43us
+            // maximum allowed by TLC5971 before latch puls would be ~750ns
+            // 1 * 1000 * 1000,
+            500 * 1000,
+            // @ 11MHz: gap: 1.43us >  83ns * 8 =  664ns → BAD
+            // @  9MHz: gap: 1.46us > 111ns * 8 =  888ns → BAD
+            // @  5MHz: gap: 1.63us > 200ns * 8 = 1600ns → BAD
+            // @  4MHz: gap: 1.84us > 250ns * 8 = 2000ns → vis. BAD light flickering
+            // @  3MHz: gap: 1.96us > 333ns * 8 = 2664ns → vis. BAD flickering
+            // @  2MHz: gap: 2.35us > 500ns * 8 = 4000ns → vis. BAD flickering
+            // @  1MHz: gap: 3.69us >1000ns * 8 = 8000ns → vis. HMM sometim. flashes
+            // @0.5MHz: gap: 6.53us >2000ns * 8 =16000ns → OK
+
+            // postXferDelayMicros (default: 4)
+            // min: 666ns; max 2.74ms
+            // min as of diagram: 1.34us
+            // https://www.ti.com/lit/ds/symlink/tlc5971.pdf?ts=1634744586475#page=25&zoom=250,-44,774
+            // we can use 0 here as the main loop needs long enough
+            // before the next tlc.write is called..
+            0
+            // 4
+            // NOLINTNEXTLINE(whitespace/parens)
+        );
+    #else
+        tlc.beginFast();
+    #endif
 
     // tlc.setBrightness(127, 127, 127);
 

@@ -128,16 +128,17 @@ void MyMenu::debugOut_update() {
         debugOut_LastAction = millis();
 
         if ( debugOut_Serial_Enabled ) {
-            // Serial.print(millis());
-            // Serial.print(F("ms;"));
-            // Serial.println();
-            // print time
-            uint16_t ms = millis() % 1000;
-            uint16_t s = (millis() / 1000) % 60;
-            uint16_t m = (millis() / 1000 * 60) % 60;
-            uint16_t h = (millis() / 1000 * 60 * 60) % 60;
-            Serial.printf("%02u:%02u:%02u:%03u", h, m, s, ms);
+            Serial.print(millis());
+            Serial.print(F("ms;"));
             Serial.println();
+            // print time
+            // this output needs about ~1.7ms on ESP32 with 240MHz clock..
+            // uint16_t ms = millis() % 1000;
+            // uint16_t s = (millis() / 1000) % 60;
+            // uint16_t m = (millis() / 1000 * 60) % 60;
+            // uint16_t h = (millis() / 1000 * 60 * 60) % 60;
+            // Serial.printf("%02u:%02u:%02u:%03u", h, m, s, ms);
+            // Serial.println();
         }
 
         if ( debugOut_LED_Enabled ) {
