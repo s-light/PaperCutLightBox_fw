@@ -114,7 +114,7 @@ public:
     // otherwise the newly created class is *sliced*
     // and only the parts of the base class is available...
     // FXBase * fx_base = new FXBase();
-    // FXBase * fx_line = new FXLine();
+    FXBase * fx_line = new FXLine();
     // FXBase * fx_rainbow = new FXRainbow();
     // FXBase * fx_sparkle = new FXSparkle();
     // FXBase * fx_plasma = new FXPlasma();

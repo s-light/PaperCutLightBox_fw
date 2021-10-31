@@ -125,40 +125,40 @@ SOFTWARE.
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Layout BookCase
-    // const uint8_t BOARDS_COL_COUNT = 7;
-    // const uint8_t BOARDS_ROW_COUNT = 3;
-    // const uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
-    //     {19, 18, 17, 16, 15, 14, 20},
-    //     {13, 12,  9,  8,  7,  3,  2},
-    //     {11, 10,  6,  5,  4,  1,  0},
-    // };
-    // const uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
-    //     {2, 2, 2, 2, 2, 2, 2},
-    //     {2, 2, 2, 2, 2, 2, 2},
-    //     {2, 2, 2, 2, 2, 2, 2},
-    // };
-
-
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Layout BigMatrix Prototype
-    const uint8_t BOARDS_COL_COUNT = 5;
-    const uint8_t BOARDS_ROW_COUNT = 6;
+    const uint8_t BOARDS_COL_COUNT = 7;
+    const uint8_t BOARDS_ROW_COUNT = 3;
     const uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
-        {29, 28, 27, 26, 25},
-        {24, 23, 22, 21, 20},
-        {19, 18, 17, 16, 15},
-        {2, 5, 8, 11, 14},
-        {1, 4, 7, 10, 13},
-        {0, 3, 6,  9, 12},
+        {19, 18, 17, 16, 15, 14, 20},
+        {13, 12,  9,  8,  7,  3,  2},
+        {11, 10,  6,  5,  4,  1,  0},
     };
     const uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
-        {2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2},
-        {3, 3, 3, 3, 3},
-        {3, 3, 3, 3, 3},
-        {3, 3, 3, 3, 3},
+        {2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2},
     };
+
+
+    // // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // // Layout BigMatrix Prototype
+    // const uint8_t BOARDS_COL_COUNT = 5;
+    // const uint8_t BOARDS_ROW_COUNT = 6;
+    // const uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+    //     {29, 28, 27, 26, 25},
+    //     {24, 23, 22, 21, 20},
+    //     {19, 18, 17, 16, 15},
+    //     {2, 5, 8, 11, 14},
+    //     {1, 4, 7, 10, 13},
+    //     {0, 3, 6,  9, 12},
+    // };
+    // const uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+    //     {2, 2, 2, 2, 2},
+    //     {2, 2, 2, 2, 2},
+    //     {2, 2, 2, 2, 2},
+    //     {3, 3, 3, 3, 3},
+    //     {3, 3, 3, 3, 3},
+    //     {3, 3, 3, 3, 3},
+    // };
 
 
     const uint8_t BOARDS_COUNT = BOARDS_COL_COUNT * BOARDS_ROW_COUNT;

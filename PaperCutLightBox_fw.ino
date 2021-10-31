@@ -1,13 +1,14 @@
 /******************************************************************************
 
-    LEDMatrix_animation_base.ino
-        develop nice animations for big LED-Matrix things
+    PaperCutLightBox_fw.ino
+        illumination for PaperCutLightBox thing :-)
         debugout on usbserial interface: 115200baud
 
     hardware:
         Board:
-            Adafruit ItsyBitsy M4 or ESP32
+            Adafruit ItsyBitsy M4
             LED on pin 13 (LEDBUILDIN)
+            onBoard Status LED: DOTSTAR
         Connections:
             D4 --> push button to GND
             SCK --> Clock input of TLC5791
@@ -103,8 +104,8 @@ void sketchinfo_print(Print &out) {
     out.println(F("|                      ( _ )                     |"));
     out.println(F("|                       \" \"                      |"));
     out.println(F("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"));
-    out.println(F("| LEDMatrix_animation_base.ino"));
-    out.println(F("|   develop nice animations for big LED-Matrix things"));
+    out.println(F("| PaperCutLightBox_fw.ino"));
+    out.println(F("|   illumination for PaperCutLightBox thing :-)"));
     out.println(F("|"));
     out.println(F("| This Sketch has a debug-menu:"));
     out.println(F("| send '?'+Return for help"));

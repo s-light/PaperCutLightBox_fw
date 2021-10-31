@@ -257,9 +257,9 @@ void MyAnimation::menu__time_meassurements(Print &out) {
 
 
 
-    out.print(F("update_position:         "));
+    out.print(F("calculate_effect_position:         "));
     tm_start = micros();
-    update_position();
+    calculate_effect_position();
     tm_end = micros();
     tm_duration = (tm_end - tm_start);
     out.print(tm_duration);
@@ -632,19 +632,19 @@ void MyAnimation::set_effect_position(float position) {
     // fx_line->set_position(position);
     // fx_rainbow->set_position(position);
     // fx_plasma->set_position(position);
-    fx_wave->set_position(position);
-    fx_points->set_position(position);
+    // fx_wave->set_position(position);
+    // fx_points->set_position(position);
 
     effect_position = position;
 }
 
 void MyAnimation::calculate_effect_position() {
     // fx_base->update_position();
-    // fx_line->update_position();
+    fx_line->update_position();
     // fx_rainbow->update_position();
     // fx_plasma->update_position();
-    fx_wave->update_position();
-    fx_points->update_position();
+    // fx_wave->update_position();
+    // fx_points->update_position();
 
     effect_position = normalize_to_01(micros(), effect_start, effect_end);
 
@@ -720,11 +720,11 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(PixelPos * pixel_pos) {
     //     pixel_hsv = fx_base_pixel;
     // }
 
-    // // line
-    // CHSV fx_line_pixel = fx_line->get_pixel(pixel_pos);
-    // if (fx_line_pixel.value > 0.0) {
-    //     pixel_hsv = fx_line_pixel;
-    // }
+    // line
+    CHSV fx_line_pixel = fx_line->get_pixel(pixel_pos);
+    if (fx_line_pixel.value > 0.0) {
+        pixel_hsv = fx_line_pixel;
+    }
 
     // // plasma
     // CHSV fx_plasma_pixel = fx_plasma->get_pixel(pixel_pos);
@@ -732,17 +732,17 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(PixelPos * pixel_pos) {
     //     pixel_hsv = fx_plasma_pixel;
     // }
 
-    // wave
-    CHSV fx_wave_pixel = fx_wave->get_pixel(pixel_pos);
-    if (fx_wave_pixel.value > 0.0) {
-        pixel_hsv = fx_wave_pixel;
-    }
+    // // wave
+    // CHSV fx_wave_pixel = fx_wave->get_pixel(pixel_pos);
+    // if (fx_wave_pixel.value > 0.0) {
+    //     pixel_hsv = fx_wave_pixel;
+    // }
 
-    // points
-    CHSV fx_points_pixel = fx_points->get_pixel(pixel_pos);
-    if (fx_points_pixel.value > 0.0) {
-        pixel_hsv = fx_points_pixel;
-    }
+    // // points
+    // CHSV fx_points_pixel = fx_points->get_pixel(pixel_pos);
+    // if (fx_points_pixel.value > 0.0) {
+    //     pixel_hsv = fx_points_pixel;
+    // }
 
     return pixel_hsv;
 }
