@@ -91,7 +91,7 @@ class MyMenu {
     const uint16_t debugOut_interval = 1000; //ms
 
     boolean debugOut_Serial_Enabled = 1;
-    boolean debugOut_LED_Enabled = 0;
+    boolean debugOut_LED_Enabled = 1;
     void debugOut_update();
 
 

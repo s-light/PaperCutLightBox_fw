@@ -256,10 +256,16 @@ uint16_t MyLEDMatrix::mymap_LEDBoard_4x4_16bit(uint8_t col, uint8_t row) {
 void MyLEDMatrix::pmap_init() {
     // """Prepare Static Map."""
     for (size_t row_index = 0; row_index < MATRIX_ROW_COUNT; row_index++) {
+        // uint16_t row_i_mapped = row_index / 2;
         for (size_t col_index = 0; col_index < MATRIX_COL_COUNT; col_index++) {
             // uint16_t index = mymap_LEDBoard_4x4_HD(
             // uint16_t index = mymap_LEDBoard_4x4_HD_CrystalLightGuide(
+            // uint16_t col_i_mapped = col_index;
+            // if (row_index % 2) {
+            //     col_i_mapped = MATRIX_COL_COUNT + col_index;
+            // }
             uint16_t index = mymap_LEDBoard_4x4_16bit(col_index, row_index);
+            // uint16_t index = mymap_LEDBoard_4x4_16bit(col_i_mapped, row_i_mapped);
             // Serial.print(row_index);
             // Serial.print(" ");
             // Serial.print(col_index);
