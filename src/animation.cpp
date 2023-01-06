@@ -640,7 +640,8 @@ void MyAnimation::set_effect_position(float position) {
 
 void MyAnimation::calculate_effect_position() {
     // fx_base->update_position();
-    fx_line->update_position();
+    // fx_line->update_position();
+    fx_shadowland->update_position();
     // fx_rainbow->update_position();
     // fx_plasma->update_position();
     // fx_wave->update_position();
@@ -720,11 +721,17 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(PixelPos *pixel_pos) {
     //     pixel_hsv = fx_base_pixel;
     // }
 
-    // line
-    CHSV fx_line_pixel = fx_line->get_pixel(pixel_pos);
-    if (fx_line_pixel.value > 0.0) {
-        pixel_hsv = fx_line_pixel;
+    // shadowLand
+    CHSV fx_shadowland_pixel = fx_shadowland->get_pixel(pixel_pos);
+    if (fx_shadowland_pixel.value > 0.0) {
+        pixel_hsv = fx_shadowland_pixel;
     }
+
+    // // line
+    // CHSV fx_line_pixel = fx_line->get_pixel(pixel_pos);
+    // if (fx_line_pixel.value > 0.0) {
+    //     pixel_hsv = fx_line_pixel;
+    // }
 
     // // plasma
     // CHSV fx_plasma_pixel = fx_plasma->get_pixel(pixel_pos);

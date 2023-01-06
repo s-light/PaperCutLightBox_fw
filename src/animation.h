@@ -67,6 +67,7 @@ SOFTWARE.
 #include "./fx/fx_plasma.h"
 #include "./fx/fx_points.h"
 #include "./fx/fx_sparkle.h"
+#include "./fx/fx_shadowland.h"
 
 class MyAnimation {
 public:
@@ -114,10 +115,11 @@ public:
     // otherwise the newly created class is *sliced*
     // and only the parts of the base class is available...
     // FXBase * fx_base = new FXBase();
+    FXBase * fx_shadowland = new FXShadowland();
     FXBase * fx_line = new FXLine();
     // FXBase * fx_rainbow = new FXRainbow();
     // FXBase * fx_sparkle = new FXSparkle();
-    // FXBase * fx_plasma = new FXPlasma();
+    FXBase * fx_plasma = new FXPlasma();
     FXBase * fx_wave = new FXWave();
     FXBase * fx_points = new FXPoints();
 
