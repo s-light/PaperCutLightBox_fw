@@ -277,6 +277,50 @@ void MyAnimation::menu__set_all_pixel(Print &out, char *command) {
     matrix.tlc.setRGB(red, green, blue);
 }
 
+
+void MyAnimation::menu__set_layer(Print &out, char *command) {
+    out.print(F("Set layer "));
+    // p0,1:500
+    // split string with help of tokenizer
+    // https://www.cplusplus.com/reference/cstring/strtok/#
+    char * command_pointer = &command[1];
+    // NOLINTNEXTLINE(runtime/threadsafe_fn)
+    command_pointer = strtok(command_pointer, " ,");
+    uint8_t row_i = atoi(command_pointer);
+    // NOLINTNEXTLINE(runtime/threadsafe_fn)
+    // command_pointer = strtok(NULL, " :");
+    // command_pointer = strtok(&command[1], ",");
+    // uint8_t row_i = atoi(command_pointer);
+    // NOLINTNEXTLINE(runtime/threadsafe_fn)
+    // command_pointer = strtok(NULL, " :");
+    // uint16_t value = atoi(command_pointer);
+    uint16_t value = 2000;
+
+    // if (col_i >= LAYER_COL_COUNT) {
+    //     col_i = LAYER_COL_COUNT -1;
+    // }
+    if (row_i >= LAYER_ROW_COUNT) {
+        row_i = LAYER_ROW_COUNT -1;
+    }
+
+    // out.print(F(" ("));
+    // out.print(col_i);
+    // out.print(F(","));
+    out.print(row_i);
+    // out.print(F("->"));
+    // out.print(pixel_index);
+    // out.print(F(")"));
+
+    out.print(F(" to "));
+    out.print(value);
+    out.println();
+    for (size_t layer_col_i = 0; layer_col_i < LAYER_COL_COUNT; layer_col_i++) {
+        uint16_t pixel_index = matrix.pmap_layer[layer_col_i][row_i];
+        matrix.tlc.setRGB(pixel_index, value, value, value);
+    }
+}
+
+
 void MyAnimation::menu__time_meassurements(Print &out) {
     out.println(F("time_meassurements:"));
 
@@ -804,36 +848,21 @@ void MyAnimation::effect_Matrix2D() {
     // ^ is now global.
     pixel_pos->progress = effect_position;
     
-    size_t layer_col_i = 0;
-    size_t layer_row_i = 0;
-    size_t matrix_col_i = 0;
-    size_t matrix_row_i = 0;
-
-    for (layer_row_i = 0; layer_row_i < LAYER_ROW_COUNT; layer_row_i++) {
-        matrix_row_i = layer_row_i / 2;
+    for (size_t layer_row_i = 0; layer_row_i < LAYER_ROW_COUNT; layer_row_i++) {
         pixel_pos->row_i = layer_row_i;
-        pixel_pos->row = map_range_0n_to_01(layer_row_i, LAYER_ROW_COUNT-1);
-        for (layer_col_i = 0; layer_col_i < LAYER_COL_COUNT; layer_col_i++) {
-            matrix_col_i = layer_col_i * 2;
-            if (layer_row_i % 2) {
-                matrix_col_i = LAYER_COL_COUNT + matrix_col_i;
-                // matrix_col_i = matrix_col_i + 1;
-            }
+        pixel_pos->row = matrix.layer_01_row[layer_row_i];
+        for (size_t layer_col_i = 0; layer_col_i < LAYER_COL_COUNT; layer_col_i++) {
             pixel_pos->col_i = layer_col_i;
-            pixel_pos->col = map_range_0n_to_01(layer_col_i, LAYER_COL_COUNT-1);
+            pixel_pos->col = matrix.layer_01_col[layer_col_i];
 
             // ------------------------------------------
-            // CHSV pixel_hsv = effect_Matrix2D_get_pixel(pixel_pos);
-            CHSV pixel_hsv = fx_shadowland->get_pixel(pixel_pos);
+            CHSV pixel_hsv = effect_Matrix2D_get_pixel(pixel_pos);
             // CHSV pixel_hsv = CHSV(hue, saturation, 0.01);
 
             // ------------------------------------------
             // final conversions
             // global brightness
-            if (pixel_hsv.value > 0.1) {
-                pixel_hsv.value *= brightness;
-            }
-            // pixel_hsv.value *= brightness;
+            pixel_hsv.value *= brightness;
 
             // CHSV pixel_hsv = CHSV(0.5, 0.0, 0.10);
             // convert to rgb
@@ -841,17 +870,12 @@ void MyAnimation::effect_Matrix2D() {
             // gamma & global brightness
             // fancyled.gamma_adjust(brightness=self.brightness);
             matrix.tlc.setRGB(
-                // matrix.pmap[col_i][row_i],
-                matrix.pmap[matrix_col_i][matrix_row_i],
+                matrix.pmap_layer[layer_col_i][layer_row_i],
+                // matrix.pmap[matrix_col_i][matrix_row_i],
                 // convert float to uint16_t
                 pixel_rgb.r * 65535,
                 pixel_rgb.g * 65535,
                 pixel_rgb.b * 65535);
-            // matrix.tlc.setRGB(
-            //     matrix.pmap[col_i][row_i],
-            //     10000,
-            //     10000,
-            //     0);
         }
     }
     // delete pixel_pos;

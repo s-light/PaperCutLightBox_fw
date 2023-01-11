@@ -92,11 +92,11 @@ public:
         CHSV(0.3, 1.0, 0.0),
         CHSV(0.3, 1.0, 0.0),
         // front trees / grass
-        CHSV(0.2, 1.0, 0.0),
-        CHSV(0.2, 1.0, 0.0),
-        CHSV(0.2, 1.0, 0.0),
-        CHSV(0.2, 1.0, 0.0),
+        CHSV(0.3, 1.0, 1.0),
+        CHSV(0.8, 1.0, 1.0),
+        CHSV(0.0, 1.0, 1.0),
         // front visible leds
+        CHSV(0.1, 1.0, 0.0),
         CHSV(0.1, 1.0, 0.0)
     };
 

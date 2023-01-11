@@ -285,10 +285,15 @@ void MyLEDMatrix::pmap_layer_init() {
         float layer_row = map_range_0n_to_01(layer_row_i, LAYER_ROW_COUNT-1);
         layer_01_row[layer_row_i] = layer_row;
         for (size_t layer_col_i = 0; layer_col_i < LAYER_COL_COUNT; layer_col_i++) {
-            size_t matrix_col_i = layer_col_i * 2;
+            size_t matrix_col_i = (
+                layer_col_i + 
+                (
+                    LEDBOARD_COL_COUNT * 
+                    (layer_col_i / LEDBOARD_COL_COUNT)
+                )
+            );
             if (layer_row_i % 2) {
-                matrix_col_i = LAYER_COL_COUNT + matrix_col_i;
-                // matrix_col_i = matrix_col_i + 1;
+                matrix_col_i = LEDBOARD_COL_COUNT + matrix_col_i;
             }
             float layer_col = map_range_0n_to_01(layer_col_i, LAYER_COL_COUNT-1);
             layer_01_col[layer_col_i] = layer_col;
@@ -329,7 +334,7 @@ void MyLEDMatrix::print_pmap(Print &out) {
     // print_uint16_align_right(stream_out, pmap[col_i][row_i]);
 
     // print header line
-    stream_out.print(F("      col "));
+    stream_out.print(F("      col   "));
     col_i = 0;
     slight_DebugMenu::print_uint16_align_right(stream_out, 0);
     for (col_i = 1; col_i < count_col; col_i++) {
@@ -338,11 +343,9 @@ void MyLEDMatrix::print_pmap(Print &out) {
     }
     stream_out.println();
 
-    stream_out.print(F("  row     "));
-    col_i = 0;
-    stream_out.print(F("     | "));
-    for (col_i = 1; col_i < count_col; col_i++) {
-        stream_out.print(F("     | "));
+    stream_out.print(F("  row       "));
+    for (col_i = 0; col_i < count_col; col_i++) {
+        stream_out.print(F("    |  "));
     }
     stream_out.println();
 
@@ -356,28 +359,24 @@ void MyLEDMatrix::print_pmap(Print &out) {
         stream_out.print("\x1b[34m");
         stream_out.print(F("  __ "));
         stream_out.print("\x1b[0m");
-        if (((row_i / 4) % 2) == 0) {
-            // light green
-            stream_out.print("\x1b[32m");
-        }
-        col_i = 0;
-        slight_DebugMenu::print_uint16_align_right(
-            stream_out, pmap[col_i][row_i]);
-        stream_out.print("\x1b[0m");
-        for (col_i = 1; col_i < count_col; col_i++) {
-            if (
-                (
-                    (((row_i / 4) % 2) == 0)
-                    && (((col_i / 4) % 2) == 0)
-                )
-                || (
-                    (((row_i / 4) % 2) == 1)
-                    && (((col_i / 4) % 2) == 1)
-                )
-            ) {
-                stream_out.print("\x1b[32m");
+        
+        for (col_i = 0; col_i < count_col; col_i++) {
+            bool row_mode = ((row_i / LEDBOARD_ROW_COUNT) % 2);
+            bool col_mode = ((col_i / LEDBOARD_COL_COUNT) % 2);
+            char pos_color[6] = "\x1b[0m"; // reset
+            if ((row_mode == 0) && (col_mode == 1)) {
+               stream_out.print("\x1b[34m"); // blue
             }
-            stream_out.print(F(", "));
+            if ((row_mode == 0) && (col_mode == 0)) {
+                stream_out.print("\x1b[31m"); // red
+            }
+            if ((row_mode == 1) && (col_mode == 0)) {
+                stream_out.print("\x1b[35m"); // purple
+            }
+            if ((row_mode == 1) && (col_mode == 1)) {
+                stream_out.print("\x1b[36m"); // cyan
+            }
+            stream_out.print(F("  "));
             slight_DebugMenu::print_uint16_align_right(
                 stream_out, pmap[col_i][row_i]);
             stream_out.print("\x1b[0m");
@@ -444,6 +443,16 @@ void MyLEDMatrix::print_layermap(Print &out) {
     // https://github.com/arduino/ArduinoCore-samd/issues/217
     asm(".global _printf_float");
 
+    // black 30m
+    // red 31m
+    // green 32m
+    // orange 33m
+    // blue 34m
+    // purple 35m
+    // cyan 36m
+
+
+
     size_t layer_col_i = 0;
     size_t layer_row_i = 0;
     size_t matrix_col_i = 0;
@@ -454,12 +463,6 @@ void MyLEDMatrix::print_layermap(Print &out) {
     layer_row_i = 0;
     stream_out.printf("\x1b[32ml \x1b[33mm \x1b[0m     col ");
     for (layer_col_i = 0; layer_col_i < LAYER_COL_COUNT; layer_col_i++) {
-        matrix_col_i = layer_col_i * 2;
-        if (layer_row_i % 2) {
-            matrix_col_i = LEDBOARD_COL_COUNT + matrix_col_i;
-            // matrix_col_i = matrix_col_i + 1;
-        }
-
         stream_out.printf(
             "   \x1b[32m%2d   \x1b[35m%1.2f\x1b[0m", 
             layer_col_i, 
@@ -485,35 +488,34 @@ void MyLEDMatrix::print_layermap(Print &out) {
         matrix_row_i = layer_row_i / 2;
 
         for (layer_col_i = 0; layer_col_i < LAYER_COL_COUNT; layer_col_i++) {
-            // print_layermap_cell(out, layer_pos);
-            matrix_col_i = layer_col_i;
-            if (((matrix_col_i / LEDBOARD_COL_COUNT) % 2) == 1) {
-                matrix_col_i = layer_col_i * 2;
-            }
+            matrix_col_i = (
+                layer_col_i + 
+                (
+                    LEDBOARD_COL_COUNT * 
+                    (layer_col_i / LEDBOARD_COL_COUNT)
+                )
+            );
             if (layer_row_i % 2) {
                 matrix_col_i = LEDBOARD_COL_COUNT + matrix_col_i;
-                // matrix_col_i = matrix_col_i + 1;
             }
             
-            char pos_color[6] = "\x1b[34m";
-            if (
-                (
-                    (((matrix_row_i / LEDBOARD_COL_COUNT) % 2) == 0)
-                    && (((matrix_col_i / LEDBOARD_COL_COUNT) % 2) == 0)
-                )
-                || (
-                    (((matrix_row_i / LEDBOARD_COL_COUNT) % 2) == 1)
-                    && (((matrix_col_i / LEDBOARD_COL_COUNT) % 2) == 1)
-                )
-            ) {
-                strcpy(pos_color, "\x1b[31m");
+            bool row_mode = ((matrix_row_i / LEDBOARD_ROW_COUNT) % 2);
+            bool col_mode = ((matrix_col_i / LEDBOARD_COL_COUNT) % 2);
+            char pos_color[6] = "\x1b[0m"; // reset
+            if ((row_mode == 0) && (col_mode == 1)) {
+                strcpy(pos_color, "\x1b[34m"); // blue
+            }
+            if ((row_mode == 0) && (col_mode == 0)) {
+                strcpy(pos_color, "\x1b[31m"); // red
+            }
+            if ((row_mode == 1) && (col_mode == 0)) {
+                strcpy(pos_color, "\x1b[35m"); // purple
+            }
+            if ((row_mode == 1) && (col_mode == 1)) {
+                strcpy(pos_color, "\x1b[36m"); // cyan
             }
 
             stream_out.printf(
-                // "  \x1b[32m%2d:%2d \x1b[33m%2d:%2d %s%3d\x1b[0m", 
-                // "  %2d:%2d|%2d:%2d      ", 
-                // layer_col_i, 
-                // layer_row_i, 
                 "   \x1b[33m%2d:%2d %s%3d\x1b[0m", 
                 matrix_col_i, 
                 matrix_row_i,
@@ -524,28 +526,6 @@ void MyLEDMatrix::print_layermap(Print &out) {
         stream_out.println();
     }
 }
-
-
-// void MyLEDMatrix::print_layermap_cell(Print &out, PixelPos * pixel_pos) {
-//     stream_out.printf(", %7d", pmap[pixel_pos->col_i][pixel_pos->row_i]);
-
-//     // pixel_pos->col_i = col_i;
-//     // pixel_pos->col = map_range_0n_to_01(col_i, LAYER_COL_COUNT-1);
-//     size_t layer_col_i = col_i;
-//     if (row_i % 2) {
-//         layer_col_i = LAYER_COL_COUNT + col_i;
-//     }
-//     pixel_pos->col_i = layer_col_i;
-//     pixel_pos->col = map_range_0n_to_01(layer_col_i, LAYER_COL_COUNT-1);
-
-//     pixel_pos.print(out);
-
-//     // CHSV pixel_hsv = effect_Matrix2D_get_pixel(pixel_pos);
-//     // pixel_hsv.print(out);
-//     pixel_pos.print(out);
-//     matrix.pmap[layer_col_i][layer_row_i]
-// }
-
 
 void MyLEDMatrix::print_info(Print &out, const char* pre) {
     out.printf("%sBOARDS_COUNT:       %4d\r\n", pre, BOARDS_COUNT);

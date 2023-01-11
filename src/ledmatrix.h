@@ -54,7 +54,14 @@ SOFTWARE.
 #include "./mapping.h"
 #include "./fx/fx_base.h"
 
-
+// asci terminal colors
+// black 30m
+// red 31m
+// green 32m
+// orange 33m
+// blue 34m
+// purple 35m
+// cyan 36m
 
 
 const uint16_t LEDBOARD_COL_COUNT = 4;
@@ -126,17 +133,19 @@ const uint8_t LEDBOARD_SINGLE
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Layout BookCase
-const uint8_t BOARDS_COL_COUNT = 7;
+const uint8_t BOARDS_COL_COUNT = 8; 
+// ^ in real there are only 7 col. 
+// but for the interleaved pattern we need some fake boards..
 const uint8_t BOARDS_ROW_COUNT = 3;
 const uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
-    {19, 18, 17, 16, 15, 14, 20},
-    {13, 12,  9,  8,  7,  3,  2},
-    {11, 10,  6,  5,  4,  1,  0},
+    {19, 18, 17, 16, 15, 14, 20, 21},
+    {13, 12,  9,  8,  7,  3,  2, 22},
+    {11, 10,  6,  5,  4,  1,  0, 23},
 };
 const uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
-    {2, 2, 2, 2, 2, 2, 2},
-    {2, 2, 2, 2, 2, 2, 2},
-    {2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2},
 };
 
 
@@ -172,8 +181,11 @@ const uint8_t MATRIX_ROW_COUNT = LEDBOARD_ROW_COUNT * BOARDS_ROW_COUNT;
 const uint16_t MATRIX_PIXEL_COUNT = MATRIX_COL_COUNT * MATRIX_ROW_COUNT;
 
 
-const size_t LAYER_ROW_COUNT = MATRIX_ROW_COUNT * 2;
 const size_t LAYER_COL_COUNT = MATRIX_COL_COUNT / 2;
+const size_t LAYER_ROW_COUNT = MATRIX_ROW_COUNT * 2;
+
+// const size_t LAYER_COL_COUNT_REAL = 14; // mod to exclude last columns.
+// const size_t LAYER_ROW_COUNT_REAL = LAYER_ROW_COUNT;
 
 
 class MyLEDMatrix {

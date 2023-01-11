@@ -347,7 +347,7 @@ void MyMenu::menu__print_help(Print &out) {
     out.print(F("\t 'r': toggle animation_run 'r' ("));
     out.print(animation.animation_run);
     out.println(F(")"));
-    out.print(F("\t 'l': start loop n times 'l3' ("));
+    out.print(F("\t 'L': start loop n times 'L3' ("));
     out.print(animation.animation_loopcount);
     out.println(F(")"));
     out.print(F("\t 'j': fx_wave start singleshot 'j'"));
@@ -392,6 +392,7 @@ void MyMenu::menu__print_help(Print &out) {
     out.println(F("\t 'T': time_meassurements 'T'"));
     // out.println(F("\t 'p': set pixel 'pX,Y:65535'"));
     // out.println(F("\t 'P': set pixel 'p0:65535'"));
+    out.println(F("\t 'l': set layer to 2000 'lY'"));
     out.println(F("\t 'p': set pixel to 2000 'pX,Y'"));
     out.println(F("\t 'P': set pixel to 2000 'p0'"));
     out.println(F("\t 'z': set all pixel to black 'z'"));
@@ -399,7 +400,7 @@ void MyMenu::menu__print_help(Print &out) {
     // out.println(F("\t 'Z': set all pixel to 21845 'z'"));
     // out.println(F("\t 'B': print Buffer 'B'"));
     out.println(F("\t 'q': print pmap 'q'"));
-    out.println(F("\t 'Q': print pmap 'Q'"));
+    out.println(F("\t 'Q': print pmap_layer 'Q'"));
     // out.println(F("\t 'F': print buffer_fc 'F'"));
     out.println();
     // out.println(F("\t 'a': print ambient light sensor 'a'"));
@@ -451,7 +452,7 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
             out.println(F("toggle animation_run"));
             animation.animation_run = !animation.animation_run;
         } break;
-        case 'l': {
+        case 'L': {
             animation.menu__start_loop_n_times(out, command);
         } break;
         case 'k': {
@@ -530,6 +531,10 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
         // } break;
         case 'T': {
             animation.menu__time_meassurements(out);
+        } break;
+        case 'l': {
+            animation.menu__set_layer(out, command);
+            animation.matrix.tlc.write();
         } break;
         case 'p': {
             animation.menu__set_pixel_layer(out, command);

@@ -142,6 +142,7 @@ public:
     void menu__set_fps(Print &out, char *command);
     void menu__start_loop_n_times(Print &out, char *command);
 
+    void menu__set_layer(Print &out, char *command);
     void menu__set_pixel_index(Print &out, char *command);
     void menu__set_pixel(Print &out, char *command);
     void menu__set_pixel_layer(Print &out, char *command);
