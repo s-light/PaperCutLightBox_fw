@@ -15,7 +15,7 @@
 /******************************************************************************
 The MIT License (MIT)
 
-Copyright (c) 2021 Stefan Krüger
+Copyright (c) 2023 Stefan Krüger
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -58,6 +58,7 @@ public:
     // uint32_t offset_;
     uint8_t row_i;
     uint8_t col_i;
+    void print(Print &out);
 };
 
 class FXBase {

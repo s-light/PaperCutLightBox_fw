@@ -24,7 +24,7 @@
 /******************************************************************************
 The MIT License (MIT)
 
-Copyright (c) 2021 Stefan Krüger
+Copyright (c) 2023 Stefan Krüger
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -173,6 +173,47 @@ void MyAnimation::menu__set_pixel(Print &out, char *command) {
     }
     if (row_i >= MATRIX_ROW_COUNT) {
         row_i = MATRIX_ROW_COUNT -1;
+    }
+
+    uint16_t pixel_index = matrix.pmap[col_i][row_i];
+    out.print(F(" ("));
+    out.print(col_i);
+    out.print(F(","));
+    out.print(row_i);
+    out.print(F("->"));
+    out.print(pixel_index);
+    out.print(F(")"));
+
+    out.print(F(" to "));
+    out.print(value);
+    out.println();
+
+    matrix.tlc.setRGB(pixel_index, value, value, value);
+}
+
+void MyAnimation::menu__set_pixel_layer(Print &out, char *command) {
+    out.print(F("Set pixel "));
+    // p0,1:500
+    // split string with help of tokenizer
+    // https://www.cplusplus.com/reference/cstring/strtok/#
+    char * command_pointer = &command[1];
+    // NOLINTNEXTLINE(runtime/threadsafe_fn)
+    command_pointer = strtok(command_pointer, " ,");
+    uint8_t col_i = atoi(command_pointer);
+    // NOLINTNEXTLINE(runtime/threadsafe_fn)
+    command_pointer = strtok(NULL, " :");
+    // command_pointer = strtok(&command[1], ",");
+    uint8_t row_i = atoi(command_pointer);
+    // NOLINTNEXTLINE(runtime/threadsafe_fn)
+    command_pointer = strtok(NULL, " :");
+    // uint16_t value = atoi(command_pointer);
+    uint16_t value = 2000;
+
+    if (col_i >= LAYER_COL_COUNT) {
+        col_i = LAYER_COL_COUNT -1;
+    }
+    if (row_i >= LAYER_ROW_COUNT) {
+        row_i = LAYER_ROW_COUNT -1;
     }
 
     uint16_t pixel_index = matrix.pmap[col_i][row_i];
@@ -549,14 +590,17 @@ void MyAnimation::animation_init(Stream &out) {
         out.print(effect_duration);
         out.println(F("ms"));
 
+        matrix.tlc.setRGB(1, 0, 0);
+        matrix.tlc.write();
+
         // out.println(F("  Set all Pixel to 21845."));
         // matrix.tlc.setRGB(21845, 21845, 21845);
-        out.println(F("  Set all Pixel to red=blue=100."));
-        matrix.tlc.setRGB(200, 50, 0);
-        matrix.tlc.write();
-        out.print(F("  ."));
-        delay(1000);
-        out.println(F("."));
+        // out.println(F("  Set all Pixel to red=blue=100."));
+        // matrix.tlc.setRGB(200, 50, 0);
+        // matrix.tlc.write();
+        // out.print(F("  ."));
+        // delay(1000);
+        // out.println(F("."));
 
         effect_start = micros();
         effect_end = micros() + (effect_duration*1000);
@@ -640,7 +684,8 @@ void MyAnimation::set_effect_position(float position) {
 
 void MyAnimation::calculate_effect_position() {
     // fx_base->update_position();
-    fx_line->update_position();
+    // fx_line->update_position();
+    fx_shadowland->update_position();
     // fx_rainbow->update_position();
     // fx_plasma->update_position();
     // fx_wave->update_position();
@@ -711,7 +756,7 @@ void MyAnimation::effect__line() {
 //     __attribute__((unused)) float row,
 //     __attribute__((unused)) float offset
 // ) {
-CHSV MyAnimation::effect_Matrix2D_get_pixel(PixelPos * pixel_pos) {
+CHSV MyAnimation::effect_Matrix2D_get_pixel(PixelPos *pixel_pos) {
     CHSV pixel_hsv = CHSV(hue, saturation, 0.0001);
 
     // // base
@@ -720,11 +765,18 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(PixelPos * pixel_pos) {
     //     pixel_hsv = fx_base_pixel;
     // }
 
-    // line
-    CHSV fx_line_pixel = fx_line->get_pixel(pixel_pos);
-    if (fx_line_pixel.value > 0.0) {
-        pixel_hsv = fx_line_pixel;
-    }
+    // shadowLand
+    pixel_hsv = fx_shadowland->get_pixel(pixel_pos);
+    // CHSV fx_shadowland_pixel = fx_shadowland->get_pixel(pixel_pos);
+    // if (fx_shadowland_pixel.value > 0.0) {
+    //     pixel_hsv = fx_shadowland_pixel;
+    // }
+
+    // // line
+    // CHSV fx_line_pixel = fx_line->get_pixel(pixel_pos);
+    // if (fx_line_pixel.value > 0.0) {
+    //     pixel_hsv = fx_line_pixel;
+    // }
 
     // // plasma
     // CHSV fx_plasma_pixel = fx_plasma->get_pixel(pixel_pos);
@@ -748,33 +800,40 @@ CHSV MyAnimation::effect_Matrix2D_get_pixel(PixelPos * pixel_pos) {
 }
 
 void MyAnimation::effect_Matrix2D() {
-    PixelPos * pixel_pos = new PixelPos();
+    // PixelPos * pixel_pos = new PixelPos();
+    // ^ is now global.
     pixel_pos->progress = effect_position;
-    const size_t LAYERS_ROW_COUNT = MATRIX_ROW_COUNT * 2;
-    const size_t LAYERS_COL_COUNT = MATRIX_COL_COUNT / 2;
-    for (size_t row_i = 0; row_i < LAYERS_ROW_COUNT; row_i++) {
-        size_t layer_row_i = row_i / 2;
+    
+    size_t layer_col_i = 0;
+    size_t layer_row_i = 0;
+    size_t matrix_col_i = 0;
+    size_t matrix_row_i = 0;
+
+    for (layer_row_i = 0; layer_row_i < LAYER_ROW_COUNT; layer_row_i++) {
+        matrix_row_i = layer_row_i / 2;
         pixel_pos->row_i = layer_row_i;
-        pixel_pos->row = map_range_0n_to_01(layer_row_i, LAYERS_ROW_COUNT-1);
-        // pixel_pos->row_i = row_i;
-        // pixel_pos->row = map_range_0n_to_01(row_i, LAYERS_ROW_COUNT-1);
-        for (size_t col_i = 0; col_i < LAYERS_COL_COUNT; col_i++) {
-            // pixel_pos->col_i = col_i;
-            // pixel_pos->col = map_range_0n_to_01(col_i, LAYERS_COL_COUNT-1);
-            size_t layer_col_i = col_i;
-                if (row_i % 2) {
-                    layer_col_i = LAYERS_COL_COUNT + col_i;
-                }
+        pixel_pos->row = map_range_0n_to_01(layer_row_i, LAYER_ROW_COUNT-1);
+        for (layer_col_i = 0; layer_col_i < LAYER_COL_COUNT; layer_col_i++) {
+            matrix_col_i = layer_col_i * 2;
+            if (layer_row_i % 2) {
+                matrix_col_i = LAYER_COL_COUNT + matrix_col_i;
+                // matrix_col_i = matrix_col_i + 1;
+            }
             pixel_pos->col_i = layer_col_i;
-            pixel_pos->col = map_range_0n_to_01(layer_col_i, LAYERS_COL_COUNT-1);
+            pixel_pos->col = map_range_0n_to_01(layer_col_i, LAYER_COL_COUNT-1);
 
             // ------------------------------------------
-            CHSV pixel_hsv = effect_Matrix2D_get_pixel(pixel_pos);
+            // CHSV pixel_hsv = effect_Matrix2D_get_pixel(pixel_pos);
+            CHSV pixel_hsv = fx_shadowland->get_pixel(pixel_pos);
+            // CHSV pixel_hsv = CHSV(hue, saturation, 0.01);
 
             // ------------------------------------------
             // final conversions
             // global brightness
-            pixel_hsv.value *= brightness;
+            if (pixel_hsv.value > 0.1) {
+                pixel_hsv.value *= brightness;
+            }
+            // pixel_hsv.value *= brightness;
 
             // CHSV pixel_hsv = CHSV(0.5, 0.0, 0.10);
             // convert to rgb
@@ -783,7 +842,7 @@ void MyAnimation::effect_Matrix2D() {
             // fancyled.gamma_adjust(brightness=self.brightness);
             matrix.tlc.setRGB(
                 // matrix.pmap[col_i][row_i],
-                matrix.pmap[layer_col_i][layer_row_i],
+                matrix.pmap[matrix_col_i][matrix_row_i],
                 // convert float to uint16_t
                 pixel_rgb.r * 65535,
                 pixel_rgb.g * 65535,
@@ -795,80 +854,8 @@ void MyAnimation::effect_Matrix2D() {
             //     0);
         }
     }
+    // delete pixel_pos;
 }
-
-// void MyAnimation::effect_Matrix2D() {
-//     // float offset = map_range_01_to(effect_position, 0.0, (PI * 30));
-//     // float offset = map_range_01_to(
-//     //     effect_position,
-//     //     0, MATRIX_ROW_COUNT);
-//
-//     PixelPos * pixel_pos = new PixelPos();
-//     pixel_pos->progress = effect_position;
-//     // Serial.println("");
-//
-//     // float offset_PI = map_range(offset, 0.0, 1.0, 0.0, (3.14/2));
-//     // PI 3,141592653589793
-//     // float offset_PI = offset * (3.141592 / 2);
-//     // Serial.printf(
-//     //     "%2.3f %2.3f "
-//     //     "%2.3f %2.3f \r\n",
-//     //     // offset,
-//     //     // sin(offset),
-//     //     offset_PI,
-//     //     sin(offset_PI)
-//     //     // NOLINTNEXTLINE(whitespace/parens)
-//     // );
-//
-//     for (size_t row_i = 0; row_i < MATRIX_ROW_COUNT; row_i++) {
-//         // normalize row
-//         // float row = map_range(
-//         //     row_i,
-//         //     0, MATRIX_ROW_COUNT-1,
-//         //     -0.5, 0.5);
-//         pixel_pos->row_i = row_i;
-//         pixel_pos->row = map_range_0n_to_01(row_i, MATRIX_ROW_COUNT-1);
-//         for (size_t col_i = 0; col_i < MATRIX_COL_COUNT; col_i++) {
-//             // normalize col
-//             // float col = map_range__int2float(
-//             // float col = map_range(
-//             //     col_i,
-//             //     0, MATRIX_COL_COUNT-1,
-//             //     -0.5, 0.5);
-//             pixel_pos->col_i = col_i;
-//             pixel_pos->col = map_range_0n_to_01(col_i, MATRIX_COL_COUNT-1);
-//             // ------------------------------------------
-//             CHSV pixel_hsv = effect_Matrix2D_get_pixel(pixel_pos);
-//
-//             // ------------------------------------------
-//             // final conversions
-//             // global brightness
-//             pixel_hsv.value *= brightness;
-//
-//             // CHSV pixel_hsv = CHSV(0.5, 0.0, 0.10);
-//             // convert to rgb
-//             CRGB pixel_rgb = hsv2rgb(pixel_hsv);
-//             // gamma & global brightness
-//             // fancyled.gamma_adjust(brightness=self.brightness);
-//             matrix.tlc.setRGB(
-//                 matrix.pmap[col_i][row_i],
-//                 // convert float to uint16_t
-//                 pixel_rgb.r * 65535,
-//                 pixel_rgb.g * 65535,
-//                 pixel_rgb.b * 65535);
-//             // matrix.tlc.setRGB(
-//             //     matrix.pmap[col_i][row_i],
-//             //     10000,
-//             //     10000,
-//             //     0);
-//         }
-//     }
-// }
-
-
-
-
-
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // THE END

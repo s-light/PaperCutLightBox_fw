@@ -19,7 +19,7 @@
 /******************************************************************************
 The MIT License (MIT)
 
-Copyright (c) 2021 Stefan Krüger
+Copyright (c) 2023 Stefan Krüger
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -532,24 +532,30 @@ void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
             animation.menu__time_meassurements(out);
         } break;
         case 'p': {
-            animation.menu__set_pixel(out, command);
+            animation.menu__set_pixel_layer(out, command);
+            animation.matrix.tlc.write();
         } break;
         case 'P': {
-            animation.menu__set_pixel_index(out, command);
+            animation.menu__set_pixel(out, command);
+            // animation.menu__set_pixel_index(out, command);
+            animation.matrix.tlc.write();
         } break;
         case 'z': {
             out.println(F("Set all Pixel to black."));
             animation.matrix.tlc.setRGB(0, 0, 0);
+            animation.matrix.tlc.write();
             out.println();
         } break;
         case 'Z': {
             animation.menu__set_all_pixel(out, command);
+            animation.matrix.tlc.write();
         } break;
         case 'q': {
             animation.matrix.print_pmap(out);
         } break;
         case 'Q': {
-            animation.matrix.print_2Dmatrix(out);
+            // animation.matrix.print_2Dmatrix(out);
+            animation.matrix.print_layermap(out);
         } break;
         // case 'Z': {
         //     out.println(F("Set all Pixel to 21845."));

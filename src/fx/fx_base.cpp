@@ -14,7 +14,7 @@
 /******************************************************************************
 The MIT License (MIT)
 
-Copyright (c) 2021 Stefan Krüger
+Copyright (c) 2023 Stefan Krüger
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,24 @@ SOFTWARE.
 // include own headerfile
 // NOLINTNEXTLINE(build/include)
 #include "./fx_base.h"
+
+
+void PixelPos::print(Print &out) {
+    // out.println(F("PixelPos:"));
+    Print &stream_out = out;
+
+    // enable float support
+    // https://github.com/arduino/ArduinoCore-samd/issues/217
+    asm(".global _printf_float");
+
+    stream_out.printf("progress: %1.2f\n", progress);
+    stream_out.printf("col: %1.2f\n", col);
+    stream_out.printf("row: %1.2f\n", row);
+    // stream_out.printf("offset: %2d\n", offset);
+    stream_out.printf("row_i: %2d\n", row_i);
+    stream_out.printf("col_i: %2d\n", col_i);
+    // stream_out.println();
+}
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // functions
