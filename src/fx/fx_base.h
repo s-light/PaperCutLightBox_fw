@@ -58,6 +58,7 @@ public:
     // uint32_t offset_;
     uint8_t row_i;
     uint8_t col_i;
+    void print(Print &out);
 };
 
 class FXBase {

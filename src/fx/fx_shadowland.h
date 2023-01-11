@@ -46,8 +46,8 @@ SOFTWARE.
 
 #include "./fx_base.h"
 
+#include "../ledmatrix.h"
 // #include "./color.h"
-// #include "./ledmatrix.h"
 // #include "./mapping.h"
 
 class FXShadowland : public FXBase{
@@ -59,10 +59,46 @@ public:
     // ~FXShadowland();
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // public functions
+    // public
 
     // void update_position();
     virtual CHSV get_pixel(PixelPos * pixel_pos);
+
+    
+    CHSV night[LAYER_ROW_COUNT] = {
+        // we have 24 layers
+        // stars
+        CHSV(0.99, 1.0, 1.0),
+        CHSV(0.8, 1.0, 0.0),
+        // back
+        CHSV(0.6, 1.0, 0.0),
+        CHSV(0.6, 1.0, 0.0),
+        CHSV(0.6, 1.0, 0.0),
+        // mountains
+        CHSV(0.5, 1.0, 1.0),
+        CHSV(0.5, 1.0, 0.0),
+        CHSV(0.5, 1.0, 0.0),
+        // hills / land
+        CHSV(0.4, 1.0, 0.0),
+        CHSV(0.4, 1.0, 0.0),
+        CHSV(0.4, 1.0, 0.1),
+        CHSV(0.4, 1.0, 0.0),
+        CHSV(0.4, 1.0, 0.0),
+        CHSV(0.4, 1.0, 0.0),
+        // land
+        CHSV(0.9, 1.0, 1.0),
+        CHSV(0.3, 1.0, 0.1),
+        CHSV(0.3, 1.0, 0.0),
+        CHSV(0.3, 1.0, 0.0),
+        CHSV(0.3, 1.0, 0.0),
+        // front trees / grass
+        CHSV(0.2, 1.0, 0.0),
+        CHSV(0.2, 1.0, 0.0),
+        CHSV(0.2, 1.0, 0.0),
+        CHSV(0.2, 1.0, 0.0),
+        // front visible leds
+        CHSV(0.1, 1.0, 0.0)
+    };
 
 private:
 

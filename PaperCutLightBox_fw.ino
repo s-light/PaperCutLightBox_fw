@@ -208,6 +208,12 @@ void setup() {
     myinput.begin(Serial, myinput_myencoder_pin_changed_ISR);
     mymenu.begin(Serial);
 
+    // debug output
+    animation.animation_run = false;
+    mymenu.debugOut_Serial_Enabled = false;
+    animation.matrix.print_info(Serial, "");
+    animation.matrix.print_layermap(Serial);
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // go
     Serial.println(F("wait 0.1s."));
