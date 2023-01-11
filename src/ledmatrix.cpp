@@ -292,7 +292,7 @@ void MyLEDMatrix::pmap_layer_init() {
                     (layer_col_i / LEDBOARD_COL_COUNT)
                 )
             );
-            if (layer_row_i % 2) {
+            if (layer_row_i % 2 == 0) {
                 matrix_col_i = LEDBOARD_COL_COUNT + matrix_col_i;
             }
             float layer_col = map_range_0n_to_01(layer_col_i, LAYER_COL_COUNT-1);
@@ -363,7 +363,6 @@ void MyLEDMatrix::print_pmap(Print &out) {
         for (col_i = 0; col_i < count_col; col_i++) {
             bool row_mode = ((row_i / LEDBOARD_ROW_COUNT) % 2);
             bool col_mode = ((col_i / LEDBOARD_COL_COUNT) % 2);
-            char pos_color[6] = "\x1b[0m"; // reset
             if ((row_mode == 0) && (col_mode == 1)) {
                stream_out.print("\x1b[34m"); // blue
             }
