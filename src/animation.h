@@ -144,6 +144,7 @@ public:
 
     void menu__set_pixel_index(Print &out, char *command);
     void menu__set_pixel(Print &out, char *command);
+    void menu__set_pixel_layer(Print &out, char *command);
     void menu__set_all_pixel(Print &out, char *command);
     void menu__test_buffer(Print &out);
     void menu__time_meassurements(Print &out);

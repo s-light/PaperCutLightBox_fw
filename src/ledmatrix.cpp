@@ -452,63 +452,69 @@ void MyLEDMatrix::print_layermap(Print &out) {
     // print header line
     layer_col_i = 0;
     layer_row_i = 0;
-    stream_out.printf(" \x1b[32ml  \x1b[33mm \x1b[35mfloat\x1b[0m  ");
+    stream_out.printf("\x1b[32ml \x1b[33mm \x1b[0m     col ");
     for (layer_col_i = 0; layer_col_i < LAYER_COL_COUNT; layer_col_i++) {
         matrix_col_i = layer_col_i * 2;
         if (layer_row_i % 2) {
-            matrix_col_i = LAYER_COL_COUNT + matrix_col_i;
+            matrix_col_i = LEDBOARD_COL_COUNT + matrix_col_i;
             // matrix_col_i = matrix_col_i + 1;
         }
 
         stream_out.printf(
-            "   \x1b[32m%2d   \x1b[33m%2d   \x1b[35m%1.2f\x1b[0m", 
+            "   \x1b[32m%2d   \x1b[35m%1.2f\x1b[0m", 
             layer_col_i, 
-            matrix_col_i, 
             layer_01_col[layer_col_i]
         );
     }
     stream_out.println();
-
+    stream_out.printf("row          ");
+    for (layer_col_i = 0; layer_col_i < LAYER_COL_COUNT; layer_col_i++) {
+        stream_out.printf("           |");
+    }
+    stream_out.println();
 
 
     for (layer_row_i = 0; layer_row_i < LAYER_ROW_COUNT; layer_row_i++) {
-        matrix_row_i = layer_row_i / 2;
-
         // print row numer
         stream_out.printf(
-            "\x1b[32m%2d\x1b[33m%2d \x1b[35m%1.3f\x1b[0m-->", 
+            "\x1b[32m%2d \x1b[35m%1.3f\x1b[0m --> ", 
             layer_row_i, 
-            matrix_row_i, 
             layer_01_row[layer_row_i]
         );
 
+        matrix_row_i = layer_row_i / 2;
+
         for (layer_col_i = 0; layer_col_i < LAYER_COL_COUNT; layer_col_i++) {
             // print_layermap_cell(out, layer_pos);
-            matrix_col_i = layer_col_i * 2;
+            matrix_col_i = layer_col_i;
+            if (((matrix_col_i / LEDBOARD_COL_COUNT) % 2) == 1) {
+                matrix_col_i = layer_col_i * 2;
+            }
             if (layer_row_i % 2) {
-                matrix_col_i = LAYER_COL_COUNT + matrix_col_i;
+                matrix_col_i = LEDBOARD_COL_COUNT + matrix_col_i;
                 // matrix_col_i = matrix_col_i + 1;
             }
             
             char pos_color[6] = "\x1b[34m";
             if (
                 (
-                    (((matrix_row_i / 4) % 2) == 0)
-                    && (((matrix_col_i / 4) % 2) == 0)
+                    (((matrix_row_i / LEDBOARD_COL_COUNT) % 2) == 0)
+                    && (((matrix_col_i / LEDBOARD_COL_COUNT) % 2) == 0)
                 )
                 || (
-                    (((matrix_row_i / 4) % 2) == 1)
-                    && (((matrix_col_i / 4) % 2) == 1)
+                    (((matrix_row_i / LEDBOARD_COL_COUNT) % 2) == 1)
+                    && (((matrix_col_i / LEDBOARD_COL_COUNT) % 2) == 1)
                 )
             ) {
-                strcpy(pos_color, "\x1b[36m");
+                strcpy(pos_color, "\x1b[31m");
             }
 
             stream_out.printf(
-                "  \x1b[32m%2d:%2d \x1b[33m%2d:%2d %s%3d\x1b[0m", 
+                // "  \x1b[32m%2d:%2d \x1b[33m%2d:%2d %s%3d\x1b[0m", 
                 // "  %2d:%2d|%2d:%2d      ", 
-                layer_col_i, 
-                layer_row_i, 
+                // layer_col_i, 
+                // layer_row_i, 
+                "   \x1b[33m%2d:%2d %s%3d\x1b[0m", 
                 matrix_col_i, 
                 matrix_row_i,
                 pos_color,
