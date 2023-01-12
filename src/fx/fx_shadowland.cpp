@@ -110,6 +110,10 @@ CHSV FXShadowland::get_pixel(PixelPos * pixel_pos) {
 
     CHSV pixel_hsv = night[pixel_pos->row_i];
 
+    // if(pixel_pos->row_i == 23) {
+    //     pixel_hsv = CHSV(pixel_pos->col, 1.0, 1.0);
+    // }
+
     // pixel_hsv.value *= visibility;
     return pixel_hsv;
 }

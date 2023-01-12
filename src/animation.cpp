@@ -294,7 +294,9 @@ void MyAnimation::menu__set_layer(Print &out, char *command) {
     // NOLINTNEXTLINE(runtime/threadsafe_fn)
     // command_pointer = strtok(NULL, " :");
     // uint16_t value = atoi(command_pointer);
-    uint16_t value = 2000;
+    // uint16_t value = 2000;
+    uint16_t value =  brightness * 65535;
+
 
     // if (col_i >= LAYER_COL_COUNT) {
     //     col_i = LAYER_COL_COUNT -1;

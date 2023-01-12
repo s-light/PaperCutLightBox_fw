@@ -211,8 +211,8 @@ void setup() {
     // debug output
     // animation.animation_run = false;
     // mymenu.debugOut_Serial_Enabled = false;
-    animation.matrix.print_info(Serial, "");
-    animation.matrix.print_layermap(Serial);
+    // animation.matrix.print_info(Serial, "");
+    // animation.matrix.print_layermap(Serial);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // go
