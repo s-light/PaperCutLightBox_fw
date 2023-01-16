@@ -386,23 +386,26 @@ void MyInput::mybutton_event(slight_ButtonInput *instance) {
         } break;
         case slight_ButtonInput::event_click : {
             Serial.println(F("click"));
-            if (animation.brightness > 0.1) {
-                animation.set_brightness(0.00015);
-            } else {
-                animation.set_brightness(0.5);
-            }
+            animation.set_brightness(0.001);
             Serial.print(F("  animation.brightness: "));
             Serial.println(animation.brightness, 4);
         } break;
         case slight_ButtonInput::event_click_long : {
             Serial.print(F("click long "));
             Serial.println((*instance).getDurationActive());
-        } break;
-        case slight_ButtonInput::event_click_double : {
-            Serial.println(F("click double"));
             encoder_mode_brightness = !encoder_mode_brightness;
             Serial.print(F("  encoder_mode_brightness: "));
             Serial.println(encoder_mode_brightness);
+        } break;
+        case slight_ButtonInput::event_click_double: {
+            Serial.println(F("click double"));
+            if (animation.brightness > 0.1) {
+              animation.set_brightness(0.001);
+            } else {
+              animation.set_brightness(1.0);
+            }
+            Serial.print(F("  animation.brightness: "));
+            Serial.println(animation.brightness, 4);
         } break;
         case slight_ButtonInput::event_click_triple : {
             Serial.println(F("click triple"));

@@ -164,8 +164,8 @@ MyMenu mymenu = MyMenu(animation, myinput, sketchinfo_print);
 // ISR magic
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void myinput_myencoder_pin_changed_ISR() {
-    myinput.myencoder.updateClassic();
-    // myinput.myencoder.updateGray();
+    // myinput.myencoder.updateClassic();
+    myinput.myencoder.updateGray();
 }
 
 
