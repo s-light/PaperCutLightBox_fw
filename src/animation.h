@@ -186,7 +186,8 @@ public:
     float contrast = 1.0;
     float brightness = 0.006;
     // float brightness = 0.1;
-    const float brightness_max = 0.37;
+    // const float brightness_max = 0.37;
+    const float brightness_max = 0.8;
     const uint16_t brightness_max_i = 25000;
 
     // const float PI = 3.141592;
