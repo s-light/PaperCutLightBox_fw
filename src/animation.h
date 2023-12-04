@@ -13,8 +13,8 @@
         ~ slight_FaderLin
         ~ slight_TLC5957
             written by stefan krueger (s-light),
-                github@s-light.eu, http://s-light.eu, https://github.com/s-light/
-            license: MIT
+                github@s-light.eu, http://s-light.eu,
+https://github.com/s-light/ license: MIT
 
     written by stefan krueger (s-light),
         github@s-light.eu, http://s-light.eu, https://github.com/s-light/
@@ -44,8 +44,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ******************************************************************************/
 
-
-
 #ifndef MyAnimation_H_
 #define MyAnimation_H_
 
@@ -56,22 +54,21 @@ SOFTWARE.
 #include <slight_FaderLin.h>
 
 #include "./color.h"
-#include "./mapping.h"
 #include "./easing.h"
 #include "./ledmatrix.h"
+#include "./mapping.h"
 
 #include "./fx/fx_base.h"
-#include "./fx/fx_rainbow.h"
 #include "./fx/fx_line.h"
-#include "./fx/fx_wave.h"
 #include "./fx/fx_plasma.h"
 #include "./fx/fx_points.h"
-#include "./fx/fx_sparkle.h"
+#include "./fx/fx_rainbow.h"
 #include "./fx/fx_shadowland.h"
+#include "./fx/fx_sparkle.h"
+#include "./fx/fx_wave.h"
 
 class MyAnimation {
 public:
-
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // structs
 
@@ -89,7 +86,7 @@ public:
     // attributes
 
     // pin_output_enable: 2
-    MyLEDMatrix matrix = MyLEDMatrix(2);
+    MyLEDMatrix matrix = MyLEDMatrix(5);
 
     // enum fx_names {
     //     // FX_base,
@@ -115,14 +112,13 @@ public:
     // otherwise the newly created class is *sliced*
     // and only the parts of the base class is available...
     // FXBase * fx_base = new FXBase();
-    FXBase * fx_shadowland = new FXShadowland();
-    FXBase * fx_line = new FXLine();
+    FXBase *fx_shadowland = new FXShadowland();
+    FXBase *fx_line = new FXLine();
     // FXBase * fx_rainbow = new FXRainbow();
     // FXBase * fx_sparkle = new FXSparkle();
-    FXBase * fx_plasma = new FXPlasma();
-    FXBase * fx_wave = new FXWave();
-    FXBase * fx_points = new FXPoints();
-
+    FXBase *fx_plasma = new FXPlasma();
+    FXBase *fx_wave = new FXWave();
+    FXBase *fx_points = new FXPoints();
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // constructor
@@ -154,6 +150,7 @@ public:
     void menu__set_saturation(Print &out, char *command);
     void menu__set_contrast(Print &out, char *command);
     void menu__set_brightness(Print &out, char *command);
+    void menu__fade_brightness(Print &out, char *command);
 
     void menu__test_colors(Print &out);
 
@@ -173,7 +170,9 @@ public:
     bool animation_run = true;
     uint16_t animation_loopcount = 0;
 
-    uint16_t effect_duration = 3 * 1000; //ms
+    uint16_t effect_duration = 3 * 1000; // ms
+
+    uint16_t brightness_fade_duration = 10 * 1000; // ms
 
     // lounge blue - night
     // float hue = 0.7;
@@ -187,14 +186,13 @@ public:
     float brightness = 0.006;
     // float brightness = 0.1;
     // const float brightness_max = 0.37;
-    const float brightness_max = 0.8;
+    const float brightness_max = 1.0;
     const uint16_t brightness_max_i = 25000;
 
     // const float PI = 3.141592;
     // is already defined by arduino or some other defaults...
 
 private:
-
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // private functions
 
@@ -205,7 +203,6 @@ private:
     void set_effect_position(float position);
     void animation_reset();
 
-
     void effect__pixel_checker();
     void effect__line();
 
@@ -214,7 +211,7 @@ private:
     // defined globally maybe for performance reasons.
     // (test did not show difference.)
     void effect_Matrix2D();
-    CHSV effect_Matrix2D_get_pixel( __attribute__((unused)) PixelPos * pixel_pos);
+    CHSV effect_Matrix2D_get_pixel(__attribute__((unused)) PixelPos *pixel_pos);
     // CHSV effect_Matrix2D_get_pixel(float col, float row, float offset);
     // CHSV effect_Matrix2D_get_pixel(
     //     float col, float row,
@@ -238,6 +235,25 @@ private:
     uint32_t effect_update_last_us = 0;
     uint32_t effect_update_delay_us = 100;
 
-};  // class MyAnimation
+    void brightnessFader_valuesChanged(slight_FaderLin *instance,
+                                       uint16_t *values, uint8_t count);
+    void brightnessFader_event(slight_FaderLin *instance);
+    // uint16_t *values_current;
+    slight_FaderLin brightnessFader = slight_FaderLin(
+        // uint8_t id_new
+        LED_BUILTIN,
+        // uint8_t count,
+        1,
+        // values changed
+        // https://stackoverflow.com/questions/14189440/c-callback-using-class-member#comment110410484_14189561
+        std::bind(&MyAnimation::brightnessFader_valuesChanged, this,
+                  std::placeholders::_1, std::placeholders::_2,
+                  std::placeholders::_3),
+        // event
+        std::bind(&MyAnimation::brightnessFader_event, this,
+                  std::placeholders::_1));
+        // values_current);
 
-#endif  // MyAnimation_H_
+}; // class MyAnimation
+
+#endif // MyAnimation_H_

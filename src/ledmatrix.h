@@ -45,8 +45,8 @@ SOFTWARE.
 
 #include <SPI.h>
 // #include <slight_TLC5957.h>
-#include <Tlc59711.h>
-
+// #include <Tlc59711.h>
+#include <Adafruit_TLC59711.h>
 
 // used for print_uint16_align_right
 #include <slight_DebugMenu.h>
@@ -207,55 +207,59 @@ public:
     // use default pins
     // slight_TLC5957 tlc = slight_TLC5957(MATRIX_PIXEL_COUNT, 7);
     // Tlc59711 tlc(CHIPS_COUNT);
-    Tlc59711 tlc = Tlc59711(CHIPS_COUNT);
+    // Tlc59711 tlc = Tlc59711(CHIPS_COUNT);
+    // Adafruit_TLC59711 tlc = Adafruit_TLC59711(CHIPS_COUNT);
+    Adafruit_TLC59711 tlc = Adafruit_TLC59711(60);
 
+    void tlc_test();
+    void setRGB(uint16_t idx, uint16_t r, uint16_t g, uint16_t b);
+    void setRGB(uint16_t r = 0, uint16_t g = 0, uint16_t b = 0);
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // constructor
+      // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      // constructor
 
-    MyLEDMatrix(uint8_t pin_output_enable_);
-    ~MyLEDMatrix();
+      MyLEDMatrix(uint8_t pin_output_enable_);
+      ~MyLEDMatrix();
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // public functions
+      // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      // public functions
 
-    // basic library api
-    void begin(Stream &out);
-    void update();
-    void end();
+      // basic library api
+      void begin(Stream & out);
+      void update();
+      void end();
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // pixel map
-    // LEDBoard_4x4_16bit mapping
+      // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      // pixel map
+      // LEDBoard_4x4_16bit mapping
 
-    uint16_t pmap[MATRIX_COL_COUNT][MATRIX_ROW_COUNT];
-    uint16_t pmap_layer[LAYER_COL_COUNT][LAYER_ROW_COUNT];
-    float layer_01_col[LAYER_COL_COUNT];
-    float layer_01_row[LAYER_ROW_COUNT];
+      uint16_t pmap[MATRIX_COL_COUNT][MATRIX_ROW_COUNT];
+      uint16_t pmap_layer[LAYER_COL_COUNT][LAYER_ROW_COUNT];
+      float layer_01_col[LAYER_COL_COUNT];
+      float layer_01_row[LAYER_ROW_COUNT];
 
-    uint8_t convert_layer2matrix_col(uint8_t col_i);
-    uint8_t convert_layer2matrix_row(uint8_t row_i);
+      uint8_t convert_layer2matrix_col(uint8_t col_i);
+      uint8_t convert_layer2matrix_row(uint8_t row_i);
 
-    void print_pmap(Print &out);
-    void print_2Dmatrix(Print &out);
-    void print_layermap(Print &out);
-    void print_info(Print &out, const char* pre);
+      void print_pmap(Print & out);
+      void print_2Dmatrix(Print & out);
+      void print_layermap(Print & out);
+      void print_info(Print & out, const char *pre);
 
-private:
+    private:
+      // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      // private functions
+      void tlc_init(Stream & out);
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // private functions
-    void tlc_init(Stream &out);
+      void pmap_init();
+      void pmap_layer_init();
+      uint16_t mymap_LEDBoard_4x4_16bit(uint8_t col, uint8_t row);
 
-    void pmap_init();
-    void pmap_layer_init();
-    uint16_t mymap_LEDBoard_4x4_16bit(uint8_t col, uint8_t row);
+      // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      // attributes
+      bool ready;
+      uint8_t pin_output_enable = false;
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // attributes
-    bool ready;
-    uint8_t pin_output_enable = false;
-
-};  // class MyLEDMatrix
+    }; // class MyLEDMatrix
 
 #endif  // ledmatrix_H_

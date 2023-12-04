@@ -40,8 +40,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ******************************************************************************/
 
-
-
 #ifndef SRC_ARDUINO_MYMENU_H_
 #define SRC_ARDUINO_MYMENU_H_
 
@@ -53,9 +51,8 @@ SOFTWARE.
 #include "./animation.h"
 #include "./myinput.h"
 
-
 class MyMenu {
- public:
+public:
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // defines
 
@@ -65,11 +62,8 @@ class MyMenu {
     // constructor
 
     // MyMenu();
-    MyMenu(
-        MyAnimation &animation,
-        MyInput &myinput,
-        const sketchinfo_func sketchinfo_print
-    );
+    MyMenu(MyAnimation &animation, MyInput &myinput,
+           const sketchinfo_func sketchinfo_print);
     ~MyMenu();
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,7 +74,6 @@ class MyMenu {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Debug Output
 
@@ -88,12 +81,11 @@ class MyMenu {
     const uint8_t infoled_pin = 13;
 
     uint32_t debugOut_LastAction = 0;
-    const uint16_t debugOut_interval = 1000; //ms
+    const uint16_t debugOut_interval = 1000; // ms
 
     boolean debugOut_Serial_Enabled = 1;
     boolean debugOut_LED_Enabled = 1;
     void debugOut_update();
-
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // attributes & objects
@@ -102,12 +94,12 @@ class MyMenu {
     void menu__print_help(Print &out);
     void handleMenu_Main(slight_DebugMenu *instance);
 
-    // slight_DebugMenu(Stream &in_ref, Print &out_ref, uint8_t input_length_new);
+    // slight_DebugMenu(Stream &in_ref, Print &out_ref, uint8_t
+    // input_length_new);
     slight_DebugMenu myDebugMenu;
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // public functions
-
 
     // menu & helper
 
@@ -120,7 +112,8 @@ class MyMenu {
     void menu__set_board_dotstar(Print &out, char *command);
     void menu__test_buffer(Print &out);
     void menu__time_meassurements(Print &out);
-
+    void menu__reboot_to_uf2(Print &out);
+    void reboot_to_uf2(void);
     void menu__set_overwrite_black(Print &out, char *command);
     void menu__set_overwrite_black_relative(Print &out, char *command);
     // void menu__set_hue(Print &out, char *command);
@@ -133,7 +126,7 @@ class MyMenu {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // helper
 
- private:
+private:
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // private functions
 
@@ -145,6 +138,6 @@ class MyMenu {
     bool ready;
     const sketchinfo_func sketchinfo_print;
 
-};  // class MyMenu
+}; // class MyMenu
 
-#endif  // SRC_ARDUINO_MYMENU_H_
+#endif // SRC_ARDUINO_MYMENU_H_

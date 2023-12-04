@@ -230,13 +230,13 @@ CHSV FXBase::get_pixel(__attribute__((unused)) PixelPos * pixel_pos) {
 //             CRGB pixel_rgb = hsv2rgb(pixel_hsv);
 //             // gamma & global brightness
 //             // fancyled.gamma_adjust(brightness=self.brightness);
-//             matrix.tlc.setRGB(
+//             matrix.setRGB(
 //                 matrix.pmap[col_i][row_i],
 //                 // convert float to uint16_t
 //                 pixel_rgb.r * 65535,
 //                 pixel_rgb.g * 65535,
 //                 pixel_rgb.b * 65535);
-//             // matrix.tlc.setRGB(
+//             // matrix.setRGB(
 //             //     matrix.pmap[col_i][row_i],
 //             //     10000,
 //             //     10000,
