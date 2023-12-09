@@ -93,13 +93,17 @@ void MyLEDMatrix::tlc_init(Stream &out) {
     pinMode(pin_output_enable, OUTPUT);
     out.println(F("    output_enable LOW"));
     digitalWrite(pin_output_enable, LOW);
-    delay(100);
-    out.println(F("    output_enable HIGH"));
-    digitalWrite(pin_output_enable, HIGH);
-
+    // delay(100);
     out.println(F("    tlc.begin()"));
     tlc.begin();
-    delay(100);
+    out.println(F("    set all black"));
+    setRGB();
+    out.println(F("    output_enable HIGH"));
+    digitalWrite(pin_output_enable, HIGH);
+    out.println(F("    write"));
+    tlc.write();
+
+    // delay(100);
     // out.println(F("    tlc.beginFast()"));
     // #if defined(ITSYBITSY_M4)
     //     tlc.beginFast(

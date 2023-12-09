@@ -12,7 +12,7 @@
 
     libraries used:
         ~ slight_DebugMenu
-        ~ slight_FaderLin
+        ~ slight_Fade
             written by stefan krueger (s-light),
             github@s-light.eu, http://s-light.eu, https://github.com/s-light/
             license: MIT
@@ -54,19 +54,22 @@ SOFTWARE.
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // functions
 
-MyAnimation::MyAnimation() { ready = false; }
+MyAnimation::MyAnimation(Stream& out_): out(out_) {
+    ready = false;
+}
 
 MyAnimation::~MyAnimation() { end(); }
 
-void MyAnimation::begin(Stream &out) {
+void MyAnimation::begin() {
     // clean up..
     end();
     // start up...
     if (ready == false) {
         // setup
         matrix.begin(out);
-        animation_init(out);
+        animation_init();
 
+        brightnessFader.fadeTo(brightness_min, 0);
         // enable
         ready = true;
     }
@@ -531,6 +534,7 @@ void MyAnimation::menu__set_brightness(Print &out, char *command) {
     out.print(value, 5);
     out.print(" --> ");
     value = set_brightness(value);
+    brightnessFader.fadeTo(value, 0);
     out.print(value, 5);
     out.println();
 }
@@ -539,18 +543,10 @@ void MyAnimation::menu__fade_brightness(Print &out, char *command) {
     out.print(F("fade brightness "));
     uint8_t command_offset = 1;
     float value = atof(&command[command_offset]);
-    out.print(value, 5);
-    out.print(" --> ");
+    out.println(value, 5);
     // out.print(value, 5);
     uint32_t duration = 2000; // ms
-    uint16_t target_value = map_range_01_to(value, 0, 65535);
-    out.print(target_value);
-    out.println();
-    // we have to manually set the *fader start values*..
-    uint16_t value_current = map_range_01_to(brightness, 0, 65535);
-    brightnessFader.startFadeTo(duration, target_value, value_current);
-    // values_current[0] = map_range_01_to(brightness, 0, 65535);
-    // brightnessFader.startFadeTo(duration, target_value);
+    brightnessFader.fadeTo(value, duration);
 }
 
 void MyAnimation::menu__test_colors(Print &out) {
@@ -578,26 +574,19 @@ void MyAnimation::menu__test_colors(Print &out) {
 // setter
 
 float MyAnimation::set_brightness(float brightness_) {
-    brightness = clamp(brightness_, static_cast<float>(0.0), brightness_max);
-    // if (brightness_ <= 0) {
-    //     brightness = 0;
-    // }
-    // if (brightness_ > brightness_max) {
-    //     brightness = brightness_max;
-    // } else {
-    //     brightness = brightness_;
-    // }
+    brightness = clamp(brightness_, brightness_min, brightness_max);
+
     return brightness;
 }
 
-void MyAnimation::brightnessFader_valuesChanged(slight_FaderLin *instance,
-                                                uint16_t *values, byte count) {
-    set_brightness(map_range_0n_to_01(values[0], 65535));
+void MyAnimation::brightnessFader_valueChanged(slight_Fade *instance,
+                                               float value) {
+    set_brightness(value);
 }
 
-void MyAnimation::brightnessFader_event(slight_FaderLin *instance) {
+void MyAnimation::brightnessFader_event(slight_Fade *instance) {
     switch (instance->getEventLast()) {
-    case slight_FaderLin::event_fading_Finished: {
+    case slight_Fade::event_fading_Finished: {
         // Serial.print(F("led on pin "));
         // Serial.print((*instance).getID());
         Serial.print(F("fading finished."));
@@ -635,7 +624,7 @@ void MyAnimation::start_loop_n_times(uint16_t count) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // animation
 
-void MyAnimation::animation_init(Stream &out) {
+void MyAnimation::animation_init() {
     out.println(F("init animation:"));
     {
         out.print(F("  effect_duration: "));
@@ -663,6 +652,10 @@ void MyAnimation::animation_init(Stream &out) {
         fx_wave->run(false);
 
         brightnessFader.begin();
+        brightnessFader.setDurationDefault(brightness_fade_duration);
+        out.print(F("  default brightness fade time: "));
+        out.print(brightness_fade_duration);
+        out.println(F("ms"));
     }
     out.println(F("  finished."));
 }
@@ -695,21 +688,21 @@ void MyAnimation::animation_reset() {
     float fps = effect_fps_loopcount / duration_seconds;
 
     // if (animation_run) {
-    //     Serial.print("millis():");
-    //     Serial.print(millis());
-    //     Serial.println();
-    //     Serial.print("effect_start:");
-    //     Serial.print(effect_start);
-    //     Serial.println();
-    //     Serial.print("duration_ms:");
-    //     Serial.print(duration_ms);
-    //     Serial.println();
-    //     Serial.print("duration_seconds:");
-    //     Serial.print(duration_seconds);
-    //     Serial.println();
-    //     Serial.print("effect_fps_loopcount:");
-    //     Serial.print(effect_fps_loopcount);
-    //     Serial.println();
+    //     out.print("millis():");
+    //     out.print(millis());
+    //     out.println();
+    //     out.print("effect_start:");
+    //     out.print(effect_start);
+    //     out.println();
+    //     out.print("duration_ms:");
+    //     out.print(duration_ms);
+    //     out.println();
+    //     out.print("duration_seconds:");
+    //     out.print(duration_seconds);
+    //     out.println();
+    //     out.print("effect_fps_loopcount:");
+    //     out.print(effect_fps_loopcount);
+    //     out.println();
     // }
 
     effect_fps_loopcount = 0;
@@ -717,12 +710,12 @@ void MyAnimation::animation_reset() {
     effect_end = micros() + (effect_duration * 1000);
 
     if (animation_run) {
-        Serial.print("----- effect_position loop restart (");
-        Serial.print(fps);
-        Serial.print("FPS)");
-        // Serial.print("   !!! millis() timming is off - ");
-        // Serial.print("so this calculation is currently wrong !!!");
-        Serial.println();
+        out.print("----- effect_position loop restart (");
+        out.print(fps);
+        out.print("FPS)");
+        // out.print("   !!! millis() timming is off - ");
+        // out.print("so this calculation is currently wrong !!!");
+        out.println();
     }
 }
 

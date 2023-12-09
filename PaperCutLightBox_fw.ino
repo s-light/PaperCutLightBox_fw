@@ -86,13 +86,16 @@
 #include "./src/animation.h"
 #include "./src/myinput.h"
 #include "./src/mymenu.h"
+#include "./src/powerhandling.h"
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // definitions (global)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-MyAnimation animation = MyAnimation();
+Stream &serialOut = Serial;
+
+MyAnimation animation = MyAnimation(serialOut);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Info
@@ -156,9 +159,9 @@ void sketchinfo_print(Print &out) {
 // definitions (global)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-MyInput myinput = MyInput(animation);
-MyMenu mymenu = MyMenu(animation, myinput, sketchinfo_print);
-
+PowerHandling powerhandling = PowerHandling(serialOut);
+MyInput myinput = MyInput(serialOut, animation, powerhandling);
+MyMenu mymenu = MyMenu(serialOut, animation, myinput, powerhandling, sketchinfo_print);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // ISR magic
@@ -194,19 +197,21 @@ void setup() {
         delay(1);
     }
 
-    Serial.println();
-    Serial.println();
-    Serial.println();
-    Serial.println();
-    Serial.println();
-    sketchinfo_print(Serial);
-    Serial.println();
+    serialOut.println();
+    serialOut.println();
+    serialOut.println();
+    serialOut.println();
+    serialOut.println();
+    sketchinfo_print(serialOut);
+    serialOut.println();
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // setup sub-Parts
-    animation.begin(Serial);
-    myinput.begin(Serial, myinput_myencoder_pin_changed_ISR);
-    mymenu.begin(Serial);
+    // TODO: change to out handling in class..
+    powerhandling.begin();
+    animation.begin();
+    myinput.begin(myinput_myencoder_pin_changed_ISR);
+    mymenu.begin();
 
     // debug output
     // animation.animation_run = false;
@@ -216,7 +221,7 @@ void setup() {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // go
-    Serial.println(F("wait 0.1s."));
+    serialOut.println(F("wait 0.1s."));
     delay(100);
     Serial.println(F("Loop:"));
 

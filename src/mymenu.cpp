@@ -49,31 +49,34 @@ SOFTWARE.
 // NOLINTNEXTLINE(build/include)
 #include "./mymenu.h"
 
-// include Core Arduino functionality
-// #include <Arduino.h>
-
-// #include <slight_DebugMenu.h>
-
-#include "esp_private/system_internal.h"
-
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // functions
 
-MyMenu::MyMenu(MyAnimation &animation, MyInput &myinput,
-               const sketchinfo_func sketchinfo_print)
-    : myDebugMenu{slight_DebugMenu(Serial, Serial, 20)}, animation(animation),
+MyMenu::MyMenu(
+    Stream& out_,
+    MyAnimation& animation,
+    MyInput& myinput,
+    PowerHandling& powerhandling,
+    const sketchinfo_func sketchinfo_print
+)
+    : myDebugMenu{slight_DebugMenu(Serial, Serial, 20)},
+      out(out_),
+      animation(animation),
       myinput(myinput),
+      powerhandling(powerhandling),
       //      ^ '(' needed. its a kind of bug in gcc..
       // https://stackoverflow.com/questions/10509603/why-cant-i-initialize-a-reference-in-an-initializer-list-with-uniform-initializ
       ready{false},
-      sketchinfo_print{sketchinfo_print} // NOLINTNEXTLINE(whitespace/braces)
+      sketchinfo_print{sketchinfo_print}  // NOLINTNEXTLINE(whitespace/braces)
 {
     // nothing to do right now..
 }
 
-MyMenu::~MyMenu() { end(); }
+MyMenu::~MyMenu() {
+    end();
+}
 
-void MyMenu::begin(Stream &out) {
+void MyMenu::begin() {
     // clean up..
     end();
     // start up...
@@ -88,7 +91,8 @@ void MyMenu::begin(Stream &out) {
 
         // out.println("  mydebugmenu.begin");
         myDebugMenu.set_callback(
-            std::bind(&MyMenu::handleMenu_Main, this, std::placeholders::_1));
+            std::bind(&MyMenu::handleMenu_Main, this, std::placeholders::_1)
+        );
         myDebugMenu.begin(true);
 
         out.println("done:");
@@ -119,9 +123,20 @@ void MyMenu::debugOut_update() {
         debugOut_LastAction = millis();
 
         if (debugOut_Serial_Enabled) {
-            Serial.print(millis());
-            Serial.print(F("ms;"));
-            Serial.println();
+            // out.print(millis());
+            // out.print(F("ms; "));
+            // Serial.println();
+
+            out.printf(
+                "%8dms   "
+                "batt: %3.0f%% (%.3fV)",
+                // "\r\n",
+                millis(),
+                powerhandling.batteryMonitor.cellPercent(),
+                powerhandling.batteryMonitor.cellVoltage()
+            );
+            out.println();
+
             // print time
             // this output needs about ~1.7ms on ESP32 with 240MHz clock..
             // uint16_t ms = millis() % 1000;
@@ -146,12 +161,12 @@ void MyMenu::debugOut_update() {
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // menu
 
-void MyMenu::menu__test_xxx(Print &out) {
+void MyMenu::menu__test_xxx(Print& out) {
     out.println(F("TODO"));
     out.println();
 }
 
-void MyMenu::menu__set_yyy(Print &out, char *command) {
+void MyMenu::menu__set_yyy(Print& out, char* command) {
     out.println(F("Set yyy "));
     out.println(F("TODO"));
 
@@ -173,7 +188,7 @@ void MyMenu::menu__set_yyy(Print &out, char *command) {
     out.println();
 }
 
-void MyMenu::menu__set_pixel(Print &out, char *command) {
+void MyMenu::menu__set_pixel(Print& out, char* command) {
     out.print(F("Set pixel "));
     uint8_t command_offset = 1;
     uint8_t index = atoi(&command[command_offset]);
@@ -192,9 +207,9 @@ void MyMenu::menu__set_pixel(Print &out, char *command) {
     out.println();
 }
 
-void MyMenu::menu__set_board_dotstar(Print &out, char *command) {
+void MyMenu::menu__set_board_dotstar(Print& out, char* command) {
     out.print(F("Set board_dotstar: "));
-    char *command_offset = command;
+    char* command_offset = command;
     uint8_t red = atoi(command_offset);
     command_offset = strchr(command_offset, ',');
     uint8_t green = atoi(command_offset + 1);
@@ -212,12 +227,12 @@ void MyMenu::menu__set_board_dotstar(Print &out, char *command) {
     out.println();
 }
 
-void MyMenu::menu__reboot_to_uf2(Print &out) {
+void MyMenu::menu__reboot_to_uf2(Print& out) {
     out.println(F("reset to uf2.."));
     reboot_to_uf2();
 }
 
-void MyMenu::menu__time_meassurements(Print &out) {
+void MyMenu::menu__time_meassurements(Print& out) {
     out.println(F("time_meassurements:"));
 
     uint32_t tm_start = 0;
@@ -250,13 +265,15 @@ void MyMenu::menu__time_meassurements(Print &out) {
 void MyMenu::reboot_to_uf2(void) {
     // https://github.com/adafruit/tinyuf2/blob/8a54e0ed4c3373765903ca6d80eeb54dbcfc54d5/ports/esp32s2/README.md#usage
     // Check out esp_reset_reason_t for other Espressif pre-defined values
-    enum { APP_REQUEST_UF2_RESET_HINT = 0x11F2 };
+    enum {
+        APP_REQUEST_UF2_RESET_HINT = 0x11F2
+    };
 
     // call esp_reset_reason() is required for idf.py to properly links
     // esp_reset_reason_set_hint()
     (void)esp_reset_reason();
-    esp_reset_reason_set_hint(
-        static_cast<esp_reset_reason_t>(APP_REQUEST_UF2_RESET_HINT));
+    esp_reset_reason_set_hint(static_cast<esp_reset_reason_t>(APP_REQUEST_UF2_RESET_HINT
+    ));
     esp_restart();
 }
 
@@ -327,7 +344,7 @@ void MyMenu::reboot_to_uf2(void) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Menu System
 
-void MyMenu::tests(Print &out) {
+void MyMenu::tests(Print& out) {
     out.println(F("__________"));
     out.println(F("Tests:"));
     // out.println(F("nothing to do."));
@@ -336,7 +353,7 @@ void MyMenu::tests(Print &out) {
     out.println(F("__________"));
 }
 
-void MyMenu::menu__print_help(Print &out) {
+void MyMenu::menu__print_help(Print& out) {
     // help
     out.println(F("__________________________________________________"));
     out.println();
@@ -360,7 +377,7 @@ void MyMenu::menu__print_help(Print &out) {
     out.print(animation.fx_wave->get_loopcount());
     out.println(F(")"));
     out.print(F("\t 'k': set fx_points point_count 'k10' ("));
-    out.print(static_cast<FXPoints *>(animation.fx_points)->point_count);
+    out.print(static_cast<FXPoints*>(animation.fx_points)->point_count);
     out.println(F(")"));
     out.print(F("\t 'd': set effect_duration 'd1000' ("));
     out.print(animation.effect_duration);
@@ -375,6 +392,9 @@ void MyMenu::menu__print_help(Print &out) {
     out.print(animation.contrast, 4);
     out.println(F(")"));
     out.print(F("\t 'b': set brightness 'b1.0' ("));
+    out.print(animation.brightness, 5);
+    out.println(F(")"));
+    out.print(F("\t 'B': fade brightness 'B1.0' ("));
     out.print(animation.brightness, 5);
     out.println(F(")"));
     out.print(F("\t 'f': set fps 'f500' ("));
@@ -416,214 +436,222 @@ void MyMenu::menu__print_help(Print &out) {
     // out.println(F(")"));
     // out.println(F("\t 'q': test light_map 'q1.0"));
     out.println();
+    out.println(F("\t '#': powerhandling: deep sleep '#'"));
     out.println(F("\t '$': reboot_to_uf2 '$'"));
+    out.println(F("\t '<': print battery state '<'"));
     out.println();
     out.println(F("__________________________________________________"));
 }
 
 // Main Menu
-void MyMenu::handleMenu_Main(slight_DebugMenu *instance) {
-    Print &out = instance->get_stream_out_ref();
-    char *command = instance->get_command_current_pointer();
+void MyMenu::handleMenu_Main(slight_DebugMenu* instance) {
+    Print& out = instance->get_stream_out_ref();
+    char* command = instance->get_command_current_pointer();
     // out.print("command: '");
     // out.print(command);
     // out.println("'");
     switch (command[0]) {
-    // case 'h':
-    // case 'H':
-    case '?': {
-        menu__print_help(out);
-    } break;
-    case '!': {
-        sketchinfo_print(out);
-    } break;
-    case 'y': {
-        out.println(F("\t toggle DebugOut livesign Serial:"));
-        debugOut_Serial_Enabled = !debugOut_Serial_Enabled;
-        out.print(F("\t debugOut_Serial_Enabled:"));
-        out.println(debugOut_Serial_Enabled);
-    } break;
-    case 'Y': {
-        out.println(F("\t toggle DebugOut livesign LED:"));
-        debugOut_LED_Enabled = !debugOut_LED_Enabled;
-        out.print(F("\t debugOut_LED_Enabled:"));
-        out.println(debugOut_LED_Enabled);
-    } break;
-    case 'x': {
-        tests(out);
-    } break;
-    // ---------------------
-    case 'r': {
-        out.println(F("toggle animation_run"));
-        animation.animation_run = !animation.animation_run;
-    } break;
-    case 'L': {
-        animation.menu__start_loop_n_times(out, command);
-    } break;
-    case 'k': {
-        out.println(F("set point_count:"));
-        uint8_t value = atoi(&command[1]);
-        out.print(value);
-        static_cast<FXPoints *>(animation.fx_points)->point_count = value;
-        out.println();
-    } break;
-    case 'j': {
-        out.println(F("fx_wave start_singleshot"));
-        // set to 1s
-        animation.fx_wave->duration = 1000;
-        animation.fx_wave->start_singleshot();
-    } break;
-    case 'J': {
-        out.println(F("fx_wave start loop n-times:"));
-        uint8_t value = atoi(&command[1]);
-        out.print(value);
-        animation.fx_wave->start_loop_n_times(value);
-        out.println();
-    } break;
-    case 'd': {
-        out.println(F("set effect_duration:"));
-        uint16_t value = atoi(&command[1]);
-        out.print(value);
-        animation.effect_duration = value;
-        out.println();
-    } break;
-    case 'h': {
-        animation.menu__set_hue(out, command);
-    } break;
-    case 's': {
-        animation.menu__set_saturation(out, command);
-    } break;
-    case 'c': {
-        animation.menu__set_contrast(out, command);
-    } break;
-    case 'b': {
-        animation.menu__set_brightness(out, command);
-    } break;
-    case 'B': {
-        animation.menu__fade_brightness(out, command);
-    } break;
-    case 'f': {
-        animation.menu__set_fps(out, command);
-    } break;
-    // ---------------------
-    case 'u': {
-        out.println(F("write buffer to chips"));
-        animation.matrix.tlc.write();
-    } break;
-    // case 'e': {
-    //     out.println(F("toggle ESPWM"));
-    //     animation.matrix.tlc.set_fc_ESPWM_all(!animation.matrix.tlc.get_fc_ESPWM());
-    //     animation.matrix.tlc.update_fc();
-    // } break;
-    // case 'g': {
-    //     out.print(F("set grayscale frequency - new value:"));
-    //     float value = atof(&command[1]);
-    //     out.print(value);
-    //     value = animation.gsclock_set_frequency_MHz(value);
-    //     out.print(F(" → "));
-    //     out.print(value, 4);
-    //     out.println(F("MHz"));
-    // } break;
-    // case 's': {
-    //     out.print(F("set spi baudrate in MHz - new value:"));
-    //     float value = atof(&command[1]);
-    //     out.print(value, 4);
-    //     out.println(F("MHz"));
-    //     animation.matrix.tlc.spi_baudrate = value * 1000 * 1000;
-    //     // out.print(F(" → "));
-    //     // out.print(animation.matrix.tlc.spi_baudrate);
-    //     // out.println();
-    // } break;
-    // case 't': {
-    //     animation.menu__test_buffer(out);
-    // } break;
-    case 'T': {
-        animation.menu__time_meassurements(out);
-    } break;
-    case 'l': {
-        animation.menu__set_layer(out, command);
-        animation.matrix.tlc.write();
-    } break;
-    case 'p': {
-        animation.menu__set_pixel_layer(out, command);
-        animation.matrix.tlc.write();
-    } break;
-    case 'P': {
-        animation.menu__set_pixel(out, command);
-        // animation.menu__set_pixel_index(out, command);
-        animation.matrix.tlc.write();
-    } break;
-    case 'z': {
-        out.println(F("Set all Pixel to black."));
-        animation.matrix.setRGB(0, 0, 0);
-        animation.matrix.tlc.write();
-        out.println();
-    } break;
-    case 'Z': {
-        animation.menu__set_all_pixel(out, command);
-        animation.matrix.tlc.write();
-    } break;
-    case 'q': {
-        animation.matrix.print_pmap(out);
-    } break;
-    case 'Q': {
-        // animation.matrix.print_2Dmatrix(out);
-        animation.matrix.print_layermap(out);
-    } break;
-    // case 'Z': {
-    //     out.println(F("Set all Pixel to 21845."));
-    //     animation.matrix.setRGB(21845, 21845, 21845);
-    //     out.println();
-    // } break;
-    // case 'B': {
-    //     out.println(F("Print Buffer:"));
-    //     animation.matrix.print_tlc_buffer(out);
-    //     out.println();
-    // } break;
-    // case 'F': {
-    //     out.println(F("Print buffer_fc:"));
-    //     animation.matrix.tlc.print_buffer_fc(out);
-    //     out.println();
-    // } break;
-    //---------------------------------------------------------------------
-    // case 'a': {
-    //     out.println(F("Print ambient light sensor:"));
-    //     // myinput.als.print_status(out);
-    //     myinput.als_debugout(out);
-    //     out.println();
-    // } break;
-    // case 'A': {
-    //     out.println(F("toggle als_debugout_enabled:"));
-    //     myinput.als_debugout_enabled = !myinput.als_debugout_enabled;
-    // } break;
-    // case 'B': {
-    //     out.println(F("toggle als_sets_brightness:"));
-    //     myinput.als_sets_brightness = !myinput.als_sets_brightness;
-    // } break;
-    // case 'q': {
-    //     out.println(F("test light_map:"));
-    //     uint8_t command_offset = 1;
-    //     float value = atof(&command[command_offset]);
-    //     out.print(value, 5);
-    //     out.print(" -> ");
-    //     out.print(myinput.light_map.mapit(value), 5);
-    //     out.println();
-    // } break;
-    //---------------------------------------------------------------------
-    case '$': {
-        menu__reboot_to_uf2(out);
-    } break;
-    //---------------------------------------------------------------------
-    default: {
-        if (strlen(command) > 0) {
-            out.print(F("command '"));
-            out.print(command);
-            out.println(F("' not recognized. try again."));
+        // case 'h':
+        // case 'H':
+        case '?': {
+            menu__print_help(out);
+        } break;
+        case '!': {
+            sketchinfo_print(out);
+        } break;
+        case 'y': {
+            out.println(F("\t toggle DebugOut livesign Serial:"));
+            debugOut_Serial_Enabled = !debugOut_Serial_Enabled;
+            out.print(F("\t debugOut_Serial_Enabled:"));
+            out.println(debugOut_Serial_Enabled);
+        } break;
+        case 'Y': {
+            out.println(F("\t toggle DebugOut livesign LED:"));
+            debugOut_LED_Enabled = !debugOut_LED_Enabled;
+            out.print(F("\t debugOut_LED_Enabled:"));
+            out.println(debugOut_LED_Enabled);
+        } break;
+        case 'x': {
+            tests(out);
+        } break;
+        // ---------------------
+        case 'r': {
+            out.println(F("toggle animation_run"));
+            animation.animation_run = !animation.animation_run;
+        } break;
+        case 'L': {
+            animation.menu__start_loop_n_times(out, command);
+        } break;
+        case 'k': {
+            out.println(F("set point_count:"));
+            uint8_t value = atoi(&command[1]);
+            out.print(value);
+            static_cast<FXPoints*>(animation.fx_points)->point_count = value;
+            out.println();
+        } break;
+        case 'j': {
+            out.println(F("fx_wave start_singleshot"));
+            // set to 1s
+            animation.fx_wave->duration = 1000;
+            animation.fx_wave->start_singleshot();
+        } break;
+        case 'J': {
+            out.println(F("fx_wave start loop n-times:"));
+            uint8_t value = atoi(&command[1]);
+            out.print(value);
+            animation.fx_wave->start_loop_n_times(value);
+            out.println();
+        } break;
+        case 'd': {
+            out.println(F("set effect_duration:"));
+            uint16_t value = atoi(&command[1]);
+            out.print(value);
+            animation.effect_duration = value;
+            out.println();
+        } break;
+        case 'h': {
+            animation.menu__set_hue(out, command);
+        } break;
+        case 's': {
+            animation.menu__set_saturation(out, command);
+        } break;
+        case 'c': {
+            animation.menu__set_contrast(out, command);
+        } break;
+        case 'b': {
+            animation.menu__set_brightness(out, command);
+        } break;
+        case 'B': {
+            animation.menu__fade_brightness(out, command);
+        } break;
+        case 'f': {
+            animation.menu__set_fps(out, command);
+        } break;
+        // ---------------------
+        case 'u': {
+            out.println(F("write buffer to chips"));
+            animation.matrix.tlc.write();
+        } break;
+        // case 'e': {
+        //     out.println(F("toggle ESPWM"));
+        //     animation.matrix.tlc.set_fc_ESPWM_all(!animation.matrix.tlc.get_fc_ESPWM());
+        //     animation.matrix.tlc.update_fc();
+        // } break;
+        // case 'g': {
+        //     out.print(F("set grayscale frequency - new value:"));
+        //     float value = atof(&command[1]);
+        //     out.print(value);
+        //     value = animation.gsclock_set_frequency_MHz(value);
+        //     out.print(F(" → "));
+        //     out.print(value, 4);
+        //     out.println(F("MHz"));
+        // } break;
+        // case 's': {
+        //     out.print(F("set spi baudrate in MHz - new value:"));
+        //     float value = atof(&command[1]);
+        //     out.print(value, 4);
+        //     out.println(F("MHz"));
+        //     animation.matrix.tlc.spi_baudrate = value * 1000 * 1000;
+        //     // out.print(F(" → "));
+        //     // out.print(animation.matrix.tlc.spi_baudrate);
+        //     // out.println();
+        // } break;
+        // case 't': {
+        //     animation.menu__test_buffer(out);
+        // } break;
+        case 'T': {
+            animation.menu__time_meassurements(out);
+        } break;
+        case 'l': {
+            animation.menu__set_layer(out, command);
+            animation.matrix.tlc.write();
+        } break;
+        case 'p': {
+            animation.menu__set_pixel_layer(out, command);
+            animation.matrix.tlc.write();
+        } break;
+        case 'P': {
+            animation.menu__set_pixel(out, command);
+            // animation.menu__set_pixel_index(out, command);
+            animation.matrix.tlc.write();
+        } break;
+        case 'z': {
+            out.println(F("Set all Pixel to black."));
+            animation.matrix.setRGB(0, 0, 0);
+            animation.matrix.tlc.write();
+            out.println();
+        } break;
+        case 'Z': {
+            animation.menu__set_all_pixel(out, command);
+            animation.matrix.tlc.write();
+        } break;
+        case 'q': {
+            animation.matrix.print_pmap(out);
+        } break;
+        case 'Q': {
+            // animation.matrix.print_2Dmatrix(out);
+            animation.matrix.print_layermap(out);
+        } break;
+        // case 'Z': {
+        //     out.println(F("Set all Pixel to 21845."));
+        //     animation.matrix.setRGB(21845, 21845, 21845);
+        //     out.println();
+        // } break;
+        // case 'B': {
+        //     out.println(F("Print Buffer:"));
+        //     animation.matrix.print_tlc_buffer(out);
+        //     out.println();
+        // } break;
+        // case 'F': {
+        //     out.println(F("Print buffer_fc:"));
+        //     animation.matrix.tlc.print_buffer_fc(out);
+        //     out.println();
+        // } break;
+        //---------------------------------------------------------------------
+        // case 'a': {
+        //     out.println(F("Print ambient light sensor:"));
+        //     // myinput.als.print_status(out);
+        //     myinput.als_debugout(out);
+        //     out.println();
+        // } break;
+        // case 'A': {
+        //     out.println(F("toggle als_debugout_enabled:"));
+        //     myinput.als_debugout_enabled = !myinput.als_debugout_enabled;
+        // } break;
+        // case 'B': {
+        //     out.println(F("toggle als_sets_brightness:"));
+        //     myinput.als_sets_brightness = !myinput.als_sets_brightness;
+        // } break;
+        // case 'q': {
+        //     out.println(F("test light_map:"));
+        //     uint8_t command_offset = 1;
+        //     float value = atof(&command[command_offset]);
+        //     out.print(value, 5);
+        //     out.print(" -> ");
+        //     out.print(myinput.light_map.mapit(value), 5);
+        //     out.println();
+        // } break;
+        //---------------------------------------------------------------------
+        case '#': {
+            powerhandling.enter_sleep_mode();
+        } break;
+        case '$': {
+            menu__reboot_to_uf2(out);
+        } break;
+        case '<': {
+            powerhandling.print_battery_state();
+        } break;
+        //---------------------------------------------------------------------
+        default: {
+            if (strlen(command) > 0) {
+                out.print(F("command '"));
+                out.print(command);
+                out.println(F("' not recognized. try again."));
+            }
+            instance->get_command_input_pointer()[0] = '?';
+            instance->set_flag_EOC(true);
         }
-        instance->get_command_input_pointer()[0] = '?';
-        instance->set_flag_EOC(true);
-    }
-    } // end switch
+    }  // end switch
 
     // end Command Parser
 }

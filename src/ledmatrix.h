@@ -208,8 +208,8 @@ public:
     // slight_TLC5957 tlc = slight_TLC5957(MATRIX_PIXEL_COUNT, 7);
     // Tlc59711 tlc(CHIPS_COUNT);
     // Tlc59711 tlc = Tlc59711(CHIPS_COUNT);
-    // Adafruit_TLC59711 tlc = Adafruit_TLC59711(CHIPS_COUNT);
-    Adafruit_TLC59711 tlc = Adafruit_TLC59711(60);
+    Adafruit_TLC59711 tlc = Adafruit_TLC59711(CHIPS_COUNT);
+    // Adafruit_TLC59711 tlc = Adafruit_TLC59711(60);
 
     void tlc_test();
     void setRGB(uint16_t idx, uint16_t r, uint16_t g, uint16_t b);

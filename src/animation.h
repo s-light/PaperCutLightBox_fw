@@ -10,7 +10,7 @@
 
     libraries used:
         ~ slight_DebugMenu
-        ~ slight_FaderLin
+        ~ slight_Fade
         ~ slight_TLC5957
             written by stefan krueger (s-light),
                 github@s-light.eu, http://s-light.eu,
@@ -51,7 +51,8 @@ SOFTWARE.
 #include <Arduino.h>
 
 #include <slight_DebugMenu.h>
-#include <slight_FaderLin.h>
+#include <slight_Fade.h>
+#include <slight_ButtonInput.h>
 
 #include "./color.h"
 #include "./easing.h"
@@ -112,47 +113,47 @@ public:
     // otherwise the newly created class is *sliced*
     // and only the parts of the base class is available...
     // FXBase * fx_base = new FXBase();
-    FXBase *fx_shadowland = new FXShadowland();
-    FXBase *fx_line = new FXLine();
+    FXBase* fx_shadowland = new FXShadowland();
+    FXBase* fx_line = new FXLine();
     // FXBase * fx_rainbow = new FXRainbow();
     // FXBase * fx_sparkle = new FXSparkle();
-    FXBase *fx_plasma = new FXPlasma();
-    FXBase *fx_wave = new FXWave();
-    FXBase *fx_points = new FXPoints();
+    FXBase* fx_plasma = new FXPlasma();
+    FXBase* fx_wave = new FXWave();
+    FXBase* fx_points = new FXPoints();
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // constructor
 
-    MyAnimation();
+    MyAnimation(Stream& out_);
     ~MyAnimation();
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // public functions
 
     // basic library api
-    void begin(Stream &out);
+    void begin();
     void update();
     void end();
 
     // menu & helper
-    void menu__set_fps(Print &out, char *command);
-    void menu__start_loop_n_times(Print &out, char *command);
+    void menu__set_fps(Print& out, char* command);
+    void menu__start_loop_n_times(Print& out, char* command);
 
-    void menu__set_layer(Print &out, char *command);
-    void menu__set_pixel_index(Print &out, char *command);
-    void menu__set_pixel(Print &out, char *command);
-    void menu__set_pixel_layer(Print &out, char *command);
-    void menu__set_all_pixel(Print &out, char *command);
-    void menu__test_buffer(Print &out);
-    void menu__time_meassurements(Print &out);
+    void menu__set_layer(Print& out, char* command);
+    void menu__set_pixel_index(Print& out, char* command);
+    void menu__set_pixel(Print& out, char* command);
+    void menu__set_pixel_layer(Print& out, char* command);
+    void menu__set_all_pixel(Print& out, char* command);
+    void menu__test_buffer(Print& out);
+    void menu__time_meassurements(Print& out);
 
-    void menu__set_hue(Print &out, char *command);
-    void menu__set_saturation(Print &out, char *command);
-    void menu__set_contrast(Print &out, char *command);
-    void menu__set_brightness(Print &out, char *command);
-    void menu__fade_brightness(Print &out, char *command);
+    void menu__set_hue(Print& out, char* command);
+    void menu__set_saturation(Print& out, char* command);
+    void menu__set_contrast(Print& out, char* command);
+    void menu__set_brightness(Print& out, char* command);
+    void menu__fade_brightness(Print& out, char* command);
 
-    void menu__test_colors(Print &out);
+    void menu__test_colors(Print& out);
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // helper
@@ -170,9 +171,9 @@ public:
     bool animation_run = true;
     uint16_t animation_loopcount = 0;
 
-    uint16_t effect_duration = 3 * 1000; // ms
+    uint16_t effect_duration = 3 * 1000;  // ms
 
-    uint16_t brightness_fade_duration = 10 * 1000; // ms
+    uint16_t brightness_fade_duration = 10 * 1000;  // ms
 
     // lounge blue - night
     // float hue = 0.7;
@@ -183,21 +184,36 @@ public:
     float hue = 0.05;
     float saturation = 1.0;
     float contrast = 1.0;
-    float brightness = 0.006;
+    float brightness = brightness_min;
     // float brightness = 0.1;
     // const float brightness_max = 0.37;
+    const float brightness_min = 0.0001;
     const float brightness_max = 1.0;
     const uint16_t brightness_max_i = 25000;
 
     // const float PI = 3.141592;
     // is already defined by arduino or some other defaults...
+    slight_Fade brightnessFader = slight_Fade(
+        // uint8_t id_new
+        0,
+        // value changed
+        // https://stackoverflow.com/questions/14189440/c-callback-using-class-member#comment110410484_14189561
+        std::bind(
+            &MyAnimation::brightnessFader_valueChanged,
+            this,
+            std::placeholders::_1,
+            std::placeholders::_2
+        ),
+        // event
+        std::bind(&MyAnimation::brightnessFader_event, this, std::placeholders::_1)
+    );
 
 private:
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // private functions
 
     // animation
-    void animation_init(Stream &out);
+    void animation_init();
     void animation_update();
     void calculate_effect_position();
     void set_effect_position(float position);
@@ -206,12 +222,12 @@ private:
     void effect__pixel_checker();
     void effect__line();
 
-    PixelPos *pixel_pos = new PixelPos();
+    PixelPos* pixel_pos = new PixelPos();
     // ^ used by effect_Matrix2D -
     // defined globally maybe for performance reasons.
     // (test did not show difference.)
     void effect_Matrix2D();
-    CHSV effect_Matrix2D_get_pixel(__attribute__((unused)) PixelPos *pixel_pos);
+    CHSV effect_Matrix2D_get_pixel(__attribute__((unused)) PixelPos* pixel_pos);
     // CHSV effect_Matrix2D_get_pixel(float col, float row, float offset);
     // CHSV effect_Matrix2D_get_pixel(
     //     float col, float row,
@@ -222,6 +238,7 @@ private:
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // attributes
     bool ready;
+    Stream& out;
 
     uint32_t effect_start = 0;
     uint32_t effect_end = 0;
@@ -235,25 +252,9 @@ private:
     uint32_t effect_update_last_us = 0;
     uint32_t effect_update_delay_us = 100;
 
-    void brightnessFader_valuesChanged(slight_FaderLin *instance,
-                                       uint16_t *values, uint8_t count);
-    void brightnessFader_event(slight_FaderLin *instance);
-    // uint16_t *values_current;
-    slight_FaderLin brightnessFader = slight_FaderLin(
-        // uint8_t id_new
-        LED_BUILTIN,
-        // uint8_t count,
-        1,
-        // values changed
-        // https://stackoverflow.com/questions/14189440/c-callback-using-class-member#comment110410484_14189561
-        std::bind(&MyAnimation::brightnessFader_valuesChanged, this,
-                  std::placeholders::_1, std::placeholders::_2,
-                  std::placeholders::_3),
-        // event
-        std::bind(&MyAnimation::brightnessFader_event, this,
-                  std::placeholders::_1));
-        // values_current);
+    void brightnessFader_valueChanged(slight_Fade* instance, float value);
+    void brightnessFader_event(slight_Fade* instance);
 
-}; // class MyAnimation
+};  // class MyAnimation
 
-#endif // MyAnimation_H_
+#endif  // MyAnimation_H_

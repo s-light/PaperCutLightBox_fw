@@ -13,8 +13,8 @@
         ~ slight_ButtonInput
         ~ slight_DebugMenu
             written by stefan krueger (s-light),
-                github@s-light.eu, http://s-light.eu, https://github.com/s-light/
-            license: MIT
+                github@s-light.eu, http://s-light.eu,
+https://github.com/s-light/ license: MIT
 
     written by stefan krueger (s-light),
         github@s-light.eu, http://s-light.eu, https://github.com/s-light/
@@ -49,7 +49,6 @@ SOFTWARE.
 // NOLINTNEXTLINE(readability/nolint)
 // https://github.com/google/styleguide/blob/gh-pages/cpplint/cpplint.py
 
-
 // include own headerfile
 // NOLINTNEXTLINE(build/include)
 #include "./myinput.h"
@@ -67,21 +66,19 @@ SOFTWARE.
 //
 // #include <slight_ButtonInput.h>
 
-
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // functions
 
 // MyInput::MyInput(button):
 // ) {
 
-MyInput::MyInput(
-    MyAnimation &animation
-):
-    animation(animation),
-    //       ^ '(' needed. its a bug in gcc..
-    // https://stackoverflow.com/questions/10509603/why-cant-i-initialize-a-reference-in-an-initializer-list-with-uniform-initializ
-    ready{false}
-// NOLINTNEXTLINE(whitespace/braces)
+MyInput::MyInput(Stream& out_, MyAnimation& animation, PowerHandling& powerhandling)
+    : out(out_),
+      animation(animation),
+      powerhandling(powerhandling),
+      //       ^ '(' needed. its a bug in gcc..
+      // https://stackoverflow.com/questions/10509603/why-cant-i-initialize-a-reference-in-an-initializer-list-with-uniform-initializ
+      ready{false}  // NOLINTNEXTLINE(whitespace/braces)
 {
     // nothing to do right now..
 }
@@ -90,11 +87,7 @@ MyInput::~MyInput() {
     end();
 }
 
-
-void MyInput::begin(
-    Stream &out,
-    slight_RotaryEncoder::tCallbackFunctionISR func_ISR
-) {
+void MyInput::begin(slight_RotaryEncoder::tCallbackFunctionISR func_ISR) {
     // clean up..
     end();
 
@@ -136,35 +129,34 @@ void MyInput::end() {
 void MyInput::update() {
     if (ready) {
         // do it :-)
-        // als_update(Serial);
-        // Serial.println("button.");
-        mybutton.update();
+        // als_update(out);
+        // out.println("button.");
+        for (size_t i = 0; i < UIButton_count; i++) {
+            mybuttons[i].update();
+        }
         myencoder.update();
         // if (counter != counter_last) {
         //     counter_last = counter;
-        //     Serial.print("counter changed: ");
-        //     Serial.print(counter);
-        //     Serial.println();
+        //     out.print("counter changed: ");
+        //     out.print(counter);
+        //     out.println();
         //     animation.brightness = map_range(counter, 0, 500, 0.0, 1.0);
         // }
 
-        // Serial.println("update.");
+        // out.println("update.");
         // delay(100);
     }
 }
-
-
-
-
+//
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // menu
 
-void MyInput::menu__test_xxx(Print &out) {
+void MyInput::menu__test_xxx(Print& out) {
     out.println(F("TODO"));
     out.println();
 }
 
-void MyInput::menu__set_yyy(Print &out, char *command) {
+void MyInput::menu__set_yyy(Print& out, char* command) {
     out.println(F("Set yyy "));
     out.println(F("TODO"));
 
@@ -176,7 +168,7 @@ void MyInput::menu__set_yyy(Print &out, char *command) {
     // was something with 'tokenize' or similar..
     command_offset = 3;
     if (index > 9) {
-        command_offset = command_offset +1;
+        command_offset = command_offset + 1;
     }
     out.print(index);
     out.print(F(" to "));
@@ -186,8 +178,7 @@ void MyInput::menu__set_yyy(Print &out, char *command) {
     out.println();
 }
 
-
-void MyInput::menu__set_test_token(Print &out, char *command) {
+void MyInput::menu__set_test_token(Print& out, char* command) {
     out.println(F("Set yyy "));
     out.println(F("TODO"));
 
@@ -206,8 +197,6 @@ void MyInput::menu__set_test_token(Print &out, char *command) {
     // out.print(F("\t bPWM: "));
     // out.println(bPWM);
 
-
-
     out.print(F("Set yyy "));
     uint8_t command_offset = 1;
     uint8_t index = atoi(&command[command_offset]);
@@ -216,7 +205,7 @@ void MyInput::menu__set_test_token(Print &out, char *command) {
     // was something with 'tokenize' or similar..
     command_offset = 3;
     if (index > 9) {
-        command_offset = command_offset +1;
+        command_offset = command_offset + 1;
     }
     out.print(index);
     out.print(F(" to "));
@@ -225,8 +214,6 @@ void MyInput::menu__set_test_token(Print &out, char *command) {
     // tlc.set_pixel_16bit_value(index, value, value, value);
     out.println();
 }
-
-
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // ambientlight sensor
@@ -348,81 +335,123 @@ void MyInput::menu__set_test_token(Print &out, char *command) {
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // button
 
-void MyInput::button_init(Stream &out) {
+void MyInput::button_init(Stream& out) {
     out.println(F("setup button input:"));
-    out.println(F("  set pinMode INPUT_PULLUP"));
-    pinMode(mybutton.pin, INPUT_PULLUP);
-    out.println(F("  mybutton.begin()"));
-    mybutton.begin();
-    out.println(F("  flag_filter_multi_click_events true"));
-    mybutton.flag_filter_multi_click_events = true;
+    for (size_t i = 0; i < UIButton_count; i++) {
+        out.print(F("  button "));
+        out.print(UIButton_names(static_cast<UIButton>(mybuttons[i].id)));
+        out.print(F(" on pin "));
+        out.println(mybuttons[i].pin);
+        pinMode(mybuttons[i].pin, INPUT_PULLUP);
+        mybuttons[i].begin();
+        mybuttons[i].flag_filter_multi_click_events = true;
+    }
     out.println(F("  finished."));
 }
 
-
-boolean MyInput::mybutton_get_input(slight_ButtonInput *instance) {
+boolean MyInput::mybutton_get_input(slight_ButtonInput* instance) {
     // read input + invert: button closes to GND.
     return !digitalRead((*instance).pin);
 }
 
-void MyInput::mybutton_event(slight_ButtonInput *instance) {
-    // Serial.print(F("instance:"));
-    // Serial.print((*instance).id);
-    // Serial.print(F(" - event: "));
-    // (*instance).printEventLast(Serial);
-    // Serial.println();
+void MyInput::mybutton_event(slight_ButtonInput* instance) {
+    out.print(F("instance:"));
+    out.print((*instance).id);
+    out.print(F(" - event: "));
+    (*instance).printEventLast(out);
+    out.println();
 
-    // react on event
     switch ((*instance).getEventLast()) {
-        case slight_ButtonInput::event_down : {
-            // Serial.println(F("down"));
-        } break;
-        case slight_ButtonInput::event_holddown : {
-            Serial.print(F("duration active: "));
-            Serial.println((*instance).getDurationActive());
-        } break;
-        case slight_ButtonInput::event_up : {
-            // Serial.println(F("up"));
-        } break;
-        case slight_ButtonInput::event_click : {
-            Serial.println(F("click"));
-            animation.set_brightness(0.001);
-            Serial.print(F("  animation.brightness: "));
-            Serial.println(animation.brightness, 4);
-        } break;
-        case slight_ButtonInput::event_click_long : {
-            Serial.print(F("click long "));
-            Serial.println((*instance).getDurationActive());
-            encoder_mode_brightness = !encoder_mode_brightness;
-            Serial.print(F("  encoder_mode_brightness: "));
-            Serial.println(encoder_mode_brightness);
-        } break;
-        case slight_ButtonInput::event_click_double: {
-            Serial.println(F("click double"));
-            if (animation.brightness > 0.1) {
-              animation.set_brightness(0.001);
-            } else {
-              animation.set_brightness(1.0);
+        case slight_ButtonInput::event_down: {
+            // out.println(F("down"));
+            switch ((*instance).id) {
+                case UIButton::up: {
+                    animation.brightnessFader.fadeUp();
+                } break;
+                case UIButton::down: {
+                    animation.brightnessFader.fadeDown();
+                } break;
             }
-            Serial.print(F("  animation.brightness: "));
-            Serial.println(animation.brightness, 4);
         } break;
-        case slight_ButtonInput::event_click_triple : {
-            Serial.println(F("click triple"));
+        case slight_ButtonInput::event_holddown: {
+            // out.print(F("duration active: "));
+            // out.println((*instance).getDurationActive());
         } break;
-        case slight_ButtonInput::event_click_multi : {
-            Serial.print(F("click multi - count: "));
-            Serial.println((*instance).getClickCount());
+        case slight_ButtonInput::event_up: {
+            // out.println(F("up"));
+            switch ((*instance).id) {
+                case UIButton::up:
+                case UIButton::down: {
+                    animation.brightnessFader.fadePause();
+                } break;
+            }
         } break;
+        case slight_ButtonInput::event_click: {
+            out.println(F("click"));
+            switch ((*instance).id) {
+                case UIButton::up: {
+                    1;
+                } break;
+                case UIButton::down: {
+                    1;
+                } break;
+                case UIButton::power: {
+                    animation.brightnessFader.fadeTo(animation.brightness_min);
+                } break;
+            }
+        } break;
+        // case slight_ButtonInput::event_click_long : {
+        //     out.print(F("click long "));
+        //     out.println((*instance).getDurationActive());
+        //     encoder_mode_brightness = !encoder_mode_brightness;
+        //     out.print(F("  encoder_mode_brightness: "));
+        //     out.println(encoder_mode_brightness);
+        // } break;
+        case slight_ButtonInput::event_click_double: {
+            out.println(F("click double"));
+            // if (animation.brightness > 0.1) {
+            //     animation.set_brightness(0.001);
+            // } else {
+            //     animation.set_brightness(1.0);
+            // }
+            // out.print(F("  animation.brightness: "));
+            // out.println(animation.brightness, 4);
+            switch ((*instance).id) {
+                case UIButton::up: {
+                    1;
+                } break;
+                case UIButton::down: {
+                    1;
+                } break;
+                case UIButton::power: {
+                    out.println("fade to min..");
+                    animation.brightnessFader.fadeTo(animation.brightness_min, 1500);
+                    // wait till we are done fading down..
+                    while (animation.brightnessFader.getState()
+                           == animation.brightnessFader.state_FadingDown) {
+                        animation.update();
+                        delay(1);
+                    }
+                    animation.update();
+                    powerhandling.enter_sleep_mode();
+                } break;
+            }
+        } break;
+            // case slight_ButtonInput::event_click_triple : {
+            //     out.println(F("click triple"));
+            // } break;
+            // case slight_ButtonInput::event_click_multi : {
+            //     out.print(F("click multi - count: "));
+            //     out.println((*instance).getClickCount());
+            // } break;
     }  // end switch
 }
-
 
 // ------------------------------------------
 // slight_RotaryEncoder things
 
 void MyInput::encoder_init(
-    Stream &out, slight_RotaryEncoder::tCallbackFunctionISR func_ISR
+    Stream& out, slight_RotaryEncoder::tCallbackFunctionISR func_ISR
 ) {
     out.println(F("setup encoder input:"));
     out.println(F("  myencoder.begin()"));
@@ -430,8 +459,6 @@ void MyInput::encoder_init(
     myencoder.begin(func_ISR);
     out.println(F("  finished."));
 }
-
-
 
 // void myencoder_pin_changed_ISR__helper(slight_RotaryEncoder * instance) {
 //   // instance->set(15);
@@ -441,54 +468,48 @@ void MyInput::encoder_init(
 // void MyInput::myencoder_pin_changed_ISR() {
 // moved to main .ino file.
 
-
-void MyInput::myencoder_event(slight_RotaryEncoder *instance) {
+void MyInput::myencoder_event(slight_RotaryEncoder* instance) {
     // react on event
     switch ((*instance).getEventLast()) {
-        case slight_RotaryEncoder::event_Rotated : {
+        case slight_RotaryEncoder::event_Rotated: {
             // get current data
             // int16_t temp_steps = (*instance).getSteps();
             int16_t temp_stepsAccel = (*instance).getStepsAccelerated();
             // clear data
             (*instance).clearSteps();
 
-            // Serial.print(F("  steps: "));
-            // Serial.println(temp_steps);
-            // Serial.print(F("  steps accelerated: "));
-            // Serial.println(temp_stepsAccel);
+            // out.print(F("  steps: "));
+            // out.println(temp_steps);
+            // out.print(F("  steps accelerated: "));
+            // out.println(temp_stepsAccel);
             // counter += temp_stepsAccel;
             if (encoder_mode_brightness) {
                 animation.set_brightness(
-                    animation.brightness
-                    + temp_stepsAccel*0.0002);
-                Serial.print(F("  animation.brightness: "));
-                Serial.println(animation.brightness, 4);
+                    animation.brightness + temp_stepsAccel * 0.0002
+                );
+                out.print(F("  animation.brightness: "));
+                out.println(animation.brightness, 4);
             } else {
-                animation.set_hue(animation.hue + temp_stepsAccel*0.0002);
-                Serial.print(F("  animation.hue: "));
-                Serial.println(animation.hue, 4);
+                animation.set_hue(animation.hue + temp_stepsAccel * 0.0002);
+                out.print(F("  animation.hue: "));
+                out.println(animation.hue, 4);
             }
         } break;
-        // currently there are no other events fired.
+            // currently there are no other events fired.
     }  // end switch
 }
 
-
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // helper
 
-void MyInput::print_runtime(Print &out) {
+void MyInput::print_runtime(Print& out) {
     char buffer[] = "[1234567890ms]   \0";
-    snprintf(
-        buffer, sizeof(buffer),
-        "[%8lums]", millis());
+    snprintf(buffer, sizeof(buffer), "[%8lums]", millis());
     out.print(buffer);
 }
 
-
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // helper
-
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // THE END

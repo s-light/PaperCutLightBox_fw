@@ -46,10 +46,13 @@ SOFTWARE.
 // include Core Arduino functionality
 #include <Arduino.h>
 
+#include "esp_private/system_internal.h"
+
 #include <slight_DebugMenu.h>
 
 #include "./animation.h"
 #include "./myinput.h"
+#include "./powerhandling.h"
 
 class MyMenu {
 public:
@@ -62,13 +65,18 @@ public:
     // constructor
 
     // MyMenu();
-    MyMenu(MyAnimation &animation, MyInput &myinput,
-           const sketchinfo_func sketchinfo_print);
+    MyMenu(
+        Stream& out_,
+        MyAnimation& animation,
+        MyInput& myinput,
+        PowerHandling& powerhandling,
+        const sketchinfo_func sketchinfo_print
+    );
     ~MyMenu();
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // basic library api
-    void begin(Stream &out);
+    void begin();
     void update();
     void end();
 
@@ -132,11 +140,12 @@ private:
 
     MyAnimation &animation;
     MyInput &myinput;
+    PowerHandling &powerhandling;
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // internal attributes
     bool ready;
-    const sketchinfo_func sketchinfo_print;
+    Stream &out; const sketchinfo_func sketchinfo_print;
 
 }; // class MyMenu
 

@@ -11,8 +11,8 @@
         ~ slight_ButtonInput
         ~ slight_DebugMenu
             written by stefan krueger (s-light),
-                github@s-light.eu, http://s-light.eu, https://github.com/s-light/
-            license: MIT
+                github@s-light.eu, http://s-light.eu,
+https://github.com/s-light/ license: MIT
 
     written by stefan krueger (s-light),
         github@s-light.eu, http://s-light.eu, https://github.com/s-light/
@@ -42,11 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ******************************************************************************/
 
-
-
 #ifndef SRC_ARDUINO_MC_INPUT_H_
 #define SRC_ARDUINO_MC_INPUT_H_
-
 
 // include Core Arduino functionality
 #include <Arduino.h>
@@ -63,25 +60,24 @@ SOFTWARE.
 // #include <slight_TSL2591AutoSensitivity.h>
 
 #include "./animation.h"
+#include "./powerhandling.h"
 // #include "./mapping.h"
 
 // void myencoder_pin_changed_ISR();
 // void myencoder_pin_changed_ISR__helper(slight_RotaryEncoder* instance);
 
 class MyInput {
- public:
+public:
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // constructor
 
-    MyInput(
-        MyAnimation &animation
-    );
+    MyInput(Stream& out_, MyAnimation& animation, PowerHandling& powerhandling);
     // MyInput(const slight_ButtonInput::tcbfOnEvent button_event);
     ~MyInput();
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // basic library api
-    void begin(Stream &out, slight_RotaryEncoder::tCallbackFunctionISR func_ISR);
+    void begin(slight_RotaryEncoder::tCallbackFunctionISR func_ISR);
     void update();
     void end();
 
@@ -95,31 +91,88 @@ class MyInput {
     Adafruit_DotStar board_dotstar = Adafruit_DotStar(1, 8, 6, DOTSTAR_BGR);
 
     // slight_ButtonInput mybutton;
-    boolean mybutton_get_input(slight_ButtonInput *instance);
-    void mybutton_event(slight_ButtonInput *instance);
+    boolean mybutton_get_input(slight_ButtonInput* instance);
+    void mybutton_event(slight_ButtonInput* instance);
 
-    slight_ButtonInput mybutton = slight_ButtonInput(
-        // uint8_t id_new
-        1,
-        // uint8_t pin_new,
-        A3,
-        // tCallbackFunctionGetInput callbackGetInput_new,
-        std::bind(&MyInput::mybutton_get_input, this, std::placeholders::_1),
-        // tCallbackFunction callbackOnEvent_new,
-        std::bind(&MyInput::mybutton_event, this, std::placeholders::_1),
-        // const uint16_t duration_debounce_new = 20,
-        10,
-        // const uint16_t duration_holddown_new = 1000,
-        1000,
-        // const uint16_t duration_click_long_new =   3000,
-        2000,
-        // const uint16_t duration_click_double_new = 250
-        250
-    );
-
+    static const uint8_t UIButton_count = 3;
+    // enum value = pin number
+    enum UIButton {
+        power = A0,
+        up = A1,
+        down = A2,
+    };
+    static const char* UIButton_names(UIButton index) {
+        switch (index) {
+            case power:
+                return "power";
+            case up:
+                return "up";
+            case down:
+                return "down";
+            default:
+                return NULL;
+        }
+    };
+    // static const char* UIButton_pins(UIButton index) {
+    //     switch (index) {
+    //         case power:
+    //             return ;
+    //         case up:
+    //             return A1;
+    //         case down:
+    //             return A2;
+    //         default:
+    //             return NULL;
+    //     }
+    // };
+    slight_ButtonInput mybuttons[UIButton_count] = {
+        // slight_ButtonInput(
+        //     // uint8_t id_new
+        //     0,
+        //     // uint8_t pin_new,
+        //     A0,
+        //     // tCallbackFunctionGetInput callbackGetInput_new,
+        //     mybutton_get_input,
+        //     // tCallbackFunction callbackOnEvent_new,
+        //     mybutton_event,
+        //     // const uint16_t duration_debounce_new = 20,
+        //     10,
+        //     // const uint16_t duration_holddown_new = 1000,
+        //     1000,
+        //     // const uint16_t duration_click_long_new =   3000,
+        //     500,
+        //     // const uint16_t duration_click_double_new = 250
+        //     250),
+        // using default values:
+        slight_ButtonInput(
+            UIButton::power,
+            UIButton::power,
+            std::bind(&MyInput::mybutton_get_input, this, std::placeholders::_1),
+            std::bind(&MyInput::mybutton_event, this, std::placeholders::_1),
+            // const uint16_t duration_debounce_new = 20,
+            20,
+            // const uint16_t duration_holddown_new = 1000,
+            1000,
+            // const uint16_t duration_click_long_new =   3000,
+            5000,
+            // const uint16_t duration_click_double_new = 250
+            350
+        ),
+        slight_ButtonInput(
+            UIButton::up,
+            UIButton::up,
+            std::bind(&MyInput::mybutton_get_input, this, std::placeholders::_1),
+            std::bind(&MyInput::mybutton_event, this, std::placeholders::_1)
+        ),
+        slight_ButtonInput(
+            UIButton::down,
+            UIButton::down,
+            std::bind(&MyInput::mybutton_get_input, this, std::placeholders::_1),
+            std::bind(&MyInput::mybutton_event, this, std::placeholders::_1)
+        )};
 
     // static void myencoder_pin_changed_ISR();
-    void myencoder_event(slight_RotaryEncoder *instance);
+    void myencoder_event(slight_RotaryEncoder* instance);
 
     slight_RotaryEncoder myencoder = slight_RotaryEncoder(
         // uint8_t id_new,
@@ -144,10 +197,9 @@ class MyInput {
     // public functions
 
     // menu & helper
-    void menu__test_xxx(Print &out);
-    void menu__set_yyy(Print &out, char *command);
-    void menu__set_test_token(Print &out, char *command);
-
+    void menu__test_xxx(Print& out);
+    void menu__set_yyy(Print& out, char* command);
+    void menu__set_test_token(Print& out, char* command);
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // configurations
@@ -186,8 +238,9 @@ class MyInput {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // helper
 
- private:
-    MyAnimation &animation;
+private:
+    MyAnimation& animation;
+    PowerHandling& powerhandling;
 
     // ambientlight sensor
     // uint32_t als_debugout_timeStamp = 0;
@@ -199,23 +252,23 @@ class MyInput {
     // double als_brightness_automatic = 0.0001;
 
     // button input
-    void button_init(Stream &out);
+    void button_init(Stream& out);
     // encoder input
-    void encoder_init(Stream &out, slight_RotaryEncoder::tCallbackFunctionISR func_ISR);
+    void encoder_init(Stream& out, slight_RotaryEncoder::tCallbackFunctionISR func_ISR);
 
     // helper
-    void print_runtime(Print &out);
+    void print_runtime(Print& out);
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // internal attributes
     bool ready;
+    Stream &out;
 
-    uint32_t light_start = 0;
-    uint32_t light_end = 0;
-    uint32_t light_loopcount = 0;
-    float effect_position = 0.0;
+        // uint32_t light_start = 0;
+        // uint32_t light_end = 0;
+        // uint32_t light_loopcount = 0;
 
-    bool encoder_mode_brightness = true;
+        bool encoder_mode_brightness = true;
     // int16_t counter = 0;
     // int16_t counter_last = 0;
 
