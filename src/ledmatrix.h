@@ -34,14 +34,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ******************************************************************************/
 
-
-
 #ifndef ledmatrix_H_
 #define ledmatrix_H_
 
 // include Core Arduino functionality
 #include <Arduino.h>
-
 
 #include <SPI.h>
 // #include <slight_TLC5957.h>
@@ -63,46 +60,77 @@ SOFTWARE.
 // purple 35m
 // cyan 36m
 
-
 const uint16_t LEDBOARD_COL_COUNT = 4;
 const uint16_t LEDBOARD_ROW_COUNT = 4;
-const uint16_t LEDBOARD_PIXEL_COUNT = (
-    LEDBOARD_ROW_COUNT * LEDBOARD_COL_COUNT);
+const uint16_t LEDBOARD_PIXEL_COUNT = (LEDBOARD_ROW_COUNT * LEDBOARD_COL_COUNT);
 const uint16_t LEDBOARD_CHIP_COUNT = LEDBOARD_PIXEL_COUNT / 4;
 
-const uint8_t LEDBOARD_SINGLE
-        [4][LEDBOARD_ROW_COUNT][LEDBOARD_COL_COUNT] = {
-    // with all 4 rotations
-    {
-        // 0 =  0° → socket at bottom
-        { 0,  1,  4,  5},
-        { 2,  3,  6,  7},
-        { 8,  9, 12, 13},
-        {10, 11, 14, 15},
-    },
-    {
-        // 1 = 90° → socket at left
-        {10,  8,  2,  0},
-        {11,  9,  3,  1},
-        {14, 12,  6,  4},
-        {15, 13,  7,  5},
-    },
-    {
-        // 2 = 180° → socket at top
-        {15, 14, 11, 10},
-        {13, 12,  9,  8},
-        { 7,  6,  3,  2},
-        { 5,  4,  1,  0},
-    },
-    {
-        // 3 = 270° → socket at right
-        { 5,  7, 13, 15},
-        { 4,  6, 12, 14},
-        { 1,  3,  9, 11},
-        { 0,  2,  8, 10},
-    },
-};
+// ulrichstern Tlc59711
+// const uint8_t LEDBOARD_SINGLE[4][LEDBOARD_ROW_COUNT][LEDBOARD_COL_COUNT] = {
+//   // with all 4 rotations
+//     {
+//      // 0 =  0° → socket at bottom
+//      {0, 1, 4, 5},
+//      {2, 3, 6, 7},
+//      {8, 9, 12, 13},
+//      {10, 11, 14, 15},
+//      },
+//     {
+//      // 1 = 90° → socket at left
+//      {10, 8, 2, 0},
+//      {11, 9, 3, 1},
+//      {14, 12, 6, 4},
+//      {15, 13, 7, 5},
+//      },
+//     {
+//      // 2 = 180° → socket at top
+//      {15, 14, 11, 10},
+//      {13, 12, 9, 8},
+//      {7, 6, 3, 2},
+//      {5, 4, 1, 0},
+//      },
+//     {
+//      // 3 = 270° → socket at right
+//      {5, 7, 13, 15},
+//      {4, 6, 12, 14},
+//      {1, 3, 9, 11},
+//      {0, 2, 8, 10},
+//      },
+// };
 
+// Adafruit_TLC59711
+const uint8_t LEDBOARD_SINGLE[4][LEDBOARD_ROW_COUNT][LEDBOARD_COL_COUNT] = {
+  // with all 4 rotations
+    {
+     // 0 =  0° → socket at bottom
+     {0, 1, 4, 5},
+     {2, 3, 6, 7},
+     {8, 9, 12, 13},
+     {10, 11, 14, 15},
+     },
+    {
+     // 1 = 90° → socket at left
+     {10, 8, 2, 0},
+     {11, 9, 3, 1},
+     {14, 12, 6, 4},
+     {15, 13, 7, 5},
+     },
+    {
+     // 2 = 180° → socket at top
+     //  i have only fixed this one for the Adafruit library...
+     {2, 3, 6, 7},
+     {0, 1, 4, 5},
+     {10, 11, 14, 15},
+     {8, 9, 12, 13},
+     },
+    {
+     // 3 = 270° → socket at right
+     {5, 7, 13, 15},
+     {4, 6, 12, 14},
+     {1, 3, 9, 11},
+     {0, 2, 8, 10},
+     },
+};
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Board Layout
@@ -112,7 +140,6 @@ const uint8_t LEDBOARD_SINGLE
 // 1 = 90° → socket at left
 // 2 = 180° → socket at top
 // 3 = 270° → socket at right
-
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Layout Minimal test
@@ -133,21 +160,29 @@ const uint8_t LEDBOARD_SINGLE
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Layout BookCase
-const uint8_t BOARDS_COL_COUNT = 8; 
-// ^ in real there are only 7 col. 
+const uint8_t BOARDS_COL_COUNT = 8;
+// ^ in real there are only 7 col.
 // but for the interleaved pattern we need some fake boards..
 const uint8_t BOARDS_ROW_COUNT = 3;
-const uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
-    {19, 18, 17, 16, 15, 14, 20, 21},
-    {13, 12,  9,  8,  7,  3,  2, 22},
-    {11, 10,  6,  5,  4,  1,  0, 23},
-};
 const uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
     {2, 2, 2, 2, 2, 2, 2, 2},
     {2, 2, 2, 2, 2, 2, 2, 2},
     {2, 2, 2, 2, 2, 2, 2, 2},
 };
 
+// ulrichstern Tlc59711
+// const uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+//     {19, 18, 17, 16, 15, 14, 20, 21},
+//     {13, 12,  9,  8,  7,  3,  2, 22},
+//     {11, 10,  6,  5,  4,  1,  0, 23},
+// };
+
+// Adafruit_TLC59711
+const uint8_t BOARDS_ORDER[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
+    { 4,  5,  6,  7,  8,  9,  3, 2},
+    {10, 11, 14, 15, 16, 20, 21, 1},
+    {12, 13, 17, 18, 19, 22, 23, 0},
+};
 
 // // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // // Layout BigMatrix Prototype
@@ -170,7 +205,6 @@ const uint8_t BOARDS_ROTATION[BOARDS_ROW_COUNT][BOARDS_COL_COUNT] = {
 //     {3, 3, 3, 3, 3},
 // };
 
-
 const uint8_t BOARDS_COUNT = BOARDS_COL_COUNT * BOARDS_ROW_COUNT;
 const uint16_t CHIPS_COUNT = BOARDS_COUNT * LEDBOARD_CHIP_COUNT;
 
@@ -180,18 +214,14 @@ const uint8_t MATRIX_COL_COUNT = LEDBOARD_COL_COUNT * BOARDS_COL_COUNT;
 const uint8_t MATRIX_ROW_COUNT = LEDBOARD_ROW_COUNT * BOARDS_ROW_COUNT;
 const uint16_t MATRIX_PIXEL_COUNT = MATRIX_COL_COUNT * MATRIX_ROW_COUNT;
 
-
 const size_t LAYER_COL_COUNT = MATRIX_COL_COUNT / 2;
 const size_t LAYER_ROW_COUNT = MATRIX_ROW_COUNT * 2;
 
 // const size_t LAYER_COL_COUNT_REAL = 14; // mod to exclude last columns.
 // const size_t LAYER_ROW_COUNT_REAL = LAYER_ROW_COUNT;
 
-
 class MyLEDMatrix {
 public:
-
-
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TLC5957
 
@@ -209,57 +239,56 @@ public:
     // Tlc59711 tlc(CHIPS_COUNT);
     // Tlc59711 tlc = Tlc59711(CHIPS_COUNT);
     Adafruit_TLC59711 tlc = Adafruit_TLC59711(CHIPS_COUNT);
-    // Adafruit_TLC59711 tlc = Adafruit_TLC59711(60);
 
     void tlc_test();
     void setRGB(uint16_t idx, uint16_t r, uint16_t g, uint16_t b);
     void setRGB(uint16_t r = 0, uint16_t g = 0, uint16_t b = 0);
 
-      // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // constructor
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // constructor
 
-      MyLEDMatrix(uint8_t pin_output_enable_);
-      ~MyLEDMatrix();
+    MyLEDMatrix(uint8_t pin_output_enable_);
+    ~MyLEDMatrix();
 
-      // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // public functions
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // public functions
 
-      // basic library api
-      void begin(Stream & out);
-      void update();
-      void end();
+    // basic library api
+    void begin(Stream& out);
+    void update();
+    void end();
 
-      // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // pixel map
-      // LEDBoard_4x4_16bit mapping
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // pixel map
+    // LEDBoard_4x4_16bit mapping
 
-      uint16_t pmap[MATRIX_COL_COUNT][MATRIX_ROW_COUNT];
-      uint16_t pmap_layer[LAYER_COL_COUNT][LAYER_ROW_COUNT];
-      float layer_01_col[LAYER_COL_COUNT];
-      float layer_01_row[LAYER_ROW_COUNT];
+    uint16_t pmap[MATRIX_COL_COUNT][MATRIX_ROW_COUNT];
+    uint16_t pmap_layer[LAYER_COL_COUNT][LAYER_ROW_COUNT];
+    float layer_01_col[LAYER_COL_COUNT];
+    float layer_01_row[LAYER_ROW_COUNT];
 
-      uint8_t convert_layer2matrix_col(uint8_t col_i);
-      uint8_t convert_layer2matrix_row(uint8_t row_i);
+    uint8_t convert_layer2matrix_col(uint8_t col_i);
+    uint8_t convert_layer2matrix_row(uint8_t row_i);
 
-      void print_pmap(Print & out);
-      void print_2Dmatrix(Print & out);
-      void print_layermap(Print & out);
-      void print_info(Print & out, const char *pre);
+    void print_pmap(Print& out);
+    void print_2Dmatrix(Print& out);
+    void print_layermap(Print& out);
+    void print_info(Print& out, const char* pre);
 
-    private:
-      // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // private functions
-      void tlc_init(Stream & out);
+private:
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // private functions
+    void tlc_init(Stream& out);
 
-      void pmap_init();
-      void pmap_layer_init();
-      uint16_t mymap_LEDBoard_4x4_16bit(uint8_t col, uint8_t row);
+    void pmap_init();
+    void pmap_layer_init();
+    uint16_t mymap_LEDBoard_4x4_16bit(uint8_t col, uint8_t row);
 
-      // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // attributes
-      bool ready;
-      uint8_t pin_output_enable = false;
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // attributes
+    bool ready;
+    uint8_t pin_output_enable = false;
 
-    }; // class MyLEDMatrix
+};  // class MyLEDMatrix
 
 #endif  // ledmatrix_H_

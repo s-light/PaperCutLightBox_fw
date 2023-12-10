@@ -94,14 +94,9 @@ void MyLEDMatrix::tlc_init(Stream &out) {
     out.println(F("    output_enable LOW"));
     digitalWrite(pin_output_enable, LOW);
     // delay(100);
+    
     out.println(F("    tlc.begin()"));
     tlc.begin();
-    out.println(F("    set all black"));
-    setRGB();
-    out.println(F("    output_enable HIGH"));
-    digitalWrite(pin_output_enable, HIGH);
-    out.println(F("    write"));
-    tlc.write();
 
     // delay(100);
     // out.println(F("    tlc.beginFast()"));
@@ -162,6 +157,13 @@ void MyLEDMatrix::tlc_init(Stream &out) {
     // #else
     //     tlc.beginFast();
     // #endif
+
+    out.println(F("    set all black"));
+    setRGB();
+    out.println(F("    output_enable HIGH"));
+    digitalWrite(pin_output_enable, HIGH);
+    out.println(F("    write"));
+    tlc.write();
 
     // tlc.setBrightness(127, 127, 127);
     
