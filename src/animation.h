@@ -205,7 +205,10 @@ public:
             std::placeholders::_2
         ),
         // event
-        std::bind(&MyAnimation::brightnessFader_event, this, std::placeholders::_1)
+        std::bind(&MyAnimation::brightnessFader_event, this, std::placeholders::_1),
+        // easing_fn
+        easeCubicIn
+        // easeQuinticIn
     );
 
 private:

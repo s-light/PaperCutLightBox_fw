@@ -387,18 +387,18 @@ void MyInput::mybutton_event(slight_ButtonInput* instance) {
             }
         } break;
         case slight_ButtonInput::event_click: {
-            out.println(F("click"));
-            switch ((*instance).id) {
-                case UIButton::up: {
-                    1;
-                } break;
-                case UIButton::down: {
-                    1;
-                } break;
-                case UIButton::power: {
-                    animation.brightnessFader.fadeTo(animation.brightness_min);
-                } break;
-            }
+            // out.println(F("click"));
+            // switch ((*instance).id) {
+            //     case UIButton::up: {
+            //         1;
+            //     } break;
+            //     case UIButton::down: {
+            //         1;
+            //     } break;
+            //     case UIButton::power: {
+            //         // animation.brightnessFader.fadeTo(animation.brightness_min);
+            //     } break;
+            // }
         } break;
         // case slight_ButtonInput::event_click_long : {
         //     out.print(F("click long "));
