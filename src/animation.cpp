@@ -670,7 +670,17 @@ void MyAnimation::brightnessFader_event(slight_Fade* instance) {
     switch (instance->getEventLast()) {
         case slight_Fade::event_fading_Paused:
         case slight_Fade::event_fading_Stop:
+        case slight_Fade::event_fading_Paused:
+        case slight_Fade::event_fading_Stop:
         case slight_Fade::event_fading_Finished: {
+            out.print("brightnessFader  ");
+            (*instance).printEventLast(out);
+            out.println();
+        } break;
+        case slight_Fade::event_StateChanged: {
+            out.print("brightnessFader state  ");
+            (*instance).printState(out);
+            out.println();
             out.print("brightnessFader  ");
             (*instance).printEventLast(out);
             out.println();
