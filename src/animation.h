@@ -173,7 +173,6 @@ public:
 
     uint16_t effect_duration = 3 * 1000;  // ms
 
-
     // lounge blue - night
     // float hue = 0.7;
     // float contrast = 1.5;
@@ -187,7 +186,7 @@ public:
     float brightness = brightness_min;
     // float brightness = 0.1;
     // const float brightness_max = 0.37;
-    const float brightness_min = 0.0001;
+    const float brightness_min = 0.001;
     const float brightness_max = 1.0;
     const uint16_t brightness_max_i = 25000;
 
@@ -259,6 +258,7 @@ private:
     uint32_t effect_update_last_us = 0;
     uint32_t effect_update_delay_us = 100;
 
+    void brightnessFader_init();
     void brightnessFader_valueChanged(slight_Fade* instance, float value);
     void brightnessFader_event(slight_Fade* instance);
 
