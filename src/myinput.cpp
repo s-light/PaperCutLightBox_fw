@@ -411,18 +411,16 @@ void MyInput::mybutton_event(slight_ButtonInput* instance) {
             // out.print(F("  encoder_mode_brightness: "));
             // out.println(encoder_mode_brightness);
             // powerhandling.get_wakeup_gpio_num()
-            switch ((*instance).id) {
-                case UIButton::up: {
-                    1;
-                } break;
-                case UIButton::down: {
-                    1;
-                } break;
-                case UIButton::power: {
-                    // out.print("power click long");
-                    powerhandling.enter_sleep_mode();
-                } break;
-            }
+            // switch ((*instance).id) {
+            //     case UIButton::up: {
+            //         1;
+            //     } break;
+            //     case UIButton::down: {
+            //         1;
+            //     } break;
+            //     case UIButton::power: {
+            //     } break;
+            // }
         } break;
         case slight_ButtonInput::event_click_double: {
             out.println(F("click double"));
@@ -441,15 +439,7 @@ void MyInput::mybutton_event(slight_ButtonInput* instance) {
                     1;
                 } break;
                 case UIButton::power: {
-                    out.println("fade to min..");
-                    animation.brightnessFader.fadeTo(animation.brightness_min, 1500);
-                    // wait till we are done fading down..
-                    while (animation.brightnessFader.getState()
-                           == animation.brightnessFader.state_FadingDown) {
-                        animation.update();
-                        delay(1);
-                    }
-                    animation.update();
+                    animation.brightness_fade_to_black_blocking();
                     powerhandling.enter_sleep_mode();
                 } break;
             }

@@ -71,7 +71,8 @@ void MyAnimation::begin() {
         matrix.begin(out);
         animation_init();
 
-        brightnessFader.fadeTo(brightness_min, 1000);
+        brightnessFader_init();
+        
         // enable
         ready = true;
     }
@@ -573,44 +574,7 @@ void MyAnimation::menu__test_colors(Print& out) {
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// setter
-
-float MyAnimation::set_brightness(float brightness_) {
-    brightness = clamp(brightness_, brightness_min, brightness_max);
-
-    return brightness;
-}
-
-void MyAnimation::brightnessFader_valueChanged(slight_Fade* instance, float value) {
-    set_brightness(value);
-}
-
-void MyAnimation::brightnessFader_event(slight_Fade* instance) {
-    switch (instance->getEventLast()) {
-        case slight_Fade::event_fading_Finished: {
-            // Serial.print(F("led on pin "));
-            // Serial.print((*instance).getID());
-            Serial.print(F("fading finished."));
-            Serial.println();
-        } break;
-    }  // end switch
-}
-
-void MyAnimation::brightness_fade_to_black_blocking() {
-    out.println("fade to min..");
-    if (brightnessFader.getPosition() > 0.2) {
-        brightnessFader.fadeTo(brightness_min, 2000);
-    } else {
-        brightnessFader.fadeDown();
-    }
-    // wait till we are done fading down..
-    while (brightnessFader.getState() == brightnessFader.state_FadingDown) {
-        update();
-        delay(1);
-    }
-    update();
-    update();
-}
+// setters
 
 float MyAnimation::set_hue(float hue_) {
     hue = clamp(hue_, static_cast<float>(0.0), static_cast<float>(1.0));
@@ -637,6 +601,102 @@ void MyAnimation::start_loop_n_times(uint16_t count) {
     animation_reset();
     animation_loopcount = count;
     animation_run = true;
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// brightness
+
+void MyAnimation::brightnessFader_init() {
+    out.println(F("brightnessFader:"));
+    brightnessFader.begin();
+
+    brightnessFader.setDurationDefault(brightness_fade_duration);
+    out.print(F("    default fade time: "));
+    out.print(brightness_fade_duration);
+    out.println(F("ms"));
+    
+    brightnessFader.setValueRange(brightness_min, brightness_max);
+    out.print(F("    fade value range: "));
+    out.print(brightness_min);
+    out.print(F(" .. "));
+    out.print(brightness_max);
+    out.println();
+
+    brightnessFader.update();
+    
+    // out.println(F("    set start value. "));
+    // brightnessFader.fadeTo(0.0, 1);
+    // delay(1);
+    // brightnessFader.update();
+    // delay(1);
+    // brightnessFader.update();
+
+    out.println("    start initial fade!");
+    brightnessFader.fadeTo(brightness_min, 3000);
+    delay(1);
+    brightnessFader.update();
+    animation_update();
+     delay(1);
+    brightnessFader.update();
+    animation_update();
+    delay(1);
+    brightnessFader.update();
+    animation_update();
+    out.println(F("    finished."));
+}
+
+float MyAnimation::set_brightness(float brightness_) {
+    brightness = clamp(brightness_, brightness_min, brightness_max);
+    return brightness;
+}
+
+void MyAnimation::brightnessFader_valueChanged(slight_Fade* instance, float value) {
+    set_brightness(value);
+}
+
+void MyAnimation::brightnessFader_event(slight_Fade* instance) {
+    out.print(F("instance:"));
+    out.print((*instance).getID());
+    out.print(F(" - "));
+    out.println();
+    out.print("event: ");
+    (*instance).printEventLast(out);
+    // out.println();
+    out.print(F(" - "));
+    out.print("state: ");
+    (*instance).printState(out);
+    out.println();
+
+    switch (instance->getEventLast()) {
+        case slight_Fade::event_fading_Paused:
+        case slight_Fade::event_fading_Stop:
+        case slight_Fade::event_fading_Finished: {
+            out.print("brightnessFader  ");
+            (*instance).printEventLast(out);
+            out.println();
+        } break;
+        case slight_Fade::event_StateChanged: {
+            out.print("brightnessFader state  ");
+            (*instance).printState(out);
+            out.println();
+        } break;
+    }  // end switch
+}
+
+void MyAnimation::brightness_fade_to_black_blocking() {
+    out.println("fade to min..");
+    if (brightnessFader.getPosition() > 0.2) {
+        brightnessFader.fadeTo(brightness_min, 2000);
+    } else {
+        brightnessFader.fadeDown();
+    }
+    // wait till we are done fading down..
+    while (brightnessFader.getState() == brightnessFader.state_FadingDown) {
+        update();
+        delay(1);
+    }
+    update();
+    update();
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -668,21 +728,6 @@ void MyAnimation::animation_init() {
         fx_wave->hue = 0.1;
         fx_wave->brightness = 0.1;
         fx_wave->run(false);
-
-        out.print(F("  brightnessFader:"));
-        brightnessFader.begin();
-        brightnessFader.setDurationDefault(brightness_fade_duration);
-        out.print(F("      default fade time: "));
-        out.print(brightness_fade_duration);
-        out.println(F("ms"));
-        brightnessFader.setValueRange(brightness_min, brightness_max);
-        out.print(F("      fade value range: "));
-        out.print(brightness_min);
-        out.print(F(" .. "));
-        out.print(brightness_max);
-        out.println();
-        out.print(F("      set start value. "));
-        brightnessFader.fadeTo(0.0, 0);
     }
     out.println(F("  finished."));
 }
