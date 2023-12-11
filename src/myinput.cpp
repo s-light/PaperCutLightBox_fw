@@ -54,6 +54,7 @@ SOFTWARE.
 #include "./myinput.h"
 
 #include <algorithm>
+#include <ratio>
 
 // // include Core Arduino functionality
 // #include <Arduino.h>
@@ -355,20 +356,22 @@ boolean MyInput::mybutton_get_input(slight_ButtonInput* instance) {
 }
 
 void MyInput::mybutton_event(slight_ButtonInput* instance) {
-    out.print(F("instance:"));
-    out.print((*instance).id);
-    out.print(F(" - event: "));
-    (*instance).printEventLast(out);
-    out.println();
+    // out.print(F("instance:"));
+    // out.print((*instance).id);
+    // out.print(F(" - event: "));
+    // (*instance).printEventLast(out);
+    // out.println();
 
     switch ((*instance).getEventLast()) {
         case slight_ButtonInput::event_down: {
             // out.println(F("down"));
             switch ((*instance).id) {
                 case UIButton::up: {
+                    out.println("fadeUp");
                     animation.brightnessFader.fadeUp();
                 } break;
                 case UIButton::down: {
+                    out.println("fadeDown");
                     animation.brightnessFader.fadeDown();
                 } break;
             }
@@ -382,6 +385,7 @@ void MyInput::mybutton_event(slight_ButtonInput* instance) {
             switch ((*instance).id) {
                 case UIButton::up:
                 case UIButton::down: {
+                    out.println("fadePause");
                     animation.brightnessFader.fadePause();
                 } break;
             }
@@ -400,13 +404,26 @@ void MyInput::mybutton_event(slight_ButtonInput* instance) {
             //     } break;
             // }
         } break;
-        // case slight_ButtonInput::event_click_long : {
-        //     out.print(F("click long "));
-        //     out.println((*instance).getDurationActive());
-        //     encoder_mode_brightness = !encoder_mode_brightness;
-        //     out.print(F("  encoder_mode_brightness: "));
-        //     out.println(encoder_mode_brightness);
-        // } break;
+        case slight_ButtonInput::event_click_long : {
+            // out.print(F("click long "));
+            // out.println((*instance).getDurationActive());
+            // encoder_mode_brightness = !encoder_mode_brightness;
+            // out.print(F("  encoder_mode_brightness: "));
+            // out.println(encoder_mode_brightness);
+            // powerhandling.get_wakeup_gpio_num()
+            switch ((*instance).id) {
+                case UIButton::up: {
+                    1;
+                } break;
+                case UIButton::down: {
+                    1;
+                } break;
+                case UIButton::power: {
+                    // out.print("power click long");
+                    powerhandling.enter_sleep_mode();
+                } break;
+            }
+        } break;
         case slight_ButtonInput::event_click_double: {
             out.println(F("click double"));
             // if (animation.brightness > 0.1) {

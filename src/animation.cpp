@@ -54,11 +54,13 @@ SOFTWARE.
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // functions
 
-MyAnimation::MyAnimation(Stream& out_): out(out_) {
+MyAnimation::MyAnimation(Stream& out_) : out(out_) {
     ready = false;
 }
 
-MyAnimation::~MyAnimation() { end(); }
+MyAnimation::~MyAnimation() {
+    end();
+}
 
 void MyAnimation::begin() {
     // clean up..
@@ -69,7 +71,7 @@ void MyAnimation::begin() {
         matrix.begin(out);
         animation_init();
 
-        brightnessFader.fadeTo(brightness_min, 0);
+        brightnessFader.fadeTo(brightness_min, 1000);
         // enable
         ready = true;
     }
@@ -91,7 +93,7 @@ void MyAnimation::update() {
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // menu
 
-void MyAnimation::menu__set_fps(Print &out, char *command) {
+void MyAnimation::menu__set_fps(Print& out, char* command) {
     out.print(F("Set fps "));
     uint8_t command_offset = 1;
     uint16_t value = atoi(&command[command_offset]);
@@ -102,7 +104,7 @@ void MyAnimation::menu__set_fps(Print &out, char *command) {
     out.println();
 }
 
-void MyAnimation::menu__start_loop_n_times(Print &out, char *command) {
+void MyAnimation::menu__start_loop_n_times(Print& out, char* command) {
     uint8_t command_offset = 1;
     uint16_t value = atoi(&command[command_offset]);
     out.print("Start loop ");
@@ -112,14 +114,14 @@ void MyAnimation::menu__start_loop_n_times(Print &out, char *command) {
     out.println();
 }
 
-void MyAnimation::menu__test_buffer(Print &out) {
+void MyAnimation::menu__test_buffer(Print& out) {
     out.println(F("SetBuffer:"));
     out.println(F("--- old"));
 
     out.println();
 }
 
-void MyAnimation::menu__set_pixel_index(Print &out, char *command) {
+void MyAnimation::menu__set_pixel_index(Print& out, char* command) {
     out.print(F("Set pixel index "));
     uint8_t command_offset = 1;
     uint8_t index = atoi(&command[command_offset]);
@@ -144,12 +146,12 @@ void MyAnimation::menu__set_pixel_index(Print &out, char *command) {
     out.println();
 }
 
-void MyAnimation::menu__set_pixel(Print &out, char *command) {
+void MyAnimation::menu__set_pixel(Print& out, char* command) {
     out.print(F("Set pixel "));
     // p0,1:500
     // split string with help of tokenizer
     // https://www.cplusplus.com/reference/cstring/strtok/#
-    char *command_pointer = &command[1];
+    char* command_pointer = &command[1];
     // NOLINTNEXTLINE(runtime/threadsafe_fn)
     command_pointer = strtok(command_pointer, " ,");
     uint8_t col_i = atoi(command_pointer);
@@ -185,12 +187,12 @@ void MyAnimation::menu__set_pixel(Print &out, char *command) {
     matrix.setRGB(pixel_index, value, value, value);
 }
 
-void MyAnimation::menu__set_pixel_layer(Print &out, char *command) {
+void MyAnimation::menu__set_pixel_layer(Print& out, char* command) {
     out.print(F("Set pixel "));
     // p0,1:500
     // split string with help of tokenizer
     // https://www.cplusplus.com/reference/cstring/strtok/#
-    char *command_pointer = &command[1];
+    char* command_pointer = &command[1];
     // NOLINTNEXTLINE(runtime/threadsafe_fn)
     command_pointer = strtok(command_pointer, " ,");
     uint8_t col_i = atoi(command_pointer);
@@ -226,7 +228,7 @@ void MyAnimation::menu__set_pixel_layer(Print &out, char *command) {
     matrix.setRGB(pixel_index, value, value, value);
 }
 
-void MyAnimation::menu__set_all_pixel(Print &out, char *command) {
+void MyAnimation::menu__set_all_pixel(Print& out, char* command) {
     out.print(F("Set all pixel to "));
     // uint16_t value = atoi(&command[1]);
     //
@@ -241,7 +243,7 @@ void MyAnimation::menu__set_all_pixel(Print &out, char *command) {
     // Z65535,65535,65535
     // split string with help of tokenizer
     // https://www.cplusplus.com/reference/cstring/strtok/#
-    char *command_pointer = &command[1];
+    char* command_pointer = &command[1];
     // NOLINTNEXTLINE(runtime/threadsafe_fn)
     command_pointer = strtok(command_pointer, " ,");
     red = atoi(command_pointer);
@@ -271,12 +273,12 @@ void MyAnimation::menu__set_all_pixel(Print &out, char *command) {
     matrix.setRGB(red, green, blue);
 }
 
-void MyAnimation::menu__set_layer(Print &out, char *command) {
+void MyAnimation::menu__set_layer(Print& out, char* command) {
     out.print(F("Set layer "));
     // p0,1:500
     // split string with help of tokenizer
     // https://www.cplusplus.com/reference/cstring/strtok/#
-    char *command_pointer = &command[1];
+    char* command_pointer = &command[1];
     // NOLINTNEXTLINE(runtime/threadsafe_fn)
     command_pointer = strtok(command_pointer, " ,");
     uint8_t row_i = atoi(command_pointer);
@@ -314,7 +316,7 @@ void MyAnimation::menu__set_layer(Print &out, char *command) {
     }
 }
 
-void MyAnimation::menu__time_meassurements(Print &out) {
+void MyAnimation::menu__time_meassurements(Print& out) {
     out.println(F("time_meassurements:"));
 
     bool animation_run_temp = animation_run;
@@ -360,7 +362,7 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     out.print(F("us / call"));
     out.println();
 
-    PixelPos *pixel_pos = new PixelPos();
+    PixelPos* pixel_pos = new PixelPos();
     pixel_pos->row = 0.5;
     pixel_pos->col = 0.5;
     pixel_pos->row_i = 0.5 * MATRIX_ROW_COUNT;
@@ -437,7 +439,7 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     animation_reset();
 
     effect_start = micros();
-    effect_end = micros() + (1000 * 1000); // 1sec
+    effect_end = micros() + (1000 * 1000);  // 1sec
 
     for (size_t i = 0; i < tm_loop_count; i++) {
         tm_start = micros();
@@ -498,7 +500,7 @@ void MyAnimation::menu__time_meassurements(Print &out) {
     animation_reset();
 }
 
-void MyAnimation::menu__set_hue(Print &out, char *command) {
+void MyAnimation::menu__set_hue(Print& out, char* command) {
     out.print(F("Set hue "));
     uint8_t command_offset = 1;
     float value = atof(&command[command_offset]);
@@ -507,7 +509,7 @@ void MyAnimation::menu__set_hue(Print &out, char *command) {
     out.println();
 }
 
-void MyAnimation::menu__set_saturation(Print &out, char *command) {
+void MyAnimation::menu__set_saturation(Print& out, char* command) {
     out.print(F("Set saturation "));
     uint8_t command_offset = 1;
     float value = atof(&command[command_offset]);
@@ -518,7 +520,7 @@ void MyAnimation::menu__set_saturation(Print &out, char *command) {
     out.println();
 }
 
-void MyAnimation::menu__set_contrast(Print &out, char *command) {
+void MyAnimation::menu__set_contrast(Print& out, char* command) {
     out.print(F("Set contrast "));
     uint8_t command_offset = 1;
     float value = atof(&command[command_offset]);
@@ -527,7 +529,7 @@ void MyAnimation::menu__set_contrast(Print &out, char *command) {
     out.println();
 }
 
-void MyAnimation::menu__set_brightness(Print &out, char *command) {
+void MyAnimation::menu__set_brightness(Print& out, char* command) {
     out.print(F("Set brightness "));
     uint8_t command_offset = 1;
     float value = atof(&command[command_offset]);
@@ -539,17 +541,17 @@ void MyAnimation::menu__set_brightness(Print &out, char *command) {
     out.println();
 }
 
-void MyAnimation::menu__fade_brightness(Print &out, char *command) {
+void MyAnimation::menu__fade_brightness(Print& out, char* command) {
     out.print(F("fade brightness "));
     uint8_t command_offset = 1;
     float value = atof(&command[command_offset]);
     out.println(value, 5);
     // out.print(value, 5);
-    uint32_t duration = 2000; // ms
+    uint32_t duration = 2000;  // ms
     brightnessFader.fadeTo(value, duration);
 }
 
-void MyAnimation::menu__test_colors(Print &out) {
+void MyAnimation::menu__test_colors(Print& out) {
     CHSV color1 = CHSV(0.1, 1.0, 1.0);
     CHSV color2 = CHSV(0.7, 1.0, 1.0);
     out.print("color1  : ");
@@ -579,20 +581,35 @@ float MyAnimation::set_brightness(float brightness_) {
     return brightness;
 }
 
-void MyAnimation::brightnessFader_valueChanged(slight_Fade *instance,
-                                               float value) {
+void MyAnimation::brightnessFader_valueChanged(slight_Fade* instance, float value) {
     set_brightness(value);
 }
 
-void MyAnimation::brightnessFader_event(slight_Fade *instance) {
+void MyAnimation::brightnessFader_event(slight_Fade* instance) {
     switch (instance->getEventLast()) {
-    case slight_Fade::event_fading_Finished: {
-        // Serial.print(F("led on pin "));
-        // Serial.print((*instance).getID());
-        Serial.print(F("fading finished."));
-        Serial.println();
-    } break;
-    } // end switch
+        case slight_Fade::event_fading_Finished: {
+            // Serial.print(F("led on pin "));
+            // Serial.print((*instance).getID());
+            Serial.print(F("fading finished."));
+            Serial.println();
+        } break;
+    }  // end switch
+}
+
+void MyAnimation::brightness_fade_to_black_blocking() {
+    out.println("fade to min..");
+    if (brightnessFader.getPosition() > 0.2) {
+        brightnessFader.fadeTo(brightness_min, 2000);
+    } else {
+        brightnessFader.fadeDown();
+    }
+    // wait till we are done fading down..
+    while (brightnessFader.getState() == brightnessFader.state_FadingDown) {
+        update();
+        delay(1);
+    }
+    update();
+    update();
 }
 
 float MyAnimation::set_hue(float hue_) {
@@ -601,8 +618,7 @@ float MyAnimation::set_hue(float hue_) {
 }
 
 float MyAnimation::set_saturation(float saturation_) {
-    saturation =
-        clamp(saturation_, static_cast<float>(0.0), static_cast<float>(1.0));
+    saturation = clamp(saturation_, static_cast<float>(0.0), static_cast<float>(1.0));
     return saturation;
 }
 
@@ -612,7 +628,9 @@ uint16_t MyAnimation::set_fps(uint16_t fps_) {
     return fps;
 }
 
-uint16_t MyAnimation::get_fps() { return fps; }
+uint16_t MyAnimation::get_fps() {
+    return fps;
+}
 
 void MyAnimation::start_loop_n_times(uint16_t count) {
     // animation_run = false;
@@ -631,8 +649,8 @@ void MyAnimation::animation_init() {
         out.print(effect_duration);
         out.println(F("ms"));
 
-        matrix.setRGB(1, 0, 0);
-        matrix.tlc.write();
+        // matrix.setRGB(1, 0, 0);
+        // matrix.tlc.write();
 
         // out.println(F("  Set all Pixel to 21845."));
         // matrix.setRGB(21845, 21845, 21845);
@@ -651,11 +669,20 @@ void MyAnimation::animation_init() {
         fx_wave->brightness = 0.1;
         fx_wave->run(false);
 
+        out.print(F("  brightnessFader:"));
         brightnessFader.begin();
         brightnessFader.setDurationDefault(brightness_fade_duration);
-        out.print(F("  default brightness fade time: "));
+        out.print(F("      default fade time: "));
         out.print(brightness_fade_duration);
         out.println(F("ms"));
+        brightnessFader.setValueRange(brightness_min, brightness_max);
+        out.print(F("      fade value range: "));
+        out.print(brightness_min);
+        out.print(F(" .. "));
+        out.print(brightness_max);
+        out.println();
+        out.print(F("      set start value. "));
+        brightnessFader.fadeTo(0.0, 0);
     }
     out.println(F("  finished."));
 }
@@ -771,10 +798,8 @@ void MyAnimation::effect__pixel_checker() {
 
 void MyAnimation::effect__line() {
     matrix.setRGB(0, 0, 0);
-    uint16_t col_i_highlight =
-        map_range_01_to(effect_position, 0, MATRIX_COL_COUNT);
-    uint16_t row_i_highlight =
-        map_range_01_to(effect_position, 0, MATRIX_ROW_COUNT);
+    uint16_t col_i_highlight = map_range_01_to(effect_position, 0, MATRIX_COL_COUNT);
+    uint16_t row_i_highlight = map_range_01_to(effect_position, 0, MATRIX_ROW_COUNT);
     // for (size_t row_i = 0; row_i < MATRIX_ROW_COUNT; row_i++) {
     //     matrix.setRGB(matrix.pmap[col_i][row_i], 0, 0, 500);
     // }
@@ -795,7 +820,7 @@ void MyAnimation::effect__line() {
 //     __attribute__((unused)) float row,
 //     __attribute__((unused)) float offset
 // ) {
-CHSV MyAnimation::effect_Matrix2D_get_pixel(PixelPos *pixel_pos) {
+CHSV MyAnimation::effect_Matrix2D_get_pixel(PixelPos* pixel_pos) {
     CHSV pixel_hsv = CHSV(hue, saturation, 0.0001);
 
     // // base
@@ -846,8 +871,7 @@ void MyAnimation::effect_Matrix2D() {
     for (size_t layer_row_i = 0; layer_row_i < LAYER_ROW_COUNT; layer_row_i++) {
         pixel_pos->row_i = layer_row_i;
         pixel_pos->row = matrix.layer_01_row[layer_row_i];
-        for (size_t layer_col_i = 0; layer_col_i < LAYER_COL_COUNT;
-             layer_col_i++) {
+        for (size_t layer_col_i = 0; layer_col_i < LAYER_COL_COUNT; layer_col_i++) {
             pixel_pos->col_i = layer_col_i;
             pixel_pos->col = matrix.layer_01_col[layer_col_i];
 
@@ -865,11 +889,14 @@ void MyAnimation::effect_Matrix2D() {
             CRGB pixel_rgb = hsv2rgb(pixel_hsv);
             // gamma & global brightness
             // fancyled.gamma_adjust(brightness=self.brightness);
-            matrix.setRGB(matrix.pmap_layer[layer_col_i][layer_row_i],
-                          // matrix.pmap[matrix_col_i][matrix_row_i],
-                          // convert float to uint16_t
-                          pixel_rgb.r * 65535, pixel_rgb.g * 65535,
-                          pixel_rgb.b * 65535);
+            matrix.setRGB(
+                matrix.pmap_layer[layer_col_i][layer_row_i],
+                // matrix.pmap[matrix_col_i][matrix_row_i],
+                // convert float to uint16_t
+                pixel_rgb.r * 65535,
+                pixel_rgb.g * 65535,
+                pixel_rgb.b * 65535
+            );
         }
     }
     // delete pixel_pos;

@@ -98,6 +98,9 @@ void MyLEDMatrix::tlc_init(Stream &out) {
     out.println(F("    tlc.begin()"));
     tlc.begin();
 
+    // tlc.setBrightness(127, 127, 127);
+    tlc.simpleSetBrightness(10);
+
     // delay(100);
     // out.println(F("    tlc.beginFast()"));
     // #if defined(ITSYBITSY_M4)
@@ -165,7 +168,7 @@ void MyLEDMatrix::tlc_init(Stream &out) {
     out.println(F("    write"));
     tlc.write();
 
-    // tlc.setBrightness(127, 127, 127);
+    
     
     // tlc_test();
 

@@ -221,9 +221,9 @@ void setup() {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // go
-    serialOut.println(F("wait 0.1s."));
-    delay(100);
-    Serial.println(F("Loop:"));
+    // serialOut.println(F("wait 0.1s."));
+    // delay(100);
+    Serial.println(F("entering main loop...."));
 
 }
 
@@ -231,6 +231,7 @@ void setup() {
 // main loop
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void loop() {
+    powerhandling.update();
     animation.update();
     myinput.update();
     mymenu.update();

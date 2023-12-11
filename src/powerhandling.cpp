@@ -82,10 +82,16 @@ void PowerHandling::begin() {
         digitalWrite(psu_enable_pin, HIGH);
 
         print_wakeup_reason();
-        if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1) {
-            print_wakeup_gpio_num();
-        }
 
+        // you have to hold the power button for about 2sec to start system..
+        // if power button is not pushed go back to sleep..
+        pinMode(A0, INPUT_PULLUP);
+        if (digitalRead(A0) == HIGH) {
+            // and we are woken up from ext1
+            if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1) {
+                enter_sleep_mode();
+            }
+        }
         out.println("done.");
         ready = true;
     }
@@ -125,6 +131,10 @@ void PowerHandling::enter_sleep_mode() {
 
     out.println("shutdown main power. (PSU disable)");
     digitalWrite(psu_enable_pin, LOW);
+    pinMode(psu_enable_pin, INPUT_PULLDOWN);
+    // make sure the psu_enable_pin is low during deep sleep
+    rtc_gpio_pullup_dis(GPIO_NUM_15);
+    rtc_gpio_pulldown_en(GPIO_NUM_15);
 
     out.println("configure wake up pins..");
     // if we only need one gpio:
@@ -133,17 +143,18 @@ void PowerHandling::enter_sleep_mode() {
     // esp_sleep_enable_ext0_wakeup(GPIO_NUM_18, 0);
 
     // if we only need multiple gpio:
-    rtc_gpio_pullup_en(GPIO_NUM_16);
-    rtc_gpio_pulldown_dis(GPIO_NUM_16);
-    rtc_gpio_pullup_en(GPIO_NUM_17);
-    rtc_gpio_pulldown_dis(GPIO_NUM_17);
+    // rtc_gpio_pullup_en(GPIO_NUM_16);
+    // rtc_gpio_pulldown_dis(GPIO_NUM_16);
+    // rtc_gpio_pullup_en(GPIO_NUM_17);
+    // rtc_gpio_pulldown_dis(GPIO_NUM_17);
     rtc_gpio_pullup_en(GPIO_NUM_18);
     rtc_gpio_pulldown_dis(GPIO_NUM_18);
 
     // enable RTC for pullup to work.
     esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
 
-    uint64_t gpio_bitmask = std::pow(2, 16) + std::pow(2, 17) + std::pow(2, 18);
+    // uint64_t gpio_bitmask = std::pow(2, 16) + std::pow(2, 17) + std::pow(2, 18);
+    uint64_t gpio_bitmask = std::pow(2, 18);
     esp_sleep_enable_ext1_wakeup(gpio_bitmask, ESP_EXT1_WAKEUP_ANY_LOW);
 
     out.println("Entering in DEEP Sleep...");
@@ -157,7 +168,7 @@ void PowerHandling::enter_sleep_mode() {
     // esp_light_sleep_start();
 }
 
-void PowerHandling::print_wakeup_reason(Stream& out_) {
+void PowerHandling::print_wakeup_reason_cause(Stream& out_) {
     // https://randomnerdtutorials.com/esp32-deep-sleep-arduino-ide-wake-up-sources/
     esp_sleep_wakeup_cause_t wakeup_reason;
 
@@ -184,8 +195,8 @@ void PowerHandling::print_wakeup_reason(Stream& out_) {
             break;
     }
 }
-void PowerHandling::print_wakeup_reason() {
-    print_wakeup_reason(out);
+void PowerHandling::print_wakeup_reason_cause() {
+    print_wakeup_reason_cause(out);
 }
 
 uint8_t PowerHandling::get_wakeup_gpio_num() {
@@ -199,6 +210,13 @@ void PowerHandling::print_wakeup_gpio_num(Stream& out_) {
 }
 void PowerHandling::print_wakeup_gpio_num() {
     print_wakeup_gpio_num(out);
+}
+
+void PowerHandling::print_wakeup_reason() {
+    print_wakeup_reason_cause();
+    if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1) {
+        print_wakeup_gpio_num();
+    }
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

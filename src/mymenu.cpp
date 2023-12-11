@@ -439,6 +439,7 @@ void MyMenu::menu__print_help(Print& out) {
     out.println(F("\t '#': powerhandling: deep sleep '#'"));
     out.println(F("\t '$': reboot_to_uf2 '$'"));
     out.println(F("\t '<': print battery state '<'"));
+    out.println(F("\t '+': print wakeup reason '+'"));
     out.println();
     out.println(F("__________________________________________________"));
 }
@@ -640,6 +641,12 @@ void MyMenu::handleMenu_Main(slight_DebugMenu* instance) {
         } break;
         case '<': {
             powerhandling.print_battery_state();
+        } break;
+        case '>': {
+            powerhandling.print_wakeup_reason();
+        } break;
+        case '+': {
+            powerhandling.print_wakeup_reason();
         } break;
         //---------------------------------------------------------------------
         default: {

@@ -115,13 +115,15 @@ public:
 
     void enter_sleep_mode();
 
-    static void print_wakeup_reason(Stream& out_);
-    void print_wakeup_reason();
+    static void print_wakeup_reason_cause(Stream& out_);
+    void print_wakeup_reason_cause();
 
     static uint8_t get_wakeup_gpio_num();
     static void print_wakeup_gpio_num(Stream& out_);
     void print_wakeup_gpio_num();
 
+    void print_wakeup_reason();
+    
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // battery monitoring
     Adafruit_MAX17048 batteryMonitor;
