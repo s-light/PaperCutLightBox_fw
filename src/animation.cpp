@@ -666,13 +666,14 @@ void MyAnimation::brightnessFader_event(slight_Fade* instance) {
 }
 
 void MyAnimation::brightness_fade_to_black_blocking() {
-    out.println("fade to min..");
+    out.println("fade to black..");
     brightnessFader.setValueRange(0.0, brightness_max);
-    if (brightnessFader.getPosition() > 0.2) {
-        brightnessFader.fadeTo(0.0, 2000);
-    } else {
-        brightnessFader.fadeDown();
-    }
+    brightnessFader.fadeTo(0.0, 2000, brightnessFader.getValue());
+    // if (brightnessFader.getPosition() > 0.2) {
+    //     brightnessFader.fadeTo(0.0, 2000, brightnessFader.getValue());
+    // } else {
+    //     brightnessFader.fadeDown();
+    // }
     // wait till we are done fading down..
     while (brightnessFader.getState() == brightnessFader.state_FadingDown) {
         update();

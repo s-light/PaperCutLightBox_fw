@@ -52,6 +52,8 @@ SOFTWARE.
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // class base
 
+RTC_DATA_ATTR int wakeup_failed_count = 0;
+
 PowerHandling::PowerHandling(Stream& out_) : out(out_) {
     ready = false;
 }
@@ -76,21 +78,23 @@ void PowerHandling::begin() {
         pinMode(TFT_I2C_POWER, OUTPUT);
         out.println("    setup NEOPIXEL_POWER pin.");
         pinMode(NEOPIXEL_POWER, OUTPUT);
-        out.println("    setup psu_enable_pin pin.");
-        pinMode(psu_enable_pin, OUTPUT);
-        out.println("    psu enable.");
-        digitalWrite(psu_enable_pin, HIGH);
+
 
         print_wakeup_reason();
 
         // you have to hold the power button for about 2sec to start system..
         // if power button is not pushed go back to sleep..
+        // and we are woken up from ext1
         pinMode(A0, INPUT_PULLUP);
-        if (digitalRead(A0) == HIGH) {
-            // and we are woken up from ext1
-            if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1) {
-                enter_sleep_mode();
-            }
+        if ((digitalRead(A0) == HIGH)
+            and (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1)) {
+            ++wakeup_failed_count;
+             enter_sleep_mode();
+        } else {
+            out.println("    setup psu_enable_pin pin.");
+            pinMode(psu_enable_pin, OUTPUT);
+            out.println("    psu enable.");
+            digitalWrite(psu_enable_pin, HIGH);
         }
         out.println("done.");
         ready = true;
@@ -217,6 +221,8 @@ void PowerHandling::print_wakeup_reason() {
     if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1) {
         print_wakeup_gpio_num();
     }
+    out.print("    wakeup_failed_count: ");
+    out.println(wakeup_failed_count);
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
