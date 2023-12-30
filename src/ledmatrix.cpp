@@ -99,7 +99,11 @@ void MyLEDMatrix::tlc_init(Stream &out) {
     tlc.begin();
 
     // tlc.setBrightness(127, 127, 127);
-    tlc.simpleSetBrightness(1);
+    tlc.setBrightness(30, 20, 30);
+    // this does not work out...
+    // we have to adjust for unlinearity here..
+    // tlc.simpleSetBrightness(1);
+
 
     // delay(100);
     // out.println(F("    tlc.beginFast()"));

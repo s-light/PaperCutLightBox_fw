@@ -394,6 +394,13 @@ void MyMenu::menu__print_help(Print& out) {
     out.print(F("\t 'b': set brightness 'b1.0' ("));
     out.print(animation.brightness, 5);
     out.println(F(")"));
+    out.print(F("\t 'v': set tlc brightness 'v127,127,127' ("));
+    out.print(animation.get_tlc_brightness_r());
+    out.print(F(", "));
+    out.print(animation.get_tlc_brightness_g());
+    out.print(F(", "));
+    out.print(animation.get_tlc_brightness_b());
+    out.println(F(")"));
     out.print(F("\t 'B': fade brightness 'B1.0' ("));
     out.print(animation.brightness, 5);
     out.println(F(")"));
@@ -584,6 +591,10 @@ void MyMenu::handleMenu_Main(slight_DebugMenu* instance) {
         } break;
         case 'Z': {
             animation.menu__set_all_pixel(out, command);
+            animation.matrix.tlc.write();
+        } break;
+        case 'v': {
+            animation.menu__set_tlc_brightness(out, command);
             animation.matrix.tlc.write();
         } break;
         case 'q': {

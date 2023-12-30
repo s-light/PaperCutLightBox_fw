@@ -195,7 +195,7 @@ void PowerHandling::print_wakeup_reason_cause(Stream& out_) {
             out_.println("Wakeup caused by ULP program");
             break;
         default:
-            out_.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
+            out_.printf("Wakeup was not caused by deep sleep: %d", wakeup_reason);
             break;
     }
 }
@@ -218,6 +218,7 @@ void PowerHandling::print_wakeup_gpio_num() {
 
 void PowerHandling::print_wakeup_reason() {
     print_wakeup_reason_cause();
+    out.println();
     if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1) {
         print_wakeup_gpio_num();
     }

@@ -53,6 +53,7 @@ SOFTWARE.
 #include <slight_DebugMenu.h>
 #include <slight_Fade.h>
 #include <slight_ButtonInput.h>
+#include <cstdint>
 
 #include "./color.h"
 #include "./easing.h"
@@ -136,6 +137,7 @@ public:
     void end();
 
     // menu & helper
+    void menu__set_tlc_brightness(Print& out, char* command);
     void menu__set_fps(Print& out, char* command);
     void menu__start_loop_n_times(Print& out, char* command);
 
@@ -189,6 +191,10 @@ public:
     const float brightness_min = 0.001;
     const float brightness_max = 1.0;
     const uint16_t brightness_max_i = 25000;
+    void set_tlc_brightness(uint8_t bcr, uint8_t bcg, uint8_t bcb);
+    uint8_t get_tlc_brightness_r();
+    uint8_t get_tlc_brightness_g();
+    uint8_t get_tlc_brightness_b();
 
     uint16_t brightness_fade_duration = 10 * 1000;  // ms
 
@@ -262,6 +268,9 @@ private:
     void brightnessFader_valueChanged(slight_Fade* instance, float value);
     void brightnessFader_event(slight_Fade* instance);
 
+    uint8_t tlc_brightness[3] = {20, 15, 22};
+    uint8_t tlc_brightness_min[3] = {20, 15, 22};
+    uint8_t tlc_brightness_max[3] = {127, 127, 127};
 };  // class MyAnimation
 
 #endif  // MyAnimation_H_

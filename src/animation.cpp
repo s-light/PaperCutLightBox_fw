@@ -48,8 +48,10 @@ SOFTWARE.
 // include own headerfile
 // NOLINTNEXTLINE(build/include)
 #include "./animation.h"
+#include <cstdint>
 
 #include "./easing.h"
+#include "src/mapping.h"
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // functions
@@ -93,6 +95,39 @@ void MyAnimation::update() {
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // menu
+
+void MyAnimation::menu__set_tlc_brightness(Print& out, char* command) {
+    out.print(F("Set tlc brightness"));
+    uint8_t red = 0;
+    uint8_t green = 0;
+    uint8_t blue = 0;
+
+    // Z65535,65535,65535
+    // split string with help of tokenizer
+    // https://www.cplusplus.com/reference/cstring/strtok/#
+    char* command_pointer = &command[1];
+    // NOLINTNEXTLINE(runtime/threadsafe_fn)
+    command_pointer = strtok(command_pointer, " ,");
+    red = atoi(command_pointer);
+    // NOLINTNEXTLINE(runtime/threadsafe_fn)
+    command_pointer = strtok(NULL, " ,");
+    if (command_pointer == NULL) {
+        green = red;
+        blue = red;
+    } else {
+        green = atoi(command_pointer);
+        // NOLINTNEXTLINE(runtime/threadsafe_fn)
+        command_pointer = strtok(NULL, " ,");
+        blue = atoi(command_pointer);
+    }
+    set_tlc_brightness(red, green, blue);
+    out.printf(
+        " r:%5d, g:%5d, b:%5d\r\n",
+        get_tlc_brightness_r(),
+        get_tlc_brightness_g(),
+        get_tlc_brightness_b()
+    );
+}
 
 void MyAnimation::menu__set_fps(Print& out, char* command) {
     out.print(F("Set fps "));
@@ -603,6 +638,25 @@ void MyAnimation::start_loop_n_times(uint16_t count) {
     animation_run = true;
 }
 
+void MyAnimation::set_tlc_brightness(uint8_t bcr, uint8_t bcg, uint8_t bcb) {
+    tlc_brightness[0] = clamp(bcr, static_cast<uint8_t>(0), tlc_brightness_max[0]);
+    tlc_brightness[1] = clamp(bcg, static_cast<uint8_t>(0), tlc_brightness_max[1]);
+    tlc_brightness[2] = clamp(bcb, static_cast<uint8_t>(0), tlc_brightness_max[2]);
+    // tlc_brightness[0] = clamp(bcr, tlc_brightness_min[0], tlc_brightness_max[0]);
+    // tlc_brightness[1] = clamp(bcg, tlc_brightness_min[1], tlc_brightness_max[1]);
+    // tlc_brightness[2] = clamp(bcb, tlc_brightness_min[2], tlc_brightness_max[2]);
+    matrix.tlc.setBrightness(tlc_brightness[0], tlc_brightness[1], tlc_brightness[2]);
+}
+uint8_t MyAnimation::get_tlc_brightness_r() {
+    return tlc_brightness[0];
+}
+uint8_t MyAnimation::get_tlc_brightness_g() {
+    return tlc_brightness[1];
+}
+uint8_t MyAnimation::get_tlc_brightness_b() {
+    return tlc_brightness[2];
+}
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // brightness
 
@@ -629,6 +683,32 @@ void MyAnimation::brightnessFader_init() {
 
 float MyAnimation::set_brightness(float brightness_) {
     brightness = clamp(brightness_, brightness_min, brightness_max);
+    // for bottom half also fade tlc_brightness:
+    const float brightness_area_min = 0.0;
+    const float brightness_area_max = 0.5;
+    set_tlc_brightness(
+        map_range_clamped(
+            brightness_,
+            brightness_area_min,
+            brightness_area_max,
+            tlc_brightness_min[0],
+            tlc_brightness_max[0]
+        ),
+        map_range_clamped(
+            brightness_,
+            brightness_area_min,
+            brightness_area_max,
+            tlc_brightness_min[1],
+            tlc_brightness_max[1]
+        ),
+        map_range_clamped(
+            brightness_,
+            brightness_area_min,
+            brightness_area_max,
+            tlc_brightness_min[2],
+            tlc_brightness_max[2]
+        )
+    );
     return brightness;
 }
 
