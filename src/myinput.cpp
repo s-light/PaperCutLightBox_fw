@@ -362,13 +362,20 @@ void MyInput::mybutton_event(slight_ButtonInput* instance) {
     // (*instance).printEventLast(out);
     // out.println();
 
-    switch ((*instance).getEventLast()) {
+        switch ((*instance).getEventLast()) {
         case slight_ButtonInput::event_down: {
             // out.println(F("down"));
+
+            // powerhandling.stop_timeout();
+
             switch ((*instance).id) {
+                case UIButton::power: {
+                    powerhandling.stop_timeout();
+                } break;
                 case UIButton::up: {
                     out.println("fadeUp");
                     animation.brightnessFader.fadeUp();
+                    powerhandling.stop_timeout();
                 } break;
                 case UIButton::down: {
                     out.println("fadeDown");

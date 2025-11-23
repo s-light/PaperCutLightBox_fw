@@ -124,6 +124,8 @@ public:
 
     void print_wakeup_reason();
     
+    void stop_timeout();
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // battery monitoring
     Adafruit_MAX17048 batteryMonitor;
@@ -137,6 +139,13 @@ private:
     // internal attributes
     bool ready;
     Stream& out;
+
+    bool check_for_no_action_go_back_to_sleep;
+    uint32_t wakeup_timestamp;
+    // 2minutes
+    // uint32_t wakeup_sleep_again_duration = 2 * 60 * 1000;
+    uint32_t wakeup_sleep_again_duration = 10 * 1000;
+
 };  // class PowerHandling
 
 #endif  // PowerHandling_H_

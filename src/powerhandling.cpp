@@ -82,20 +82,39 @@ void PowerHandling::begin() {
 
         print_wakeup_reason();
 
+        // ------------------------------------------
+        // old behavior:
         // you have to hold the power button for about 2sec to start system..
         // if power button is not pushed go back to sleep..
         // and we are woken up from ext1
-        pinMode(A0, INPUT_PULLUP);
-        if ((digitalRead(A0) == HIGH)
-            and (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1)) {
-            ++wakeup_failed_count;
-             enter_sleep_mode();
+        // pinMode(A0, INPUT_PULLUP);
+        // if ((digitalRead(A0) == HIGH)
+        //     and (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1)) {
+        //     ++wakeup_failed_count;
+        //      enter_sleep_mode();
+        // } else {
+        //     out.println("    setup psu_enable_pin pin.");
+        //     pinMode(psu_enable_pin, OUTPUT);
+        //     out.println("    psu enable.");
+        //     digitalWrite(psu_enable_pin, HIGH);
+        // }
+
+        // ------------------------------------------
+        // new behavior
+        // set timer for no action-go-back-to-sleep
+        if ((esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1)) {
+            wakeup_timestamp = millis();
+            check_for_no_action_go_back_to_sleep = true;
+            delay(100);
         } else {
-            out.println("    setup psu_enable_pin pin.");
-            pinMode(psu_enable_pin, OUTPUT);
-            out.println("    psu enable.");
-            digitalWrite(psu_enable_pin, HIGH);
+            check_for_no_action_go_back_to_sleep = false;
         }
+
+        out.println("    setup psu_enable_pin pin.");
+        pinMode(psu_enable_pin, OUTPUT);
+        out.println("    psu enable.");
+        digitalWrite(psu_enable_pin, HIGH);
+
         out.println("done.");
         ready = true;
     }
@@ -109,12 +128,29 @@ void PowerHandling::end() {
 
 void PowerHandling::update() {
     if (ready) {
+        if (check_for_no_action_go_back_to_sleep) {
+            if ((millis() - wakeup_timestamp) > wakeup_sleep_again_duration) {
+                out.println(F("*go-back-to-sleep* timeout triggered!"));
+                ++wakeup_failed_count;
+                enter_sleep_mode();
+            }
+        }
     }
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // public functions
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+void PowerHandling::stop_timeout() {
+    if (check_for_no_action_go_back_to_sleep) {
+        out.print(F("Stop *go-back-to-sleep* timeout after "));
+        out.print(millis() - wakeup_timestamp);
+        out.println(" ms");
+        out.println();
+        check_for_no_action_go_back_to_sleep = false;
+    }
+}
 
 void PowerHandling::print_battery_state() {
     out.print(F("Batt Voltage: "));
@@ -149,20 +185,22 @@ void PowerHandling::enter_sleep_mode() {
     // if we only need multiple gpio:
     // rtc_gpio_pullup_en(GPIO_NUM_16);
     // rtc_gpio_pulldown_dis(GPIO_NUM_16);
-    // rtc_gpio_pullup_en(GPIO_NUM_17);
-    // rtc_gpio_pulldown_dis(GPIO_NUM_17);
+    rtc_gpio_pullup_en(GPIO_NUM_17);
+    rtc_gpio_pulldown_dis(GPIO_NUM_17);
     rtc_gpio_pullup_en(GPIO_NUM_18);
     rtc_gpio_pulldown_dis(GPIO_NUM_18);
 
     // enable RTC for pullup to work.
     esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
 
+    // uint64_t gpio_bitmask = std::pow(2, 18);
+    uint64_t gpio_bitmask = std::pow(2, 17) + std::pow(2, 18);
     // uint64_t gpio_bitmask = std::pow(2, 16) + std::pow(2, 17) + std::pow(2, 18);
-    uint64_t gpio_bitmask = std::pow(2, 18);
     esp_sleep_enable_ext1_wakeup(gpio_bitmask, ESP_EXT1_WAKEUP_ANY_LOW);
 
     out.println("Entering in DEEP Sleep...");
     out.flush();
+    delay(50);
     esp_deep_sleep_start();
     // this function never returns.
     // on wakeup the full sketch is restarted.
@@ -195,7 +233,7 @@ void PowerHandling::print_wakeup_reason_cause(Stream& out_) {
             out_.println("Wakeup caused by ULP program");
             break;
         default:
-            out_.printf("Wakeup was not caused by deep sleep: %d", wakeup_reason);
+            out_.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
             break;
     }
 }
@@ -217,9 +255,10 @@ void PowerHandling::print_wakeup_gpio_num() {
 }
 
 void PowerHandling::print_wakeup_reason() {
+    out.print("    ");
     print_wakeup_reason_cause();
-    out.println();
     if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1) {
+        out.print("    ");
         print_wakeup_gpio_num();
     }
     out.print("    wakeup_failed_count: ");
